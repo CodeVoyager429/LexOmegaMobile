@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lex Omega Dashboard</title>
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+  <header>
+    <h1>Welcome to Lex Omega</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="#">Legal Tools</a></li>
+        <li><a href="#">Case Tracker</a></li>
+        <li><a href="#">Logout</a></li>
+      </ul>
+    </nav>
+  </header>  <main>
+    <section class="profile-overview">
+      <h2>Your Profile</h2>
+      <p>Name: John Doe</p>
+      <p>Status: Active Client</p>
+    </section><section class="alerts">
+  <h2>Recent Alerts</h2>
+  <ul>
+    <li>Upcoming court date: August 14th</li>
+    <li>New document uploaded by legal team</li>
+  </ul>
+</section>
+
+<section class="quick-links">
+  <h2>Quick Links</h2>
+  <div class="link-grid">
+    <a href="#">Find Legal Help</a>
+    <a href="#">Upload Documents</a>
+    <a href="#">View Case Files</a>
+    <a href="#">Schedule Meeting</a>
+  </div>
+</section>
+
+<section class="daily-message">
+  <h2>Daily Legal Wisdom</h2>
+  <blockquote>
+    "Justice delayed is justice denied." – William E. Gladstone
+  </blockquote>
+</section>
+
+  </main>  <footer>
+    <p>&copy; 2025 Lex Omega. All rights reserved.</p>
+  </footer>  <script src="js/dashboard.js"></script></body>
+</html>
