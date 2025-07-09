@@ -1,1 +1,2 @@
-(https://codevoyager429.github.io/LexOmegaMobile/home.html)
+
+https://lex-omega-mobile.vercel.app
