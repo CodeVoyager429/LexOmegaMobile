@@ -1,0 +1,162 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LexOmega | Law Elevated</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Open+Sans&display=swap" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Playfair Display', serif;
+      background-image: url('https://images.unsplash.com/photo-1603570419883-c1f9f748cc99?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #f1f1f1;
+    }
+    .container {
+      background-color: rgba(0, 0, 0, 0.75);
+      padding: 3rem;
+      max-width: 900px;
+      margin: 5vh auto;
+      border: 2px solid gold;
+      border-radius: 20px;
+      box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+    }
+    h1, h2, h3 {
+      color: gold;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .tagline {
+      font-style: italic;
+      font-size: 1.2rem;
+      color: #ccc;
+    }
+    section {
+      margin-bottom: 2rem;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-bottom: 1rem;
+      font-family: 'Open Sans', sans-serif;
+    }
+    button {
+      padding: 0.8rem 1.5rem;
+      background: gold;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      color: black;
+      cursor: pointer;
+    }
+    .form-card {
+      background-color: #1a1a1a;
+      padding: 2rem;
+      border-radius: 10px;
+      border: 1px solid #444;
+      margin-bottom: 2rem;
+    }
+    .history ul {
+      list-style: none;
+      padding: 0;
+    }
+    .history li {
+      background: rgba(255, 215, 0, 0.1);
+      border-left: 4px solid gold;
+      margin: 0.5rem 0;
+      padding: 0.5rem 1rem;
+    }
+    .support-button {
+      display: block;
+      width: fit-content;
+      margin: 1rem auto;
+      padding: 0.8rem 1.5rem;
+      background: gold;
+      border: none;
+      border-radius: 6px;
+      color: black;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 2rem;
+      color: #ccc;
+    }
+    .verse {
+      font-style: italic;
+      margin-top: 1rem;
+      color: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="hero">
+        <h1>LexOmega</h1>
+        <p class="tagline">Where Divine Order Meets Artificial Intelligence</p>
+      </div>
+    </header><main>
+  <section class="intro">
+    <h2>Coming Soon</h2>
+    <p>LexOmega will redefine the law through AI, justice, and legacy. Stay informed. Ask questions. Prepare for a legal revolution.</p>
+    <a href="/support-bot.html" class="support-button">Talk to Support Bot</a>
+  </section>
+
+  <section class="forms">
+    <div class="form-card">
+      <h3>Get Launch Updates</h3>
+      <form id="email-form">
+        <input type="email" placeholder="Your email address" required />
+        <button type="submit">Notify Me</button>
+        <p class="response" id="email-response"></p>
+      </form>
+    </div>
+
+    <div class="form-card">
+      <h3>Ask LexOmega Anything</h3>
+      <form id="question-form">
+        <textarea rows="4" placeholder="Type your question..." required></textarea>
+        <button type="submit">Submit Question</button>
+        <p class="response" id="question-response"></p>
+      </form>
+    </div>
+  </section>
+
+  <section class="history">
+    <h2>The Pillars of Law</h2>
+    <ul>
+      <li>Moses & the Tablets of Command</li>
+      <li>The Magna Carta</li>
+      <li>The United States Constitution</li>
+      <li>The Law of the Lord (New Covenant)</li>
+      <li>LexOmega: The Future of Righteous Judgement</li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <p class="verse">“Justice and judgment are the habitation of thy throne...” – Psalm 89:14</p>
+  <p>&copy; 2025 LexOmega. All Rights Reserved.</p>
+</footer>
+
+  </div>  <script>
+    document.getElementById('email-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      document.getElementById('email-response').textContent = 'Thank you. You will be notified at launch.';
+    });
+    document.getElementById('question-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      document.getElementById('question-response').textContent = 'Thank you. Your question has been received.';
+    });
+  </script></body>
+</html>
