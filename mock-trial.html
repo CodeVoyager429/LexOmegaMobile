@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lex Omega - Mock Trial Submission</title>
+  <script defer>
+    async function submitMockTrialForm(event) {
+      event.preventDefault();const formData = new FormData(event.target);
+  const response = await fetch('/api/mock-trial', {
+    method: 'POST',
+    body: formData
+  });
+
+  const result = await response.json();
+  document.getElementById('confirmation').innerText =
+    result.success ? "✅ You’ve been added to the courtroom queue."
+                   : "❌ Something went wrong. Please try again.";
+}
+
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex items-center justify-center py-12 px-4">
+  <div class="w-full max-w-xl bg-white shadow-xl rounded-2xl p-8">
+    <h1 class="text-3xl font-bold text-center mb-6">Mock Trial Submission</h1>
+    <form onsubmit="submitMockTrialForm(event)" class="space-y-4">
+      <div>
+        <label class="block text-sm font-semibold mb-1">Full Name</label>
+        <input type="text" name="name" required class="w-full border rounded px-3 py-2" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Role</label>
+        <select name="role" required class="w-full border rounded px-3 py-2">
+          <option value="">-- Select Role --</option>
+          <option value="plaintiff">Plaintiff</option>
+          <option value="defendant">Defendant</option>
+          <option value="judge">Judge</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Trial Type</label>
+        <select name="trial_type" required class="w-full border rounded px-3 py-2">
+          <option value="">-- Select Trial Type --</option>
+          <option value="civil">Civil</option>
+          <option value="criminal">Criminal</option>
+          <option value="family">Family</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Evidence Upload</label>
+        <input type="file" name="evidence" accept=".pdf,.png,.jpg,.jpeg,.txt" class="w-full border rounded px-3 py-2" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Additional Notes</label>
+        <textarea name="notes" rows="3" class="w-full border rounded px-3 py-2"></textarea>
+      </div>
+      <div class="pt-4">
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl">Submit to Mock Trial Queue</button>
+      </div>
+    </form>
+    <p id="confirmation" class="mt-4 text-center text-green-600 font-bold"></p>
+  </div>
+</body>
+</html>
