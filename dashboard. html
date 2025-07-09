@@ -6,6 +6,15 @@
   <link rel="stylesheet" href="css/dashboard.css" />
 </head>
 <body>
+<!-- Navigation Bar -->
+<nav style="background-color: #2b2e4a; padding: 10px 0; text-align: center;">
+  <a href="index.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: bold;">Home</a>
+  <a href="lex-tools.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: bold;">Legal Tools</a>
+  <a href="case-tracking.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: bold;">Case Tracking</a>
+  <a href="faq.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: bold;">FAQ</a>
+  <a href="support.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: bold;">Support</a>
+  <a href="login.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: bold;">Login</a>
+</nav>
   <header>
     <h1>Welcome to Lex Omega</h1>
     <nav>
