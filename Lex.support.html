@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lex Omega Support</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #f3f4f6, #e5e7eb);
+      color: #111827;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #1f2937;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      margin: 0;
+    }
+    nav a {
+      color: white;
+      margin-left: 1.5rem;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    main {
+      padding: 3rem 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    button {
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      margin: 1rem 0;
+    }
+    button:hover {
+      background-color: #1e40af;
+    }
+    section {
+      margin-top: 2rem;
+    }
+    a {
+      color: #1e3a8a;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Lex Omega Support</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="faq.html">FAQ</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Speak to Lex Omega's AI Support Bot</h2>
+    <p>Click the button below to start asking questions. Lex Omega's AI will listen and help you instantly.</p>
+
+    <button onclick="startBot()">🎤 Launch Support Bot</button>
+
+    <section>
+      <h3>Still Need Help?</h3>
+      <p>If the AI cannot assist, feel free to reach out directly at:
+        <a href="mailto:EchoVerse9@gmail.com">EchoVerse9@gmail.com</a>
+      </p>
+    </section>
+  </main>
+
+  <script>
+    function startBot() {
+      const msg = new SpeechSynthesisUtterance("Hello, I'm Lex Omega's support bot. How can I assist you?");
+      window.speechSynthesis.speak(msg);
+    }
+  </script>
+</body>
+</html>
