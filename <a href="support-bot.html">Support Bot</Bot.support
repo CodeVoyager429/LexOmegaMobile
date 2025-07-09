@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LexOmega | Support Bot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Open+Sans&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Open Sans', sans-serif;
+      background: linear-gradient(to right, #1a1a1a, #111);
+      color: #f1f1f1;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: gold;
+    }
+    .chat-box {
+      background: #222;
+      border-radius: 10px;
+      padding: 1rem;
+      height: 400px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    }
+    .chat-message {
+      margin: 0.5rem 0;
+    }
+    .bot {
+      color: gold;
+    }
+    .user {
+      text-align: right;
+      color: #0ff;
+    }
+    .input-area {
+      display: flex;
+      gap: 0.5rem;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 0.7rem;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      padding: 0.7rem 1.2rem;
+      background: gold;
+      color: black;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .quick-links {
+      margin-top: 2rem;
+    }
+    .quick-links a {
+      display: inline-block;
+      margin: 0.5rem;
+      color: #ccc;
+      background: #333;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+    .quick-links a:hover {
+      background: gold;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>LexOmega Support Bot</h1>
+      <p>Get help anytime, anywhere.</p>
+    </header>
+
+    <div class="chat-box" id="chat-box">
+      <div class="chat-message bot">👋 Hi there! I’m LexOmega’s Support Bot. How can I assist you today?</div>
+    </div>
+
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <div class="quick-links">
+      <a href="#">FAQs</a>
+      <a href="#">Submit Ticket</a>
+      <a href="#">Live Support</a>
+      <a href="index.html">Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    function sendMessage() {
+      const input = document.getElementById('user-input');
+      const chatBox = document.getElementById('chat-box');
+      const userMessage = input.value.trim();
+      if (!userMessage) return;
+
+      const userDiv = document.createElement('div');
+      userDiv.className = 'chat-message user';
+      userDiv.textContent = userMessage;
+      chatBox.appendChild(userDiv);
+
+      const botDiv = document.createElement('div');
+      botDiv.className = 'chat-message bot';
+      botDiv.textContent = "🤖 I'm working on a response...";
+      chatBox.appendChild(botDiv);
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+      input.value = '';
+    }
+  </script>
+</body>
+</html>
