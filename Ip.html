@@ -18,22 +18,45 @@
       justify-content: center;
       height: 100vh;
       text-align: center;
+      padding: 20px;
     }
+
     h1 {
       font-size: 3rem;
       margin-bottom: 0.5rem;
     }
+
     p {
       font-size: 1.2rem;
       max-width: 600px;
     }
+
     .glow {
-      text-shadow: 0 0 10px #00fff7, 0 0 20px #00a9f7;
+      text-shadow: 0 0 10px #0ffff7, 0 0 20px #0a9f7f;
+    }
+
+    .button {
+      margin-top: 1.5rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1.1rem;
+      color: #ffffff;
+      background-color: #00a9f7;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      box-shadow: 0 0 10px #00a9f7;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .button:hover {
+      background-color: #007bbf;
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
   <h1 class="glow">Welcome to LexOmega</h1>
   <p>Empowering innovators. Protecting visionaries. This is where legacy begins.</p>
+  <a href="index.html" class="button">Go to Homepage</a>
 </body>
 </html>
