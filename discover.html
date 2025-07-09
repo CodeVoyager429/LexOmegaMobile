@@ -1,0 +1,98 @@
+<!-- discover.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LexOmega | Discovery AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      background: linear-gradient(to bottom right, #101820, #1a1f2b);
+      color: #fff;
+      padding: 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+    }
+
+    #chatbox {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: #ffffff10;
+      border-radius: 12px;
+      padding: 1rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 1rem;
+      margin-top: 1rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+
+    button {
+      margin-top: 1rem;
+      padding: 0.8rem 2rem;
+      background: #ffca28;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #response {
+      margin-top: 1.5rem;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🧠 LexOmega Discovery AI</h1>
+    <p>Not sure what you need? Tell us anything. We'll guide you.</p>
+  </header>
+
+  <div id="chatbox">
+    <input type="text" id="userInput" placeholder="Type your thoughts, questions, or problems..." />
+    <button onclick="analyze()">Discover</button>
+    <div id="response"></div>
+  </div>
+
+  <script>
+    function analyze() {
+      const input = document.getElementById("userInput").value.toLowerCase();
+      const response = document.getElementById("response");
+
+      let suggestions = "";
+
+      if (input.includes("idea") || input.includes("protect") || input.includes("patent")) {
+        suggestions = "Sounds like you might want to protect an idea. Visit our <a href='ip.html'>IP Portal</a>.";
+      } else if (input.includes("lawyer") || input.includes("attorney")) {
+        suggestions = "You can browse legal experts in the <a href='Create-attorney-directory.html'>Attorney Directory</a>.";
+      } else if (input.includes("help") || input.includes("faq")) {
+        suggestions = "Try our <a href='faq.html'>FAQ section</a> or connect with our AI support system.";
+      } else if (input.includes("dashboard") || input.includes("progress")) {
+        suggestions = "You can monitor everything through the <a href='dashboard.html'>Dashboard</a>.";
+      } else {
+        suggestions = "We’re analyzing your request. Please hold while we refine your route...";
+      }
+
+      response.innerHTML = suggestions;
+    }
+  </script>
+
+</body>
+</html>
