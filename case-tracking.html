@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lex Omega | Case Tracking</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #2b2e4a;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .case {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      padding: 20px;
+    }
+
+    .case h2 {
+      margin: 0 0 10px;
+      font-size: 1.4rem;
+      color: #2b2e4a;
+    }
+
+    .status {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .progress-bar {
+      background: #eee;
+      border-radius: 6px;
+      overflow: hidden;
+      height: 10px;
+      margin: 10px 0;
+    }
+
+    .progress {
+      background-color: #04b4d4;
+      height: 100%;
+      width: 0%;
+      transition: width 0.6s ease;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 16px;
+      background-color: #04b4d4;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .btn:hover {
+      background-color: #029ec1;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Case Tracking</h1>
+  </header>
+
+  <div class="container">
+
+    <div class="case">
+      <h2>Case #001 - John Doe vs. State of Florida</h2>
+      <div class="status">Status: In Progress</div>
+      <div class="progress-bar"><div class="progress" style="width: 65%;"></div></div>
+      <a href="#" class="btn">View Details</a>
+    </div>
+
+    <div class="case">
+      <h2>Case #002 - Estate Planning - Jane Smith</h2>
+      <div class="status">Status: Completed</div>
+      <div class="progress-bar"><div class="progress" style="width: 100%; background-color: #00c851;"></div></div>
+      <a href="#" class="btn">Download Summary</a>
+    </div>
+
+    <div class="case">
+      <h2>Case #003 - Business Contract Negotiation</h2>
+      <div class="status">Status: Awaiting Client Action</div>
+      <div class="progress-bar"><div class="progress" style="width: 40%; background-color: #ffbb33;"></div></div>
+      <a href="#" class="btn">Upload Documents</a>
+    </div>
+
+  </div>
+</body>
+</html>
