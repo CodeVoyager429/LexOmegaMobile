@@ -1,0 +1,95 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lex Omega Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <header>
+    <nav>
+      <ul class="nav">
+        <li><button onclick="toggleSection('home')">Home</button></li>
+        <li><button onclick="toggleSection('dashboard')">Dashboard</button></li>
+        <li><button onclick="toggleSection('legalTools')">Legal Tools</button></li>
+        <li><button onclick="toggleSection('lexfaq')">LexFAQ</button></li>
+        <li><button onclick="toggleSection('support')">Support</button></li>
+        <li><button onclick="toggleSection('contact')">Contact</button></li>
+        <li><button onclick="toggleSection('login')">Login</button></li>
+      </ul>
+    </nav>
+  </header>  <main>
+    <section id="home" class="content-section hidden">
+      <h2>Welcome to Lex Omega</h2>
+      <p>This is your AI-powered legal assistant for every U.S. state and county.</p>
+    </section><section id="dashboard" class="content-section hidden">
+  <h2>Dashboard</h2>
+  <p>Track updates, view alerts, and access tools.</p>
+  <details>
+    <summary>Daily Legal Fact</summary>
+    <p>You have the right to remain silent. Use it wisely.</p>
+  </details>
+  <details>
+    <summary>Case Updates</summary>
+    <p>No new updates at this time.</p>
+  </details>
+</section>
+
+<section id="legalTools" class="content-section hidden">
+  <h2>Legal Tools</h2>
+  <ul>
+    <li>Document Generator</li>
+    <li>Legal Definitions</li>
+    <li>Statute Lookup</li>
+  </ul>
+</section>
+
+<section id="lexfaq" class="content-section hidden">
+  <h2>LexFAQ</h2>
+  <details>
+    <summary>Do I really need a lawyer?</summary>
+    <p>Lex Omega provides tools to determine if legal counsel is needed and when.</p>
+  </details>
+  <details>
+    <summary>Is Lex Omega available in my state?</summary>
+    <p>Yes. We cover all 50 states and every U.S. county.</p>
+  </details>
+</section>
+
+<section id="support" class="content-section hidden">
+  <h2>Support</h2>
+  <p>Need help? Reach out anytime at <a href="mailto:echoverse9@gmail.com">echoverse9@gmail.com</a>.</p>
+  <p>Or ask our AI voice assistant below.</p>
+  <button onclick="startVoiceSupport()">🎤 Speak to Support Bot</button>
+</section>
+
+<section id="contact" class="content-section hidden">
+  <h2>Contact Us</h2>
+  <form>
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required />
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required />
+    <label for="message">Message:</label>
+    <textarea id="message" name="message" rows="4"></textarea>
+    <button type="submit">Send</button>
+  </form>
+</section>
+
+<section id="login" class="content-section hidden">
+  <h2>Login</h2>
+  <form>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required />
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required />
+    <button type="submit">Login</button>
+  </form>
+</section>
+
+  </main>  <footer>
+    <p>&copy; 2025 Lex Omega. All rights reserved.</p>
+  </footer>
+</body>
+</html>
