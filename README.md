@@ -1,2 +1,1 @@
-
-https://lex-omega-mobile.vercel.app
+echoversellcio.com
