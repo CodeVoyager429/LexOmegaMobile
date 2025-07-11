@@ -3,55 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lex Omega | Command Center</title>
-
-  <!-- YOUR EXISTING INLINE STYLES -->
+  <title>Lex Omega Command Center</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #0f0f1a;
-      color: #fff;
-      text-align: center;
+      background-color: #0e0e1a;
+      color: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
     }
-    /* …other inline styles you already had… */
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 400px;
+    }
+    .nav-links a {
+      text-decoration: none;
+      background-color: #1e1e2f;
+      color: #00d0ff;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      text-align: center;
+      transition: background-color 0.3s ease;
+    }
+    .nav-links a:hover {
+      background-color: #2e2e4d;
+    }
   </style>
-
-  <!-- GLOBAL STYLES & CHATBOT -->
-  <link rel="stylesheet" href="assets/styles.css">
-  <script src="assets/chatbot.js" defer></script>
 </head>
 <body>
-  <!-- HEADER PLACEHOLDER -->
-  <div id="header"></div>
-
-  <!-- COMMAND CENTER GRID -->
-  <main class="grid">
-    <div class="card"><a href="lex-dashboard.html">Lex Dashboard</a></div>
-    <div class="card"><a href="new-dashboard.html">New Dashboard</a></div>
-    <div class="card"><a href="12-aia-dashboard.html">12-AIA Dashboard</a></div>
-    <div class="card"><a href="mock-trial.html">Mock Trial</a></div>
-    <div class="card"><a href="lexflow.html">LexFlow Grid</a></div>
-    <div class="card"><a href="case-tracking.html">Case Tracking</a></div>
-    <div class="card"><a href="smart-search.html">Smart Search</a></div>
-    <div class="card"><a href="legal-tools.html">Legal Tools</a></div>
-    <div class="card"><a href="support.html">Support</a></div>
-    <div class="card"><a href="faq.html">FAQ</a></div>
-    <div class="card"><a href="discover.html">Discover</a></div>
-    <div class="card"><a href="index.html">Landing Page</a></div>
-  </main>
-
-  <!-- FOOTER PLACEHOLDER & LOADER SCRIPT -->
-  <div id="footer"></div>
-  <script>
-    async function loadComponent(id, path) {
-      const res  = await fetch(path);
-      const html = await res.text();
-      document.getElementById(id).innerHTML = html;
-    }
-    loadComponent("header", "components/header.html");
-    loadComponent("footer", "components/footer.html");
-  </script>
+  <h1>Welcome to Lex Omega</h1>
+  <p>Your Command Center is live. Select a page to begin:</p>
+  
+  <div class="nav-links">
+    <a href="dashboard.html">Lex Dashboard</a>
+    <a href="new-dashboard.html">New Dashboard</a>
+    <a href="12-aia-dashboard.html">12-AIA Dashboard</a>
+    <a href="mock-trial.html">Mock Trial</a>
+    <a href="lexflow-grid.html">LexFlow Grid</a>
+    <a href="case-tracking.html">Case Tracking</a>
+    <a href="smart-search.html">Smart Search</a>
+    <a href="legal-tools.html">Legal Tools</a>
+    <a href="support.html">Support</a>
+    <a href="faq.html">FAQ</a>
+    <a href="discover.html">Discover</a>
+    <a href="landing-page.html">Landing Page</a>
+  </div>
 </body>
 </html>
