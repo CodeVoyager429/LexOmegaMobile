@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lex Omega | Justice, Redefined</title>
+  <title>Lex Omega | Command Center</title>
 
-  <!-- Your existing inline styles -->
+  <!-- YOUR EXISTING INLINE STYLES -->
   <style>
     body {
       margin: 0;
@@ -18,23 +18,31 @@
     /* …other inline styles you already had… */
   </style>
 
-  <!-- ─── LINK GLOBAL STYLES & CHATBOT SCRIPT ─── -->
+  <!-- GLOBAL STYLES & CHATBOT -->
   <link rel="stylesheet" href="assets/styles.css">
   <script src="assets/chatbot.js" defer></script>
 </head>
-
 <body>
-  <!-- ─── HEADER PLACEHOLDER ─── -->
+  <!-- HEADER PLACEHOLDER -->
   <div id="header"></div>
 
-  <!-- ─── YOUR PAGE CONTENT ─── -->
-  <main>
-    <h1>Welcome to Lex Omega</h1>
-    <p>Your Command Center is live.<br>Click a card to begin.</p>
-    <!-- …rest of your homepage content… -->
+  <!-- COMMAND CENTER GRID -->
+  <main class="grid">
+    <div class="card"><a href="lex-dashboard.html">Lex Dashboard</a></div>
+    <div class="card"><a href="new-dashboard.html">New Dashboard</a></div>
+    <div class="card"><a href="12-aia-dashboard.html">12-AIA Dashboard</a></div>
+    <div class="card"><a href="mock-trial.html">Mock Trial</a></div>
+    <div class="card"><a href="lexflow.html">LexFlow Grid</a></div>
+    <div class="card"><a href="case-tracking.html">Case Tracking</a></div>
+    <div class="card"><a href="smart-search.html">Smart Search</a></div>
+    <div class="card"><a href="legal-tools.html">Legal Tools</a></div>
+    <div class="card"><a href="support.html">Support</a></div>
+    <div class="card"><a href="faq.html">FAQ</a></div>
+    <div class="card"><a href="discover.html">Discover</a></div>
+    <div class="card"><a href="index.html">Landing Page</a></div>
   </main>
 
-  <!-- ─── FOOTER PLACEHOLDER & COMPONENT LOADER ─── -->
+  <!-- FOOTER PLACEHOLDER & LOADER SCRIPT -->
   <div id="footer"></div>
   <script>
     async function loadComponent(id, path) {
