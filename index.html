@@ -5,70 +5,58 @@
   <title>LexOmega</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
   <style>
-    * {
-      box-sizing: border-box;
-    }
     body {
       font-family: 'Roboto', sans-serif;
-      background: linear-gradient(145deg, #101010, #2c2c2c);
+      background: linear-gradient(145deg, #1b1b1b, #2d2d2d);
       color: #f5f5f5;
       margin: 0;
       padding: 0;
+      text-align: center;
     }
     header {
-      background-color: #000;
-      padding: 2rem;
-      font-size: 2.5rem;
-      font-weight: 900;
-      color: #ffd700;
-      text-align: center;
-      border-bottom: 3px solid #ffd700;
-      text-shadow: 2px 2px #000;
+      background-color: #111;
+      padding: 1.5rem;
+      font-size: 2rem;
+      font-weight: bold;
+      border-bottom: 2px solid gold;
+      color: gold;
     }
     .button-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
       padding: 3rem;
-      max-width: 1000px;
-      margin: auto;
     }
     button {
-      background: linear-gradient(to right, #ffd700, #fff176);
+      background: gold;
       border: none;
-      color: #000;
+      color: black;
       padding: 1rem 2rem;
       font-size: 1.2rem;
-      font-weight: bold;
-      border-radius: 15px;
+      border-radius: 12px;
       cursor: pointer;
       transition: all 0.3s ease-in-out;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      min-width: 250px;
     }
     button:hover {
-      background-color: #ffffff;
-      color: #000;
-      transform: translateY(-3px);
+      background-color: white;
+      transform: scale(1.05);
     }
     .section {
       padding: 2rem;
-      margin: 2rem auto;
+      margin-top: 2rem;
       background-color: #1e1e1e;
       border-radius: 15px;
-      max-width: 900px;
       display: none;
-      box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
     }
     input, select {
       padding: 0.7rem;
-      width: 90%;
+      width: 80%;
       margin: 1rem auto;
       border-radius: 8px;
-      border: 1px solid #888;
+      border: none;
       font-size: 1rem;
-      display: block;
-      background-color: #333;
-      color: #fff;
     }
     .output-box {
       margin-top: 1rem;
@@ -79,80 +67,28 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: linear-gradient(to right, #ffd700, #fff176);
+      background: gold;
       color: black;
-      padding: 0.8rem 1.4rem;
+      padding: 0.7rem 1.2rem;
       border-radius: 30px;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
   </style>
 </head>
 <body><header>LexOmega — First AI Law Firm</header><div class="button-grid">
-  <button onclick="toggleSection('mockTrial')">🧑‍⚖️ Mock Trial</button>
-  <button onclick="toggleSection('legalDictionary')">📘 Legal Dictionary</button>
-  <button onclick="toggleSection('smartSearch')">🔍 Smart Search</button>
-  <button onclick="toggleSection('liveChat')">💬 Live Chat Support</button>
-  <button onclick="toggleSection('docGen')">📄 Document Generator</button>
-  <button onclick="toggleSection('subscription')">💼 Subscription</button>
-</div><!-- Sections --><div class="section" id="mockTrial">
-  <h2>Mock Trial Interface</h2>
-  <p>Simulate your case in a realistic trial setting.<br/>(Live module launching soon)</p>
-</div><div class="section" id="legalDictionary">
-  <h2>Legal Dictionary</h2>
-  <input type="text" placeholder="Enter legal term (e.g., Tort, Plaintiff)" />
-  <div class="output-box">Definition will appear here. (Coming soon)</div>
-</div><div class="section" id="smartSearch">
-  <h2>Smart Legal Search</h2>
-  <input type="text" placeholder="Ask your legal question..." />
-  <div class="output-box">AI legal insights ready. (GPT integration active)</div>
-</div><div class="section" id="liveChat">
-  <h2>Live Chat Support</h2>
-  <p>Talk to your LexAI Assistant, available 24/7.</p>
-  <input type="text" placeholder="Type your legal question or request..." />
-</div><div class="section" id="docGen">
-  <h2>Generate Legal Documents</h2>
-  <select>
-    <option>Select Document Category</option>
-    <option>Civil</option>
-    <option>Criminal</option>
-    <option>Business</option>
-    <option>Family</option>
-    <option>Intellectual Property</option>
-    <option>Real Estate</option>
-  </select>
-  <div class="output-box">Details will be shown here based on document type.</div>
-</div><div class="section" id="subscription">
-  <h2>Subscription Plans</h2>
-  <select id="plan">
-    <option value="free">Free - Basic Access</option>
-    <option value="pro">Pro - $19.99/mo (Tools + Document Saves)</option>
-    <option value="executive">Executive - $99.99/mo (All Features Unlocked)</option>
-  </select>
-  <input type="email" id="email" placeholder="Enter your email" />
-  <button onclick="activateSubscription()">Subscribe Now</button>
-  <div class="output-box" id="subOutput">Status: Awaiting input...</div>
-</div><div class="floating-support" onclick="toggleSection('liveChat')">
+  <button onclick="navigateTo('mockTrial.html')">Mock Trial</button>
+  <button onclick="navigateTo('legalDictionary.html')">Legal Dictionary</button>
+  <button onclick="navigateTo('smartSearch.html')">Smart Search</button>
+  <button onclick="navigateTo('liveChat.html')">Live Chat Support</button>
+  <button onclick="navigateTo('docGen.html')">Document Generator</button>
+  <button onclick="navigateTo('subscription.html')">Subscription</button>
+</div><!-- Floating Support Button --><div class="floating-support" onclick="navigateTo('liveChat.html')">
   💬 Need Help?
 </div><script>
-  function toggleSection(id) {
-    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
-  }
-
-  function activateSubscription() {
-    const email = document.getElementById('email').value;
-    const plan = document.getElementById('plan').value;
-    const output = document.getElementById('subOutput');
-
-    if (!email) {
-      output.textContent = "Please enter your email to continue.";
-      return;
-    }
-
-    output.textContent = `Processing your ${plan.toUpperCase()} subscription for ${email}... (Simulated)`;
-    // TODO: Connect to backend payment API
+  function navigateTo(page) {
+    window.location.href = page;
   }
 </script></body>
 </html>
