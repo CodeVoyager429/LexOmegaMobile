@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LexOmega v1.0.2+</title>
+  <title>LexOmega</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
   <style>
     body {
@@ -64,88 +63,43 @@
       font-style: italic;
       color: #aaa;
     }
-    .subnote {
-      font-size: 0.85rem;
-      color: #999;
-      margin-top: 1rem;
-    }
   </style>
 </head>
-<body>
-
-<header>LexOmega Hub v1.0.2+Subscription</header>
-
-<div class="button-grid">
+<body><header>LexOmega AI Law Firm</header><div class="button-grid">
   <button onclick="toggleSection('mockTrial')">Mock Trial</button>
   <button onclick="toggleSection('legalDictionary')">Legal Dictionary</button>
   <button onclick="toggleSection('smartSearch')">Smart Search</button>
   <button onclick="toggleSection('liveChat')">Live Chat Support</button>
   <button onclick="toggleSection('docGen')">Document Generator</button>
-  <button onclick="toggleSection('subscription')">Subscription Plans</button>
-</div>
-
-<!-- Mock Trial UI -->
-<div class="section" id="mockTrial">
+</div><!-- Mock Trial UI --><div class="section" id="mockTrial">
   <h2>Mock Trial Interface</h2>
-  <p>Simulate courtroom experience with future AI interactivity.</p>
-  <div class="subnote">Routing to full courtroom experience in v1.1</div>
-</div>
-
-<!-- Legal Dictionary -->
-<div class="section" id="legalDictionary">
+  <p>Simulate a courtroom experience. (Live simulation module coming soon)</p>
+</div><!-- Legal Dictionary --><div class="section" id="legalDictionary">
   <h2>Legal Dictionary</h2>
-  <input type="text" placeholder="Enter legal term..." />
-  <div class="output-box">Definition loads here. (Future: GPT API integration)</div>
-</div>
-
-<!-- Smart Legal Search -->
-<div class="section" id="smartSearch">
+  <input type="text" placeholder="Enter legal term (e.g., Tort, Plaintiff)" />
+  <div class="output-box">Definition will appear here. (Coming soon)</div>
+</div><!-- Smart Search --><div class="section" id="smartSearch">
   <h2>Smart Legal Search</h2>
   <input type="text" placeholder="Ask your legal question..." />
-  <div class="output-box">AI output shown here. (Placeholder for backend)</div>
-</div>
-
-<!-- Live Chat -->
-<div class="section" id="liveChat">
+  <div class="output-box">AI interpretation output coming here. (GPT API ready)</div>
+</div><!-- Live Chat --><div class="section" id="liveChat">
   <h2>Live Chat Support</h2>
-  <input type="text" placeholder="Ask LexAI anything..." />
-  <p class="subnote">ChatGPT-powered assistant in upcoming release</p>
-</div>
-
-<!-- Document Generator -->
-<div class="section" id="docGen">
+  <p>Talk to LexAI Assistant (Powered by GPT API — coming soon)</p>
+  <input type="text" placeholder="Ask me anything..." />
+</div><!-- Document Generator --><div class="section" id="docGen">
   <h2>Generate Legal Documents</h2>
   <select>
     <option>Select Document Type</option>
     <option>Lease Agreement</option>
-    <option>Cease and Desist</option>
-    <option>Business Contract</option>
+    <option>Cease and Desist Letter</option>
     <option>Complaint Form</option>
+    <option>Business Contract</option>
   </select>
-  <div class="output-box">Document preview & export (coming soon)</div>
-</div>
-
-<!-- Subscription Plans -->
-<div class="section" id="subscription">
-  <h2>LexOmega Subscription Options</h2>
-  <select>
-    <option>Choose Plan</option>
-    <option>Free – Limited Access</option>
-    <option>Pro – Extended Tools</option>
-    <option>Executive – All Legal Tools</option>
-    <option>Enterprise – Unlimited + AI Assistant</option>
-  </select>
-  <div class="subnote">Future: Stripe/PayPal integration for payments</div>
-</div>
-
-<script>
+  <div class="output-box">Your generated document will preview here. (Export feature next)</div>
+</div><script>
   function toggleSection(id) {
-    document.querySelectorAll('.section').forEach(section => {
-      section.style.display = 'none';
-    });
+    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
     document.getElementById(id).style.display = 'block';
   }
-</script>
-
-</body>
+</script></body>
 </html>
