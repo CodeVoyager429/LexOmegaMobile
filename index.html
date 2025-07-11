@@ -63,14 +63,27 @@
       font-style: italic;
       color: #aaa;
     }
+    .floating-support {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: gold;
+      color: black;
+      padding: 0.7rem 1.2rem;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
-<body><header>LexOmega AI Law Firm</header><div class="button-grid">
+<body><header>LexOmega — First AI Law Firm</header><div class="button-grid">
   <button onclick="toggleSection('mockTrial')">Mock Trial</button>
   <button onclick="toggleSection('legalDictionary')">Legal Dictionary</button>
   <button onclick="toggleSection('smartSearch')">Smart Search</button>
   <button onclick="toggleSection('liveChat')">Live Chat Support</button>
   <button onclick="toggleSection('docGen')">Document Generator</button>
+  <button onclick="toggleSection('subscription')">Subscription</button>
 </div><!-- Mock Trial UI --><div class="section" id="mockTrial">
   <h2>Mock Trial Interface</h2>
   <p>Simulate a courtroom experience. (Live simulation module coming soon)</p>
@@ -96,10 +109,37 @@
     <option>Business Contract</option>
   </select>
   <div class="output-box">Your generated document will preview here. (Export feature next)</div>
+</div><!-- Subscription Management --><div class="section" id="subscription">
+  <h2>Subscription Plans</h2>
+  <select id="plan">
+    <option value="free">Free - Basic Access</option>
+    <option value="pro">Pro - $9.99/mo (Extra tools, document saves)</option>
+    <option value="executive">Executive - $29.99/mo (Full backend + AI Chat)</option>
+  </select>
+  <input type="email" id="email" placeholder="Enter your email" />
+  <button onclick="activateSubscription()">Subscribe Now</button>
+  <div class="output-box" id="subOutput">Status: Awaiting input...</div>
+</div><!-- Floating Support Button --><div class="floating-support" onclick="toggleSection('liveChat')">
+  💬 Need Help?
 </div><script>
   function toggleSection(id) {
     document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
     document.getElementById(id).style.display = 'block';
+  }
+
+  function activateSubscription() {
+    const email = document.getElementById('email').value;
+    const plan = document.getElementById('plan').value;
+    const output = document.getElementById('subOutput');
+
+    if (!email) {
+      output.textContent = "Please enter your email to continue.";
+      return;
+    }
+
+    output.textContent = `Processing your ${plan.toUpperCase()} subscription for ${email}... (Simulated)`;
+
+    // Future: integrate backend API route and token generation here
   }
 </script></body>
 </html>
