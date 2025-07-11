@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LexOmega | Justice, Redefined</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lex Omega | Justice, Redefined</title>
+
+  <!-- Your existing inline styles -->
   <style>
     body {
       margin: 0;
@@ -13,99 +15,35 @@
       color: #fff;
       text-align: center;
     }
-
-    header {
-      background: #141428;
-      padding: 1.5rem 1rem;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-    }
-
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1.2rem;
-      font-size: 1.1rem;
-    }
-
-    nav a {
-      color: #ccc;
-      text-decoration: none;
-      transition: 0.3s;
-    }
-
-    nav a:hover {
-      color: #66bfff;
-    }
-
-    main {
-      margin-top: 3rem;
-      padding: 1rem;
-    }
-
-    h1 {
-      font-size: 2.8rem;
-      margin-bottom: 1rem;
-      color: #fff;
-    }
-
-    p {
-      font-size: 1.2rem;
-      max-width: 600px;
-      margin: 0 auto 2rem auto;
-      color: #d0d0e0;
-    }
-
-    footer {
-      margin-top: 3rem;
-      font-size: 0.9rem;
-      color: #999;
-    }
-
-    .quote {
-      font-style: italic;
-      color: #bdbdff;
-      margin-top: 1rem;
-    }
-
-    #chatbot {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #66bfff;
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 30px;
-      color: #fff;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(0,0,0,0.6);
-    }
+    /* …other inline styles you already had… */
   </style>
-</head>
-<body>
-  <header>
-    <nav>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="legal-tools.html">Legal Tools</a>
-      <a href="faq.html">FAQ</a>
-      <a href="support.html">Support</a>
-      <a href="discover.html">Discover</a>
-      <a href="lp.html">Login</a>
-    </nav>
-  </header>
 
+  <!-- ─── LINK GLOBAL STYLES & CHATBOT SCRIPT ─── -->
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="assets/chatbot.js" defer></script>
+</head>
+
+<body>
+  <!-- ─── HEADER PLACEHOLDER ─── -->
+  <div id="header"></div>
+
+  <!-- ─── YOUR PAGE CONTENT ─── -->
   <main>
-    <h1>Welcome to LexOmega</h1>
-    <p>We believe in equal access, clear paths, and powerful tools for every individual — whether you're seeking guidance, discovery, or advocacy.</p>
-    <p class="quote">"Beauty is in the eye of the beholder — and every soul has beauty, purpose, and light."</p>
+    <h1>Welcome to Lex Omega</h1>
+    <p>Your Command Center is live.<br>Click a card to begin.</p>
+    <!-- …rest of your homepage content… -->
   </main>
 
-  <button id="chatbot" onclick="alert('Chatbot integration coming soon!')">💬</button>
-
-  <footer>
-    &copy; 2025 LexOmega. All rights reserved. | Built with heart, for all people.
-  </footer>
+  <!-- ─── FOOTER PLACEHOLDER & COMPONENT LOADER ─── -->
+  <div id="footer"></div>
+  <script>
+    async function loadComponent(id, path) {
+      const res  = await fetch(path);
+      const html = await res.text();
+      document.getElementById(id).innerHTML = html;
+    }
+    loadComponent("header", "components/header.html");
+    loadComponent("footer", "components/footer.html");
+  </script>
 </body>
 </html>
