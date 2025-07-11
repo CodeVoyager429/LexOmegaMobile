@@ -1,8 +1,9 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LexOmega</title>
+  <title>LexOmega — First AI Law Firm</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
   <style>
     body {
@@ -77,51 +78,86 @@
     }
   </style>
 </head>
-<body><header>LexOmega — First AI Law Firm</header><div class="button-grid">
+<body>
+
+<header>LexOmega — First AI Law Firm</header>
+
+<div class="button-grid">
   <button onclick="toggleSection('mockTrial')">Mock Trial</button>
   <button onclick="toggleSection('legalDictionary')">Legal Dictionary</button>
   <button onclick="toggleSection('smartSearch')">Smart Search</button>
   <button onclick="toggleSection('liveChat')">Live Chat Support</button>
   <button onclick="toggleSection('docGen')">Document Generator</button>
   <button onclick="toggleSection('subscription')">Subscription</button>
-</div><!-- Mock Trial UI --><div class="section" id="mockTrial">
+</div>
+
+<!-- Mock Trial UI -->
+<div class="section" id="mockTrial">
   <h2>Mock Trial Interface</h2>
   <p>Simulate a courtroom experience. (Live simulation module coming soon)</p>
-</div><!-- Legal Dictionary --><div class="section" id="legalDictionary">
+</div>
+
+<!-- Legal Dictionary -->
+<div class="section" id="legalDictionary">
   <h2>Legal Dictionary</h2>
   <input type="text" placeholder="Enter legal term (e.g., Tort, Plaintiff)" />
   <div class="output-box">Definition will appear here. (Coming soon)</div>
-</div><!-- Smart Search --><div class="section" id="smartSearch">
+</div>
+
+<!-- Smart Search -->
+<div class="section" id="smartSearch">
   <h2>Smart Legal Search</h2>
   <input type="text" placeholder="Ask your legal question..." />
   <div class="output-box">AI interpretation output coming here. (GPT API ready)</div>
-</div><!-- Live Chat --><div class="section" id="liveChat">
+</div>
+
+<!-- Live Chat -->
+<div class="section" id="liveChat">
   <h2>Live Chat Support</h2>
   <p>Talk to LexAI Assistant (Powered by GPT API — coming soon)</p>
   <input type="text" placeholder="Ask me anything..." />
-</div><!-- Document Generator --><div class="section" id="docGen">
+</div>
+
+<!-- Document Generator -->
+<div class="section" id="docGen">
   <h2>Generate Legal Documents</h2>
   <select>
-    <option>Select Document Type</option>
-    <option>Lease Agreement</option>
-    <option>Cease and Desist Letter</option>
-    <option>Complaint Form</option>
-    <option>Business Contract</option>
+    <option>Select Document Category (A–Z)</option>
+    <option>Affidavits</option>
+    <option>Business/Corporate</option>
+    <option>Civil Law</option>
+    <option>Contracts</option>
+    <option>Criminal Law</option>
+    <option>Employment</option>
+    <option>Family Law</option>
+    <option>Intellectual Property</option>
+    <option>Immigration</option>
+    <option>Real Estate</option>
+    <option>Tax</option>
+    <option>Wills & Estates</option>
   </select>
-  <div class="output-box">Your generated document will preview here. (Export feature next)</div>
-</div><!-- Subscription Management --><div class="section" id="subscription">
+  <div class="output-box">Need help selecting a document? Use Smart Search or Live Chat.</div>
+</div>
+
+<!-- Subscription Management -->
+<div class="section" id="subscription">
   <h2>Subscription Plans</h2>
   <select id="plan">
     <option value="free">Free - Basic Access</option>
-    <option value="pro">Pro - $9.99/mo (Extra tools, document saves)</option>
-    <option value="executive">Executive - $29.99/mo (Full backend + AI Chat)</option>
+    <option value="pro">Pro - $19.99/mo (Tools, document saves)</option>
+    <option value="executive">Executive - $99.99/mo (Full LexOmega AI Capabilities)</option>
   </select>
   <input type="email" id="email" placeholder="Enter your email" />
   <button onclick="activateSubscription()">Subscribe Now</button>
   <div class="output-box" id="subOutput">Status: Awaiting input...</div>
-</div><!-- Floating Support Button --><div class="floating-support" onclick="toggleSection('liveChat')">
+</div>
+
+<!-- Floating Support Button -->
+<div class="floating-support" onclick="toggleSection('liveChat')">
   💬 Need Help?
-</div><script>
+</div>
+
+<script>
   function toggleSection(id) {
     document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
     document.getElementById(id).style.display = 'block';
@@ -139,7 +175,9 @@
 
     output.textContent = `Processing your ${plan.toUpperCase()} subscription for ${email}... (Simulated)`;
 
-    // Future: integrate backend API route and token generation here
+    // Future: backend integration with Stripe, PayPal, MongoDB, tokens
   }
-</script></body>
+</script>
+
+</body>
 </html>
