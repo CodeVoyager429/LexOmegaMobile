@@ -3,59 +3,149 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lex Omega Command Center</title>
+  <title>LexOmega v1.0.2+</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
   <style>
     body {
-      background-color: #0e0e1a;
-      color: #ffffff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-    }
-    .nav-links {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      width: 100%;
-      max-width: 400px;
-    }
-    .nav-links a {
-      text-decoration: none;
-      background-color: #1e1e2f;
-      color: #00d0ff;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(145deg, #1b1b1b, #2d2d2d);
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
       text-align: center;
-      transition: background-color 0.3s ease;
     }
-    .nav-links a:hover {
-      background-color: #2e2e4d;
+    header {
+      background-color: #111;
+      padding: 1.5rem;
+      font-size: 2rem;
+      font-weight: bold;
+      border-bottom: 2px solid gold;
+      color: gold;
+    }
+    .button-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 3rem;
+    }
+    button {
+      background: gold;
+      border: none;
+      color: black;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      min-width: 250px;
+    }
+    button:hover {
+      background-color: white;
+      transform: scale(1.05);
+    }
+    .section {
+      padding: 2rem;
+      margin-top: 2rem;
+      background-color: #1e1e1e;
+      border-radius: 15px;
+      display: none;
+    }
+    input, select {
+      padding: 0.7rem;
+      width: 80%;
+      margin: 1rem auto;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+    .output-box {
+      margin-top: 1rem;
+      font-style: italic;
+      color: #aaa;
+    }
+    .subnote {
+      font-size: 0.85rem;
+      color: #999;
+      margin-top: 1rem;
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to Lex Omega</h1>
-  <p>Your Command Center is live. Select a page to begin:</p>
-  
-  <div class="nav-links">
-    <a href="dashboard.html">Lex Dashboard</a>
-    <a href="new-dashboard.html">New Dashboard</a>
-    <a href="12-aia-dashboard.html">12-AIA Dashboard</a>
-    <a href="mock-trial.html">Mock Trial</a>
-    <a href="lexflow-grid.html">LexFlow Grid</a>
-    <a href="case-tracking.html">Case Tracking</a>
-    <a href="smart-search.html">Smart Search</a>
-    <a href="legal-tools.html">Legal Tools</a>
-    <a href="support.html">Support</a>
-    <a href="faq.html">FAQ</a>
-    <a href="discover.html">Discover</a>
-    <a href="landing-page.html">Landing Page</a>
-  </div>
+
+<header>LexOmega Hub v1.0.2+Subscription</header>
+
+<div class="button-grid">
+  <button onclick="toggleSection('mockTrial')">Mock Trial</button>
+  <button onclick="toggleSection('legalDictionary')">Legal Dictionary</button>
+  <button onclick="toggleSection('smartSearch')">Smart Search</button>
+  <button onclick="toggleSection('liveChat')">Live Chat Support</button>
+  <button onclick="toggleSection('docGen')">Document Generator</button>
+  <button onclick="toggleSection('subscription')">Subscription Plans</button>
+</div>
+
+<!-- Mock Trial UI -->
+<div class="section" id="mockTrial">
+  <h2>Mock Trial Interface</h2>
+  <p>Simulate courtroom experience with future AI interactivity.</p>
+  <div class="subnote">Routing to full courtroom experience in v1.1</div>
+</div>
+
+<!-- Legal Dictionary -->
+<div class="section" id="legalDictionary">
+  <h2>Legal Dictionary</h2>
+  <input type="text" placeholder="Enter legal term..." />
+  <div class="output-box">Definition loads here. (Future: GPT API integration)</div>
+</div>
+
+<!-- Smart Legal Search -->
+<div class="section" id="smartSearch">
+  <h2>Smart Legal Search</h2>
+  <input type="text" placeholder="Ask your legal question..." />
+  <div class="output-box">AI output shown here. (Placeholder for backend)</div>
+</div>
+
+<!-- Live Chat -->
+<div class="section" id="liveChat">
+  <h2>Live Chat Support</h2>
+  <input type="text" placeholder="Ask LexAI anything..." />
+  <p class="subnote">ChatGPT-powered assistant in upcoming release</p>
+</div>
+
+<!-- Document Generator -->
+<div class="section" id="docGen">
+  <h2>Generate Legal Documents</h2>
+  <select>
+    <option>Select Document Type</option>
+    <option>Lease Agreement</option>
+    <option>Cease and Desist</option>
+    <option>Business Contract</option>
+    <option>Complaint Form</option>
+  </select>
+  <div class="output-box">Document preview & export (coming soon)</div>
+</div>
+
+<!-- Subscription Plans -->
+<div class="section" id="subscription">
+  <h2>LexOmega Subscription Options</h2>
+  <select>
+    <option>Choose Plan</option>
+    <option>Free – Limited Access</option>
+    <option>Pro – Extended Tools</option>
+    <option>Executive – All Legal Tools</option>
+    <option>Enterprise – Unlimited + AI Assistant</option>
+  </select>
+  <div class="subnote">Future: Stripe/PayPal integration for payments</div>
+</div>
+
+<script>
+  function toggleSection(id) {
+    document.querySelectorAll('.section').forEach(section => {
+      section.style.display = 'none';
+    });
+    document.getElementById(id).style.display = 'block';
+  }
+</script>
+
 </body>
 </html>
