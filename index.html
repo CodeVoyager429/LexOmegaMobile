@@ -1,8 +1,8 @@
-<!-- ✅ VERIFIED index.html --><!DOCTYPE html><html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LexOmega | AI Law Hub</title>
+  <title>LexOmega</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
   <style>
     body {
@@ -26,23 +26,43 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 1.5rem;
-      padding: 3rem;
+      padding: 2rem;
     }
-    a.button {
-      text-decoration: none;
+    button {
       background: gold;
+      border: none;
       color: black;
       padding: 1rem 2rem;
       font-size: 1.2rem;
       border-radius: 12px;
       cursor: pointer;
       transition: all 0.3s ease-in-out;
-      min-width: 250px;
-      display: inline-block;
+      min-width: 220px;
     }
-    a.button:hover {
+    button:hover {
       background-color: white;
       transform: scale(1.05);
+    }
+    .section {
+      padding: 2rem;
+      margin-top: 1.5rem;
+      background-color: #1e1e1e;
+      border-radius: 15px;
+      display: none;
+    }
+    input, select, textarea {
+      padding: 0.7rem;
+      width: 80%;
+      margin: 1rem auto;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      display: block;
+    }
+    .output-box {
+      margin-top: 1rem;
+      font-style: italic;
+      color: #aaa;
     }
     .floating-support {
       position: fixed;
@@ -58,16 +78,109 @@
     }
   </style>
 </head>
-<body>
-  <header>LexOmega — First AI Law Firm</header>  <div class="button-grid">
-    <a class="button" href="mocktrial.html">⚖️ Mock Trial</a>
-    <a class="button" href="dictionary.html">📚 Legal Dictionary</a>
-    <a class="button" href="smartsearch.html">🔍 Smart Search</a>
-    <a class="button" href="livechat.html">💬 Live Chat Support</a>
-    <a class="button" href="docgen.html">📄 Document Generator</a>
-    <a class="button" href="subscription.html">💼 Subscription</a>
-  </div>  <div class="floating-support" onclick="location.href='livechat.html'">
-    💬 Need Help?
-  </div>
-</body>
-</html><!-- ✅ NEXT: You'll receive verified mocktrial.html next -->
+<body><header>LexOmega – First AI Law Firm</header><div class="button-grid">
+  <button onclick="toggleSection('mockTrial')">⚖️ Mock Trial</button>
+  <button onclick="toggleSection('legalDictionary')">📚 Legal Dictionary</button>
+  <button onclick="toggleSection('smartSearch')">🔍 Smart Search</button>
+  <button onclick="toggleSection('docGen')">📄 Document Generator</button>
+  <button onclick="toggleSection('subscription')">💼 Subscription</button>
+  <button onclick="toggleSection('smartContracts')">🧠 Smart Contracts</button>
+</div><div class="section" id="mockTrial">
+  <h2>⚖️ Virtual Mock Trial Simulation</h2>
+  <textarea placeholder="Enter trial script or roleplay scenario..."></textarea>
+  <button onclick="runMockTrial()">Simulate Trial</button>
+  <div class="output-box" id="trialResult">Awaiting script...</div>
+</div><div class="section" id="legalDictionary">
+  <h2>📚 Legal Dictionary</h2>
+  <input type="text" placeholder="Search legal term..." id="legalTerm" />
+  <button onclick="lookupTerm()">Lookup</button>
+  <div class="output-box" id="termDefinition">Definition appears here.</div>
+</div><div class="section" id="smartSearch">
+  <h2>🔍 Smart Legal Search</h2>
+  <input type="text" placeholder="Type your legal question..." id="legalQuery" />
+  <button onclick="submitQuery()">Search</button>
+  <div class="output-box" id="searchOutput">Search results will appear here.</div>
+</div><div class="section" id="docGen">
+  <h2>📄 Generate Legal Documents</h2>
+  <select id="docCategory">
+    <option>Select Category</option>
+    <option>Civil Law</option>
+    <option>Criminal Law</option>
+    <option>Business Law</option>
+    <option>Family Law</option>
+    <option>Property Law</option>
+    <option>Wills & Trusts</option>
+  </select>
+  <select id="docType">
+    <option>Choose Document Type</option>
+    <option>Affidavit</option>
+    <option>Power of Attorney</option>
+    <option>Lease Agreement</option>
+    <option>Contract</option>
+    <option>Last Will</option>
+    <option>Custody Agreement</option>
+  </select>
+  <button onclick="generateDocument()">Generate</button>
+  <div class="output-box" id="docPreview">Document preview here...</div>
+</div><div class="section" id="subscription">
+  <h2>💼 Subscription Plans</h2>
+  <select id="plan">
+    <option value="free">Free</option>
+    <option value="pro">Pro - $9.99/mo</option>
+    <option value="executive">Executive - $19.99/mo</option>
+    <option value="premium">Premium - $99.99/mo</option>
+  </select>
+  <input type="email" id="email" placeholder="Enter your email" />
+  <button onclick="activateSubscription()">Subscribe Now</button>
+  <div class="output-box" id="subOutput">Status: Waiting...</div>
+</div><div class="section" id="smartContracts">
+  <h2>🧠 Smart Contracts</h2>
+  <textarea placeholder="Write your smart contract clause here..."></textarea>
+  <button onclick="processContract()">Review & Structure</button>
+  <div class="output-box" id="contractResult">Structured output coming here...</div>
+</div><div class="floating-support" onclick="toggleSection('smartSearch')">
+  💬 Ask Lex
+</div><script>
+  function toggleSection(id) {
+    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+  }
+
+  function activateSubscription() {
+    const email = document.getElementById('email').value;
+    const plan = document.getElementById('plan').value;
+    const output = document.getElementById('subOutput');
+    if (!email) {
+      output.textContent = "Please enter a valid email.";
+      return;
+    }
+    output.textContent = `Subscribed to ${plan.toUpperCase()} plan. Confirmation sent to ${email}.`;
+    // API integration placeholder
+  }
+
+  function lookupTerm() {
+    const term = document.getElementById('legalTerm').value;
+    document.getElementById('termDefinition').textContent = `Looking up '${term}'... [API Response Placeholder]`;
+  }
+
+  function submitQuery() {
+    const query = document.getElementById('legalQuery').value;
+    document.getElementById('searchOutput').textContent = `Searching: '${query}'... [ChatGPT API Response Placeholder]`;
+  }
+
+  function generateDocument() {
+    const category = document.getElementById('docCategory').value;
+    const type = document.getElementById('docType').value;
+    document.getElementById('docPreview').textContent = `Generating a ${type} under ${category}... [ChatGPT API Ready]`;
+  }
+
+  function runMockTrial() {
+    const result = document.getElementById('trialResult');
+    result.textContent = "Running trial simulation... [Interactive Logic Placeholder]";
+  }
+
+  function processContract() {
+    document.getElementById('contractResult').textContent = "Analyzing and structuring smart contract... [GPT API Ready]";
+  }
+</script></body>
+</html>
