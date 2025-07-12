@@ -1,113 +1,70 @@
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LexOmega Legal Document Index</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #1e1e1e;
-      color: #f5f5f5;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: gold;
-    }
-    .index-container {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-    .index-section {
-      background: #2d2d2d;
-      padding: 1rem;
-      border-radius: 10px;
-    }
-    .index-section h2 {
-      color: gold;
-    }
-    ul {
-      list-style-type: none;
-      padding-left: 0;
-    }
-    li {
-      padding: 0.3rem 0;
-    }
-  </style>
-</head>
-<body>
-  <h1>📄 A-Z Legal Document Index</h1>
-  <div class="index-container">
-    <div class="index-section">
-      <h2>A</h2>
-      <ul>
-        <li>Affidavit</li>
-        <li>Articles of Incorporation</li>
-        <li>Asset Purchase Agreement</li>
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LexOmega | Legal SPA Platform</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script defer src="chatbot.js"></script>
+  <script defer src="spa.js"></script>
+</head><body>
+  <header class="header">
+    <h1>LexOmega Portal</h1>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#documentIndex">Documents</a></li>
+        <li><a href="#caseBuilder">Case Builder</a></li>
+        <li><a href="#subscriptions">Pricing</a></li>
+        <li><a href="#chat">ChatBot</a></li>
       </ul>
+    </nav>
+  </header>  <section id="hero" class="hero">
+    <h2>Your All-In-One Legal Companion</h2>
+    <p>Search, generate, and organize legal documents with ease.</p>
+  </section>  <section id="documentIndex" class="section">
+    <h2>A–Z Legal Document Index</h2>
+    <div class="accordion-container">
+      <!-- Example Document Group -->
+      <div class="accordion">
+        <button class="accordion-header">A</button>
+        <div class="accordion-body">
+          <button class="doc-btn" data-doc="Affidavit">Affidavit</button>
+          <button class="doc-btn" data-doc="Articles of Incorporation">Articles of Incorporation</button>
+          <button class="doc-btn" data-doc="Asset Purchase Agreement">Asset Purchase Agreement</button>
+        </div>
+      </div>
+      <!-- Repeat A–Z groups here dynamically -->
     </div>
-    <div class="index-section">
-      <h2>B</h2>
-      <ul>
-        <li>Bill of Sale</li>
-        <li>Business License Application</li>
-        <li>Bylaws</li>
-      </ul>
+  </section>  <section id="caseBuilder" class="section">
+    <h2>Build Your Case</h2>
+    <p>Upload files, attach generated docs, and export your full case file.</p>
+    <div class="upload-box">
+      <input type="file" id="fileUpload" multiple />
+      <button id="generateCaseFile">Generate Case File</button>
     </div>
-    <div class="index-section">
-      <h2>C</h2>
-      <ul>
-        <li>Contract Agreement</li>
-        <li>Complaint</li>
-        <li>Copyright Application</li>
-      </ul>
+  </section>  <section id="subscriptions" class="section">
+    <h2>Subscription Plans</h2>
+    <div class="pricing-tiers">
+      <div class="price-card">
+        <h3>Free</h3>
+        <p>$0/month</p>
+        <p>Basic document generation</p>
+      </div>
+      <div class="price-card">
+        <h3>Pro</h3>
+        <p>$19.99/month</p>
+        <p>Advanced templates + storage</p>
+      </div>
+      <div class="price-card">
+        <h3>Executive</h3>
+        <p>$99.99/month</p>
+        <p>Full automation + GPT integrations</p>
+      </div>
     </div>
-    <div class="index-section">
-      <h2>D</h2>
-      <ul>
-        <li>Divorce Petition</li>
-        <li>Deed of Trust</li>
-        <li>Demand Letter</li>
-      </ul>
+  </section>  <section id="chat" class="section">
+    <h2>Ask Our Legal Assistant</h2>
+    <div id="chat-widget">
+      <!-- GPT API-driven chat will appear here -->
     </div>
-    <div class="index-section">
-      <h2>E</h2>
-      <ul>
-        <li>Employment Contract</li>
-        <li>Eviction Notice</li>
-        <li>Estate Planning Worksheet</li>
-      </ul>
-    </div>
-    <div class="index-section">
-      <h2>F</h2>
-      <ul>
-        <li>Franchise Agreement</li>
-        <li>Final Judgment</li>
-        <li>Financial Affidavit</li>
-      </ul>
-    </div>
-    <div class="index-section">
-      <h2>G-Z</h2>
-      <ul>
-        <li>General Power of Attorney</li>
-        <li>Grant Deed</li>
-        <li>Lease Agreement</li>
-        <li>Living Will</li>
-        <li>Non-Disclosure Agreement (NDA)</li>
-        <li>Operating Agreement</li>
-        <li>Partnership Agreement</li>
-        <li>Promissory Note</li>
-        <li>Quitclaim Deed</li>
-        <li>Resignation Letter</li>
-        <li>Settlement Agreement</li>
-        <li>Subpoena</li>
-        <li>Trademark Application</li>
-        <li>Trust Agreement</li>
-        <li>Will and Testament</li>
-      </ul>
-    </div>
-  </div>
-</body>
-</html>
+  </section>  <footer class="footer">
+    <p>&copy; 2025 LexOmega | Built for EchoVerseLLCIO</p>
+  </footer></body></html>
