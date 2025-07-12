@@ -2,7 +2,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LexOmega — Mock Trial Courtroom</title>
+  <title>LexOmega</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
   <style>
     body {
@@ -21,83 +21,125 @@
       border-bottom: 2px solid gold;
       color: gold;
     }
-    .courtroom {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2rem;
+    .button-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
       padding: 3rem;
-      justify-items: center;
     }
-    .role {
-      background: #2e2e2e;
-      border: 2px solid gold;
-      padding: 2rem;
-      border-radius: 12px;
-      width: 250px;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-    .role:hover {
-      background: #3e3e3e;
-      transform: scale(1.05);
-    }
-    .interaction-box {
-      margin-top: 2rem;
-      padding: 1rem;
-      background-color: #1e1e1e;
-      border-radius: 10px;
-      min-height: 100px;
-    }
-    button.return-btn {
-      margin-top: 2rem;
+    button {
       background: gold;
       border: none;
-      padding: 0.8rem 1.5rem;
-      font-size: 1rem;
-      border-radius: 10px;
+      color: black;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      border-radius: 12px;
       cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      min-width: 250px;
     }
-    button.return-btn:hover {
+    button:hover {
       background-color: white;
+      transform: scale(1.05);
+    }
+    .section {
+      padding: 2rem;
+      margin-top: 2rem;
+      background-color: #1e1e1e;
+      border-radius: 15px;
+      display: none;
+    }
+    input, select {
+      padding: 0.7rem;
+      width: 80%;
+      margin: 1rem auto;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+    .output-box {
+      margin-top: 1rem;
+      font-style: italic;
+      color: #aaa;
+    }
+    .floating-support {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: gold;
+      color: black;
+      padding: 0.7rem 1.2rem;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
   </style>
 </head>
-<body><header>⚖️ LexOmega Mock Trial Courtroom</header><div class="courtroom">
-  <div class="role" onclick="simulateRole('👩‍⚖️ Judge')">👩‍⚖️ Judge</div>
-  <div class="role" onclick="simulateRole('👨‍💼 Lawyer')">👨‍💼 Lawyer</div>
-  <div class="role" onclick="simulateRole('🧑‍⚖️ Jury')">🧑‍⚖️ Jury</div>
-  <div class="role" onclick="simulateRole('🧍‍♂️ Plaintiff')">🧍‍♂️ Plaintiff</div>
-  <div class="role" onclick="simulateRole('🧍‍♀️ Defendant')">🧍‍♀️ Defendant</div>
-</div><div class="interaction-box" id="courtroomOutput">
-  Click on a role above to simulate interaction.
-</div><button class="return-btn" onclick="goHome()">🏠 Return to Home</button>
-
-<script>
-  function simulateRole(role) {
-    const output = document.getElementById('courtroomOutput');
-    switch(role) {
-      case '👩‍⚖️ Judge':
-        output.textContent = "👩‍⚖️ Judge: Order in the court! Let's begin the trial.";
-        break;
-      case '👨‍💼 Lawyer':
-        output.textContent = "👨‍💼 Lawyer: Your Honor, I present Exhibit A as evidence.";
-        break;
-      case '🧑‍⚖️ Jury':
-        output.textContent = "🧑‍⚖️ Jury: We will deliberate and return a verdict soon.";
-        break;
-      case '🧍‍♂️ Plaintiff':
-        output.textContent = "🧍‍♂️ Plaintiff: I believe my rights were violated and seek justice.";
-        break;
-      case '🧍‍♀️ Defendant':
-        output.textContent = "🧍‍♀️ Defendant: I deny all allegations presented against me.";
-        break;
-      default:
-        output.textContent = "Role not recognized.";
-    }
+<body><header>LexOmega — First AI Law Firm</header><div class="button-grid">
+  <button onclick="window.location.href='mocktrial.html'">⚖️ Mock Trial</button>
+  <button onclick="toggleSection('legalDictionary')">📚 Legal Dictionary</button>
+  <button onclick="toggleSection('smartSearch')">🔍 Smart Search</button>
+  <button onclick="toggleSection('liveChat')">💬 Live Chat Support</button>
+  <button onclick="toggleSection('docGen')">📄 Document Generator</button>
+  <button onclick="toggleSection('subscription')">💼 Subscription</button>
+</div><!-- Legal Dictionary --><div class="section" id="legalDictionary">
+  <h2>📚 Legal Dictionary</h2>
+  <input type="text" placeholder="Enter legal term (e.g., Tort, Plaintiff)" />
+  <div class="output-box">Definition will appear here. (Coming soon)</div>
+</div><!-- Smart Search --><div class="section" id="smartSearch">
+  <h2>🔍 Smart Legal Search</h2>
+  <input type="text" placeholder="Ask your legal question..." />
+  <div class="output-box">AI interpretation output coming here. (GPT API ready)</div>
+</div><!-- Live Chat --><div class="section" id="liveChat">
+  <h2>💬 Live Chat Support</h2>
+  <p>Talk to LexAI Assistant (Powered by GPT API — coming soon)</p>
+  <input type="text" placeholder="Ask me anything..." />
+</div><!-- Document Generator --><div class="section" id="docGen">
+  <h2>📄 Generate Legal Documents</h2>
+  <select>
+    <option>Select Document Category</option>
+    <option>Civil Law</option>
+    <option>Criminal Law</option>
+    <option>Business Law</option>
+    <option>Family Law</option>
+    <option>Property Law</option>
+    <option>Wills & Trusts</option>
+  </select>
+  <div class="output-box">Your selected document category will preview here. Need help? Ask Smart Search or Live Chat.</div>
+</div><!-- Subscription Management --><div class="section" id="subscription">
+  <h2>💼 Subscription Plans</h2>
+  <select id="plan">
+    <option value="free">Free - Basic Access</option>
+    <option value="pro">Pro - $9.99/mo (Extra tools, document saves)</option>
+    <option value="executive">Executive - $19.99/mo (Live Chat + Documents)</option>
+    <option value="premium">Premium - $99.99/mo (ALL Features & AIA tools)</option>
+  </select>
+  <input type="email" id="email" placeholder="Enter your email" />
+  <button onclick="activateSubscription()">Subscribe Now</button>
+  <div class="output-box" id="subOutput">Status: Awaiting input...</div>
+</div><!-- Floating Support Button --><div class="floating-support" onclick="toggleSection('liveChat')">
+  💬 Need Help?
+</div><script>
+  function toggleSection(id) {
+    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
   }
 
-  function goHome() {
-    window.location.href = 'index.html';
+  function activateSubscription() {
+    const email = document.getElementById('email').value;
+    const plan = document.getElementById('plan').value;
+    const output = document.getElementById('subOutput');
+
+    if (!email) {
+      output.textContent = "Please enter your email to continue.";
+      return;
+    }
+
+    output.textContent = `Processing your ${plan.toUpperCase()} subscription for ${email}... (Simulated)`;
+
+    // Future: Integrate backend with Node.js + Express + MongoDB + Stripe + PayPal
   }
 </script></body>
 </html>
