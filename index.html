@@ -1,70 +1,92 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="en">
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LexOmega | Legal SPA Platform</title>
+  <title>LexOmega Portal</title>
   <link rel="stylesheet" href="styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <script defer src="chatbot.js"></script>
-  <script defer src="spa.js"></script>
-</head><body>
-  <header class="header">
+  <script defer src="index.js"></script>
+</head>
+<body>
+  <header>
     <h1>LexOmega Portal</h1>
     <nav>
-      <ul class="nav-links">
-        <li><a href="#documentIndex">Documents</a></li>
-        <li><a href="#caseBuilder">Case Builder</a></li>
-        <li><a href="#subscriptions">Pricing</a></li>
-        <li><a href="#chat">ChatBot</a></li>
+      <ul>
+        <li><a href="#documents">Documents</a></li>
+        <li><a href="#case-builder">Case Builder</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#chatbot">ChatBot</a></li>
       </ul>
     </nav>
-  </header>  <section id="hero" class="hero">
-    <h2>Your All-In-One Legal Companion</h2>
-    <p>Search, generate, and organize legal documents with ease.</p>
-  </section>  <section id="documentIndex" class="section">
-    <h2>A–Z Legal Document Index</h2>
-    <div class="accordion-container">
-      <!-- Example Document Group -->
-      <div class="accordion">
-        <button class="accordion-header">A</button>
-        <div class="accordion-body">
-          <button class="doc-btn" data-doc="Affidavit">Affidavit</button>
-          <button class="doc-btn" data-doc="Articles of Incorporation">Articles of Incorporation</button>
-          <button class="doc-btn" data-doc="Asset Purchase Agreement">Asset Purchase Agreement</button>
-        </div>
-      </div>
-      <!-- Repeat A–Z groups here dynamically -->
+  </header>  <main>
+    <section id="intro">
+      <h2>Your All-In-One Legal Companion</h2>
+      <p>Search, generate, and organize legal documents with the power of AI.</p>
+    </section><section id="documents">
+  <h2>A–Z Legal Document Index</h2>
+  <input type="text" placeholder="Search legal documents..." id="search-docs" />
+  <div id="document-index">
+    <!-- A-Z groupings will be dynamically generated here by JavaScript -->
+  </div>
+</section>
+
+<section id="case-builder">
+  <h2>Build Your Case</h2>
+  <form id="case-form">
+    <label for="case-title">Case Title:</label>
+    <input type="text" id="case-title" required />
+    <label for="case-files">Attach Files:</label>
+    <input type="file" id="case-files" multiple />
+    <label for="case-summary">Notes & Summary:</label>
+    <textarea id="case-summary" rows="4"></textarea>
+    <button type="submit">Generate Case File</button>
+  </form>
+</section>
+
+<section id="pricing">
+  <h2>Subscription Plans</h2>
+  <div class="plans">
+    <div class="plan">
+      <h3>Free</h3>
+      <p>$0/month</p>
+      <ul>
+        <li>Basic document generation</li>
+        <li>ChatBot access</li>
+        <li>Case Builder (limited)</li>
+      </ul>
     </div>
-  </section>  <section id="caseBuilder" class="section">
-    <h2>Build Your Case</h2>
-    <p>Upload files, attach generated docs, and export your full case file.</p>
-    <div class="upload-box">
-      <input type="file" id="fileUpload" multiple />
-      <button id="generateCaseFile">Generate Case File</button>
+    <div class="plan">
+      <h3>Pro</h3>
+      <p>$19.99/month</p>
+      <ul>
+        <li>Unlimited documents</li>
+        <li>Smart Document Generator</li>
+        <li>Priority AI support</li>
+      </ul>
     </div>
-  </section>  <section id="subscriptions" class="section">
-    <h2>Subscription Plans</h2>
-    <div class="pricing-tiers">
-      <div class="price-card">
-        <h3>Free</h3>
-        <p>$0/month</p>
-        <p>Basic document generation</p>
-      </div>
-      <div class="price-card">
-        <h3>Pro</h3>
-        <p>$19.99/month</p>
-        <p>Advanced templates + storage</p>
-      </div>
-      <div class="price-card">
-        <h3>Executive</h3>
-        <p>$99.99/month</p>
-        <p>Full automation + GPT integrations</p>
-      </div>
+    <div class="plan">
+      <h3>Executive</h3>
+      <p>$99.99/month</p>
+      <ul>
+        <li>All Pro features</li>
+        <li>Advanced AI-Law Advisor</li>
+        <li>Smart Case Compiler</li>
+      </ul>
     </div>
-  </section>  <section id="chat" class="section">
-    <h2>Ask Our Legal Assistant</h2>
-    <div id="chat-widget">
-      <!-- GPT API-driven chat will appear here -->
-    </div>
-  </section>  <footer class="footer">
-    <p>&copy; 2025 LexOmega | Built for EchoVerseLLCIO</p>
-  </footer></body></html>
+  </div>
+</section>
+
+<section id="chatbot">
+  <h2>Legal ChatBot</h2>
+  <div id="chat-container">
+    <div id="chat-log"></div>
+    <input type="text" id="chat-input" placeholder="Ask a legal question..." />
+    <button id="chat-send">Send</button>
+  </div>
+</section>
+
+  </main>  <footer>
+    <p>&copy; 2025 LexOmega. All rights reserved.</p>
+  </footer>
+</body>
+</html>
