@@ -1,100 +1,34 @@
-<!DOCTYPE html><html lang="en">
+<!-- mocktrial.html --><!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LexOmega — Mock Trial Courtroom</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
-  <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #1f1f1f, #2b2b2b);
-      color: #f5f5f5;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-    header {
-      background-color: #111;
-      padding: 1.5rem;
-      font-size: 2rem;
-      font-weight: bold;
-      border-bottom: 2px solid gold;
-      color: gold;
-    }
-    .courtroom-container {
-      padding: 2rem;
-      display: grid;
-      gap: 2rem;
-    }
-    .role-section {
-      background-color: #222;
-      border-radius: 10px;
-      padding: 1rem;
-    }
-    textarea {
-      width: 80%;
-      height: 100px;
-      padding: 0.5rem;
-      margin-top: 1rem;
-      border-radius: 8px;
-      border: none;
-      font-size: 1rem;
-    }
-    .verdict-area {
-      margin-top: 2rem;
-      padding: 1rem;
-      background-color: #292929;
-      border-radius: 12px;
-    }
-    .return-button {
-      margin-top: 2rem;
-      background-color: gold;
-      color: black;
-      padding: 1rem 2rem;
-      border-radius: 30px;
-      text-decoration: none;
-      font-weight: bold;
-      display: inline-block;
-      transition: background 0.3s ease;
-    }
-    .return-button:hover {
-      background-color: white;
-    }
-    select {
-      padding: 0.5rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      margin-top: 1rem;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LexOmega Mock Trial Interface</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body><header>⚖️ LexOmega — Virtual Courtroom</header><div class="courtroom-container">
-  <div class="role-section">
-    <h2>👨‍⚖️ Judge</h2>
-    <textarea placeholder="Judge's instructions or verdict..."></textarea>
-  </div>  <div class="role-section">
-    <h2>👨‍💼 Prosecution</h2>
-    <textarea placeholder="Prosecution's argument..."></textarea>
-  </div>  <div class="role-section">
-    <h2>👩‍💼 Defense</h2>
-    <textarea placeholder="Defense's argument..."></textarea>
-  </div>  <div class="role-section">
-    <h2>🧑‍⚖️ Jury</h2>
-    <textarea placeholder="Jury deliberation notes..."></textarea>
-  </div>  <div class="role-section">
-    <h2>🗣️ Witness</h2>
-    <textarea placeholder="Witness testimony..."></textarea>
-  </div>
-</div><div class="verdict-area">
-  <h3>✅ Choose Verdict</h3>
-  <select>
-    <option>-- Select --</option>
-    <option>Guilty</option>
-    <option>Not Guilty</option>
-    <option>Mistrial</option>
-    <option>Hung Jury</option>
-  </select>
-</div><a href="index.html" class="return-button">🔙 Return to Home</a>
+<body>
+  <header>
+    <h1>LexOmega Mock Trial Simulator</h1>
+    <nav>
+      <a href="index.html">Home</a>
+    </nav>
+  </header>  <main class="mock-trial">
+    <section class="trial-setup">
+      <h2>Start a Mock Trial</h2>
+      <label for="role">Choose Your Role:</label>
+      <select id="role">
+        <option>Prosecutor</option>
+        <option>Defense Attorney</option>
+        <option>Judge</option>
+        <option>Witness</option>
+        <option>Jury Member</option>
+      </select>
+      <button id="startTrial">Start Trial</button>
+    </section><section class="trial-room hidden" id="trialRoom">
+  <h2>Virtual Courtroom</h2>
+  <div id="courtLog" class="court-log"></div>
+  <textarea id="inputStatement" placeholder="Enter your argument or response..."></textarea>
+  <button id="submitStatement">Submit</button>
+</section>
 
-</body>
+  </main>  <script src="mocktrial.js"></script></body>
 </html>
