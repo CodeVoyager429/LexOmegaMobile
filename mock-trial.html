@@ -2,95 +2,99 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LexOmega Mock Trial</title>
+  <title>LexOmega — Mock Trial Courtroom</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
   <style>
     body {
       font-family: 'Roboto', sans-serif;
-      background-color: #111;
-      color: #f0f0f0;
+      background: linear-gradient(135deg, #1f1f1f, #2b2b2b);
+      color: #f5f5f5;
       margin: 0;
       padding: 0;
       text-align: center;
     }
     header {
-      background-color: #1b1b1b;
+      background-color: #111;
       padding: 1.5rem;
       font-size: 2rem;
       font-weight: bold;
-      color: gold;
       border-bottom: 2px solid gold;
-    }
-    .courtroom {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 2rem;
-      padding: 2rem;
-    }
-    .role-box {
-      background: #222;
-      padding: 1rem;
-      border-radius: 10px;
-      width: 300px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-    .role-box h3 {
-      margin-top: 0;
       color: gold;
+    }
+    .courtroom-container {
+      padding: 2rem;
+      display: grid;
+      gap: 2rem;
+    }
+    .role-section {
+      background-color: #222;
+      border-radius: 10px;
+      padding: 1rem;
     }
     textarea {
-      width: 90%;
+      width: 80%;
       height: 100px;
-      margin-top: 1rem;
-      border-radius: 6px;
-      border: none;
       padding: 0.5rem;
-      font-size: 1rem;
-    }
-    select, button {
       margin-top: 1rem;
-      padding: 0.6rem 1.2rem;
       border-radius: 8px;
       border: none;
       font-size: 1rem;
     }
-    .return-btn {
-      margin: 2rem auto;
-      display: inline-block;
-      background: gold;
+    .verdict-area {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: #292929;
+      border-radius: 12px;
+    }
+    .return-button {
+      margin-top: 2rem;
+      background-color: gold;
       color: black;
-      cursor: pointer;
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-block;
+      transition: background 0.3s ease;
+    }
+    .return-button:hover {
+      background-color: white;
+    }
+    select {
+      padding: 0.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-top: 1rem;
     }
   </style>
 </head>
-<body><header>LexOmega Virtual Courtroom</header><div class="courtroom">
-  <div class="role-box">
-    <h3>🧑‍⚖️ Judge</h3>
-    <textarea placeholder="Judge's comments..."></textarea>
-  </div>
-  <div class="role-box">
-    <h3>⚖️ Prosecution</h3>
-    <textarea placeholder="Prosecution arguments..."></textarea>
-  </div>
-  <div class="role-box">
-    <h3>🛡️ Defense</h3>
-    <textarea placeholder="Defense statements..."></textarea>
-  </div>
-  <div class="role-box">
-    <h3>🧑‍🤝‍🧑 Jury</h3>
-    <textarea placeholder="Jury discussion notes..."></textarea>
-  </div>
-  <div class="role-box">
-    <h3>🗣️ Witness</h3>
+<body><header>⚖️ LexOmega — Virtual Courtroom</header><div class="courtroom-container">
+  <div class="role-section">
+    <h2>👨‍⚖️ Judge</h2>
+    <textarea placeholder="Judge's instructions or verdict..."></textarea>
+  </div>  <div class="role-section">
+    <h2>👨‍💼 Prosecution</h2>
+    <textarea placeholder="Prosecution's argument..."></textarea>
+  </div>  <div class="role-section">
+    <h2>👩‍💼 Defense</h2>
+    <textarea placeholder="Defense's argument..."></textarea>
+  </div>  <div class="role-section">
+    <h2>🧑‍⚖️ Jury</h2>
+    <textarea placeholder="Jury deliberation notes..."></textarea>
+  </div>  <div class="role-section">
+    <h2>🗣️ Witness</h2>
     <textarea placeholder="Witness testimony..."></textarea>
   </div>
-</div><h3>Final Verdict</h3>
-<select>
-  <option>Select Verdict</option>
-  <option>Guilty</option>
-  <option>Not Guilty</option>
-  <option>Mistrial</option>
-</select><br />
-<a href="index.html" class="return-btn">⬅️ Return to Homepage</a></body>
+</div><div class="verdict-area">
+  <h3>✅ Choose Verdict</h3>
+  <select>
+    <option>-- Select --</option>
+    <option>Guilty</option>
+    <option>Not Guilty</option>
+    <option>Mistrial</option>
+    <option>Hung Jury</option>
+  </select>
+</div><a href="index.html" class="return-button">🔙 Return to Home</a>
+
+</body>
 </html>
