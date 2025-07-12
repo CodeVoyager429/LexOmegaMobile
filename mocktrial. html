@@ -1,0 +1,103 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LexOmega — Mock Trial Courtroom</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(145deg, #1b1b1b, #2d2d2d);
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #111;
+      padding: 1.5rem;
+      font-size: 2rem;
+      font-weight: bold;
+      border-bottom: 2px solid gold;
+      color: gold;
+    }
+    .courtroom {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      padding: 3rem;
+      justify-items: center;
+    }
+    .role {
+      background: #2e2e2e;
+      border: 2px solid gold;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 250px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .role:hover {
+      background: #3e3e3e;
+      transform: scale(1.05);
+    }
+    .interaction-box {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: #1e1e1e;
+      border-radius: 10px;
+      min-height: 100px;
+    }
+    button.return-btn {
+      margin-top: 2rem;
+      background: gold;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button.return-btn:hover {
+      background-color: white;
+    }
+  </style>
+</head>
+<body><header>⚖️ LexOmega Mock Trial Courtroom</header><div class="courtroom">
+  <div class="role" onclick="simulateRole('👩‍⚖️ Judge')">👩‍⚖️ Judge</div>
+  <div class="role" onclick="simulateRole('👨‍💼 Lawyer')">👨‍💼 Lawyer</div>
+  <div class="role" onclick="simulateRole('🧑‍⚖️ Jury')">🧑‍⚖️ Jury</div>
+  <div class="role" onclick="simulateRole('🧍‍♂️ Plaintiff')">🧍‍♂️ Plaintiff</div>
+  <div class="role" onclick="simulateRole('🧍‍♀️ Defendant')">🧍‍♀️ Defendant</div>
+</div><div class="interaction-box" id="courtroomOutput">
+  Click on a role above to simulate interaction.
+</div><button class="return-btn" onclick="goHome()">🏠 Return to Home</button>
+
+<script>
+  function simulateRole(role) {
+    const output = document.getElementById('courtroomOutput');
+    switch(role) {
+      case '👩‍⚖️ Judge':
+        output.textContent = "👩‍⚖️ Judge: Order in the court! Let's begin the trial.";
+        break;
+      case '👨‍💼 Lawyer':
+        output.textContent = "👨‍💼 Lawyer: Your Honor, I present Exhibit A as evidence.";
+        break;
+      case '🧑‍⚖️ Jury':
+        output.textContent = "🧑‍⚖️ Jury: We will deliberate and return a verdict soon.";
+        break;
+      case '🧍‍♂️ Plaintiff':
+        output.textContent = "🧍‍♂️ Plaintiff: I believe my rights were violated and seek justice.";
+        break;
+      case '🧍‍♀️ Defendant':
+        output.textContent = "🧍‍♀️ Defendant: I deny all allegations presented against me.";
+        break;
+      default:
+        output.textContent = "Role not recognized.";
+    }
+  }
+
+  function goHome() {
+    window.location.href = 'index.html';
+  }
+</script></body>
+</html>
