@@ -1,126 +1,113 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LexOmega SPA — First AI Law Firm</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LexOmega Legal Document Index</title>
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(to right, #1a1a1a, #2a2a2a);
-      color: white;
+      font-family: Arial, sans-serif;
+      background-color: #1e1e1e;
+      color: #f5f5f5;
       margin: 0;
-      padding: 0;
+      padding: 20px;
     }
-    header {
-      background-color: #000;
-      padding: 1rem;
+    h1 {
       text-align: center;
-      font-size: 2rem;
-      font-weight: bold;
       color: gold;
-      border-bottom: 2px solid gold;
     }
-    nav {
+    .index-container {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      background-color: #111;
-      padding: 1rem;
-      gap: 1rem;
+      flex-direction: column;
+      gap: 2rem;
     }
-    nav button {
-      padding: 0.8rem 1.5rem;
-      border: none;
-      border-radius: 10px;
-      background-color: gold;
-      color: black;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    nav button:hover {
-      background-color: white;
-    }
-    .section {
-      display: none;
-      padding: 2rem;
-    }
-    .active {
-      display: block;
-    }
-    select, input, textarea {
-      display: block;
-      width: 90%;
-      margin: 1rem auto;
-      padding: 0.8rem;
-      border-radius: 8px;
-      border: none;
-    }
-    .output-box {
-      background-color: #222;
+    .index-section {
+      background: #2d2d2d;
       padding: 1rem;
       border-radius: 10px;
-      margin-top: 1rem;
-      color: #ccc;
+    }
+    .index-section h2 {
+      color: gold;
+    }
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    li {
+      padding: 0.3rem 0;
     }
   </style>
 </head>
 <body>
-  <header>LexOmega — First AI Law Firm</header>  <nav>
-    <button onclick="showSection('smartSearch')">🔍 Smart Search</button>
-    <button onclick="showSection('docGen')">📄 Document Generator</button>
-    <button onclick="showSection('subscription')">💼 Subscriptions</button>
-    <button onclick="showSection('mockTrial')">⚖️ Mock Trial</button>
-    <button onclick="showSection('caseBuilder')">🗂️ Build Your Case</button>
-    <button onclick="showSection('chatBot')">🤖 Smart Bot</button>
-  </nav>  <div id="smartSearch" class="section">
-    <h2>🔍 Smart Legal Search</h2>
-    <input type="text" placeholder="Ask a legal question..." />
-    <div class="output-box">Response via GPT API will appear here</div>
-  </div>  <div id="docGen" class="section">
-    <h2>📄 Legal Document Generator</h2>
-    <select>
-      <option>Select Document Type</option>
-      <option>Affidavit</option>
-      <option>Cease & Desist</option>
-      <option>Contract Agreement</option>
-      <option>Divorce Filing</option>
-      <option>Eviction Notice</option>
-      <option>Wills & Trusts</option>
-    </select>
-    <textarea rows="6" placeholder="Additional Details (optional)"></textarea>
-    <div class="output-box">Generated document preview here</div>
-  </div>  <div id="subscription" class="section">
-    <h2>💼 Subscription Options</h2>
-    <select>
-      <option value="free">Free Access</option>
-      <option value="pro">Pro — $19.99/mo</option>
-      <option value="elite">Elite — $99.99/mo</option>
-    </select>
-    <input type="email" placeholder="Your email" />
-    <button>Subscribe</button>
-    <div class="output-box">Subscription status and actions</div>
-  </div>  <div id="mockTrial" class="section">
-    <h2>⚖️ Virtual Mock Trial</h2>
-    <p>Simulated courtroom roles and interactions. Load evidence, assign roles (Judge, Plaintiff, Defendant, Witnesses), and simulate outcomes.</p>
-    <button>Begin Simulation</button>
-    <div class="output-box">Role-based interactions appear here</div>
-  </div>  <div id="caseBuilder" class="section">
-    <h2>🗂️ Build Your Legal Case</h2>
-    <input type="text" placeholder="Case Title" />
-    <textarea rows="5" placeholder="Enter case details, facts, and supporting evidence..."></textarea>
-    <button>Add to Case File</button>
-    <div class="output-box">Case file entries will appear here</div>
-  </div>  <div id="chatBot" class="section">
-    <h2>🤖 Ask LexAI</h2>
-    <input type="text" placeholder="Ask LexAI anything..." />
-    <div class="output-box">ChatGPT response here</div>
-  </div>  <script>
-    function showSection(id) {
-      document.querySelectorAll('.section').forEach(section => {
-        section.classList.remove('active');
-      });
-      document.getElementById(id).classList.add('active');
-    }
-  </script></body>
+  <h1>📄 A-Z Legal Document Index</h1>
+  <div class="index-container">
+    <div class="index-section">
+      <h2>A</h2>
+      <ul>
+        <li>Affidavit</li>
+        <li>Articles of Incorporation</li>
+        <li>Asset Purchase Agreement</li>
+      </ul>
+    </div>
+    <div class="index-section">
+      <h2>B</h2>
+      <ul>
+        <li>Bill of Sale</li>
+        <li>Business License Application</li>
+        <li>Bylaws</li>
+      </ul>
+    </div>
+    <div class="index-section">
+      <h2>C</h2>
+      <ul>
+        <li>Contract Agreement</li>
+        <li>Complaint</li>
+        <li>Copyright Application</li>
+      </ul>
+    </div>
+    <div class="index-section">
+      <h2>D</h2>
+      <ul>
+        <li>Divorce Petition</li>
+        <li>Deed of Trust</li>
+        <li>Demand Letter</li>
+      </ul>
+    </div>
+    <div class="index-section">
+      <h2>E</h2>
+      <ul>
+        <li>Employment Contract</li>
+        <li>Eviction Notice</li>
+        <li>Estate Planning Worksheet</li>
+      </ul>
+    </div>
+    <div class="index-section">
+      <h2>F</h2>
+      <ul>
+        <li>Franchise Agreement</li>
+        <li>Final Judgment</li>
+        <li>Financial Affidavit</li>
+      </ul>
+    </div>
+    <div class="index-section">
+      <h2>G-Z</h2>
+      <ul>
+        <li>General Power of Attorney</li>
+        <li>Grant Deed</li>
+        <li>Lease Agreement</li>
+        <li>Living Will</li>
+        <li>Non-Disclosure Agreement (NDA)</li>
+        <li>Operating Agreement</li>
+        <li>Partnership Agreement</li>
+        <li>Promissory Note</li>
+        <li>Quitclaim Deed</li>
+        <li>Resignation Letter</li>
+        <li>Settlement Agreement</li>
+        <li>Subpoena</li>
+        <li>Trademark Application</li>
+        <li>Trust Agreement</li>
+        <li>Will and Testament</li>
+      </ul>
+    </div>
+  </div>
+</body>
 </html>
