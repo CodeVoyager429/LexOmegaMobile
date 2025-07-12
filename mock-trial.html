@@ -1,65 +1,96 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lex Omega - Mock Trial Submission</title>
-  <script defer>
-    async function submitMockTrialForm(event) {
-      event.preventDefault();const formData = new FormData(event.target);
-  const response = await fetch('/api/mock-trial', {
-    method: 'POST',
-    body: formData
-  });
-
-  const result = await response.json();
-  document.getElementById('confirmation').innerText =
-    result.success ? "✅ You’ve been added to the courtroom queue."
-                   : "❌ Something went wrong. Please try again.";
-}
-
-  </script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LexOmega Mock Trial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #111;
+      color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #1b1b1b;
+      padding: 1.5rem;
+      font-size: 2rem;
+      font-weight: bold;
+      color: gold;
+      border-bottom: 2px solid gold;
+    }
+    .courtroom {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      padding: 2rem;
+    }
+    .role-box {
+      background: #222;
+      padding: 1rem;
+      border-radius: 10px;
+      width: 300px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .role-box h3 {
+      margin-top: 0;
+      color: gold;
+    }
+    textarea {
+      width: 90%;
+      height: 100px;
+      margin-top: 1rem;
+      border-radius: 6px;
+      border: none;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+    select, button {
+      margin-top: 1rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+    .return-btn {
+      margin: 2rem auto;
+      display: inline-block;
+      background: gold;
+      color: black;
+      cursor: pointer;
+    }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen flex items-center justify-center py-12 px-4">
-  <div class="w-full max-w-xl bg-white shadow-xl rounded-2xl p-8">
-    <h1 class="text-3xl font-bold text-center mb-6">Mock Trial Submission</h1>
-    <form onsubmit="submitMockTrialForm(event)" class="space-y-4">
-      <div>
-        <label class="block text-sm font-semibold mb-1">Full Name</label>
-        <input type="text" name="name" required class="w-full border rounded px-3 py-2" />
-      </div>
-      <div>
-        <label class="block text-sm font-semibold mb-1">Role</label>
-        <select name="role" required class="w-full border rounded px-3 py-2">
-          <option value="">-- Select Role --</option>
-          <option value="plaintiff">Plaintiff</option>
-          <option value="defendant">Defendant</option>
-          <option value="judge">Judge</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-semibold mb-1">Trial Type</label>
-        <select name="trial_type" required class="w-full border rounded px-3 py-2">
-          <option value="">-- Select Trial Type --</option>
-          <option value="civil">Civil</option>
-          <option value="criminal">Criminal</option>
-          <option value="family">Family</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-semibold mb-1">Evidence Upload</label>
-        <input type="file" name="evidence" accept=".pdf,.png,.jpg,.jpeg,.txt" class="w-full border rounded px-3 py-2" />
-      </div>
-      <div>
-        <label class="block text-sm font-semibold mb-1">Additional Notes</label>
-        <textarea name="notes" rows="3" class="w-full border rounded px-3 py-2"></textarea>
-      </div>
-      <div class="pt-4">
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl">Submit to Mock Trial Queue</button>
-      </div>
-    </form>
-    <p id="confirmation" class="mt-4 text-center text-green-600 font-bold"></p>
+<body><header>LexOmega Virtual Courtroom</header><div class="courtroom">
+  <div class="role-box">
+    <h3>🧑‍⚖️ Judge</h3>
+    <textarea placeholder="Judge's comments..."></textarea>
   </div>
-</body>
+  <div class="role-box">
+    <h3>⚖️ Prosecution</h3>
+    <textarea placeholder="Prosecution arguments..."></textarea>
+  </div>
+  <div class="role-box">
+    <h3>🛡️ Defense</h3>
+    <textarea placeholder="Defense statements..."></textarea>
+  </div>
+  <div class="role-box">
+    <h3>🧑‍🤝‍🧑 Jury</h3>
+    <textarea placeholder="Jury discussion notes..."></textarea>
+  </div>
+  <div class="role-box">
+    <h3>🗣️ Witness</h3>
+    <textarea placeholder="Witness testimony..."></textarea>
+  </div>
+</div><h3>Final Verdict</h3>
+<select>
+  <option>Select Verdict</option>
+  <option>Guilty</option>
+  <option>Not Guilty</option>
+  <option>Mistrial</option>
+</select><br />
+<a href="index.html" class="return-btn">⬅️ Return to Homepage</a></body>
 </html>
