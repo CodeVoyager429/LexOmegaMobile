@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -22,6 +23,7 @@
   </style>
 </head>
 <body class="p-6" x-data="{ tab: 'home' }">
+
   <header class="flex justify-between items-center py-4">
     <h1 class="text-3xl font-bold glow">LexOmega Legal AI</h1>
     <nav class="space-x-4">
@@ -29,61 +31,66 @@
       <button class="hover:underline" @click="tab = 'dashboard'">Dashboard</button>
       <button class="hover:underline" @click="tab = 'tools'">Tools</button>
       <button class="hover:underline" @click="tab = 'docs'">Documents</button>
-    </nav><a href="mocktrial.html" class="hover:underline font-semibold text-white transition duration-200 ease-in-out">🧑‍⚖️ Mock Trial</a>
-  </header>  <main class="mt-8">
+    </nav>
+  </header>
+
+  <!-- External navigation links -->
+  <div class="space-x-4 mb-6">
+    <a href="mocktrial.html" class="hover:underline font-semibold text-white transition duration-200 ease-in-out">🧑‍⚖️ Mock Trial</a>
+    <a href="chat.html" class="hover:underline font-semibold text-white transition duration-200 ease-in-out">💬 Chat Assistant</a>
+  </div>
+
+  <main class="mt-8">
     <!-- Home -->
     <div x-show="tab === 'home'" class="transition-all">
       <div class="card p-6 text-lg">
         <h2 class="text-2xl font-semibold glow mb-4">Welcome to LexOmega</h2>
-        <p>This is your one-stop legal AI hub. Generate legal documents, interact with your smart legal assistant, and manage mock trials all from one place.</p>
+        <p>This is your one-stop legal AI hub. Generate legal documents, interact with your smart legal assistant, and manage mock trials.</p>
       </div>
-    </div><!-- Dashboard -->
-<div x-show="tab === 'dashboard'" class="transition-all">
-  <div class="card p-6">
-    <h2 class="text-xl font-bold glow mb-2">Your Dashboard</h2>
-    <ul class="list-disc ml-5">
-      <li>Subscription Status: <strong>Active</strong></li>
-      <li>Documents Generated: 14</li>
-      <li>Mock Trials Run: 3</li>
-      <li>Plan: Pro Tier</li>
-    </ul>
-  </div>
-</div>
+    </div>
 
-<!-- Tools -->
-<div x-show="tab === 'tools'" class="transition-all">
-  <div class="grid md:grid-cols-2 gap-4">
-    <div class="card p-4">
-      <h3 class="text-lg font-bold mb-2">Document Generator</h3>
-      <button class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white">Launch</button>
+    <!-- Dashboard -->
+    <div x-show="tab === 'dashboard'" class="transition-all">
+      <div class="card p-6">
+        <h2 class="text-xl font-bold glow mb-2">Your Dashboard</h2>
+        <ul class="list-disc ml-5">
+          <li>Subscription Status: <strong>Active</strong></li>
+          <li>Documents Generated: 14</li>
+          <li>Mock Trials Run: 3</li>
+          <li>Plan: Pro Tier</li>
+        </ul>
+      </div>
     </div>
-    <div class="card p-4">
-      <h3 class="text-lg font-bold mb-2">Smart Legal Bot</h3>
-      <button class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white">Chat Now</button>
-    </div>
-    <div class="card p-4">
-      <h3 class="text-lg font-bold mb-2">Mock Trial Engine</h3>
-      <button class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white">Start</button>
-    </div>
-    <div class="card p-4">
-      <h3 class="text-lg font-bold mb-2">Legal Coaching</h3>
-      <button class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white">Schedule</button>
-    </div>
-  </div>
-</div>
 
-<!-- Documents -->
-<div x-show="tab === 'docs'" class="transition-all">
-  <div class="card p-6">
-    <h2 class="text-xl font-bold glow mb-4">Your Documents</h2>
-    <ul class="list-disc ml-5">
-      <li>Divorce Filing - <button class="text-blue-400 underline">View</button></li>
-      <li>Tenant Eviction Notice - <button class="text-blue-400 underline">View</button></li>
-      <li>LLC Operating Agreement - <button class="text-blue-400 underline">View</button></li>
-    </ul>
-  </div>
-</div>
+    <!-- Tools -->
+    <div x-show="tab === 'tools'" class="transition-all">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="card p-4">
+          <h3 class="text-lg font-bold mb-2">Document Generator</h3>
+          <button class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white">Launch Tool</button>
+        </div>
+        <div class="card p-4">
+          <h3 class="text-lg font-bold mb-2">Smart Legal Bot</h3>
+          <button class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white">Check It Out</button>
+        </div>
+        <div class="card p-4">
+          <h3 class="text-lg font-bold mb-2">Mock Trial Engine</h3>
+          <button class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white">Start Trial</button>
+        </div>
+        <div class="card p-4">
+          <h3 class="text-lg font-bold mb-2">Legal Coaching</h3>
+          <button class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white">Schedule Now</button>
+        </div>
+      </div>
+    </div>
 
+    <!-- Docs -->
+    <div x-show="tab === 'docs'" class="transition-all">
+      <div class="card p-6">
+        <h2 class="text-xl font-bold glow mb-2">Help & Documentation</h2>
+        <p>Explore FAQs, legal topics, and system guides to get the most from LexOmega.</p>
+      </div>
+    </div>
   </main>
 </body>
 </html>
