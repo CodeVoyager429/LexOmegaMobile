@@ -1,178 +1,61 @@
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LexOmega | AI Legal Platform</title>
-  <link rel="stylesheet" href="styles.css" /> <!-- Optional external stylesheet -->
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; color: #333; }
-    header { background: #222; color: #fff; padding: 1rem; text-align: center; }
-    nav a { margin: 0 1rem; color: #fff; text-decoration: none; }
-    section { padding: 2rem; }
-    button { padding: 0.5rem 1rem; margin: 0.5rem; background: #007BFF; color: white; border: none; border-radius: 5px; }
-    .section-block { background: white; margin: 1rem 0; padding: 1rem; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
-    textarea, input[type="text"] { width: 100%; padding: 0.5rem; margin: 0.5rem 0; }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>LexOmega</h1>
-    <nav>
-      <a href="#subscriptions">Subscriptions</a>
-      <a href="#casebuilder">Case Builder</a>
-      <a href="#mocktrial">Mock Trial</a>
-      <a href="#assistant">Smart Assistant</a>
-      <a href="#documents">Documents</a>
-    </nav>
-  </header>  <main>
-    <!-- Subscription Section -->
-    <section id="subscriptions">
-      <h2>Subscription Plans</h2>
-      <div class="section-block">
-        <h3>Free Plan</h3>
-        <p>Explore basic legal tools.</p>
-        <button onclick="subscribe('free')">Subscribe - $0</button>
-      </div>
-      <div class="section-block">
-        <h3>Pro Plan</h3>
-        <p>Unlock document generation, case tracking, and assistant queries.</p>
-        <button onclick="subscribe('pro')">Subscribe - $19.89/month</button>
-      </div>
-      <div class="section-block">
-        <h3>Executive Plan</h3>
-        <p>All features + custom trial simulations and 1-on-1 AI legal coaching.</p>
-        <button onclick="subscribe('executive')">Subscribe - $99/month</button>
-      </div>
-    </section><!-- Case Builder -->
-<section id="casebuilder">
-  <h2>Case Builder</h2>
-  <div class="section-block">
-    <input type="text" id="caseTitle" placeholder="Enter your case title...">
-    <textarea id="caseDetails" rows="6" placeholder="Describe your legal case..."></textarea>
-    <button onclick="generateCaseSummary()">Build Case</button>
-    <div id="caseOutput"></div>
-  </div>
-</section>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>LexOmega | Home</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="chatbot.js"></script>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <header class="navbar">
+      <div class="logo">LexOmega</div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="dashboard-pro.html">Dashboard</a></li>
+          <li><a href="#legal-tools">Legal Tools</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="#subscribe">Subscribe</a></li>
+        </ul>
+      </nav>
+    </header>
 
-<!-- Mock Trial -->
-<section id="mocktrial">
-  <h2>Mock Trial Interface</h2>
-  <div class="section-block">
-    <textarea id="trialInput" rows="4" placeholder="State your argument or testimony..."></textarea>
-    <button onclick="runMockTrial()">Run Trial</button>
-    <div id="trialResult"></div>
-  </div>
-</section>
+    <!-- Hero Section -->
+    <section class="hero">
+      <h1>Welcome to LexOmega</h1>
+      <p>The most advanced AI-powered legal ecosystem on the web.</p>
+      <a href="dashboard-pro.html" class="btn-primary">Go to Dashboard</a>
+    </section>
 
-<!-- Smart Assistant -->
-<section id="assistant">
-  <h2>Smart Legal Assistant</h2>
-  <div class="section-block">
-    <input type="text" id="assistantQuery" placeholder="Ask a legal question...">
-    <button onclick="askAssistant()">Ask</button>
-    <div id="assistantResponse"></div>
-  </div>
-</section>
+    <!-- Info Section -->
+    <section class="info">
+      <h2>Why LexOmega?</h2>
+      <p>Because you deserve tools that work as smart as you do. Draft documents. Build legal cases. Talk to AI.</p>
+    </section>
 
-<!-- Document Generator -->
-<section id="documents">
-  <h2>Document Generator</h2>
-  <div class="section-block">
-    <textarea id="docRequest" rows="4" placeholder="Describe the document you need..."></textarea>
-    <button onclick="generateDocument()">Generate Document</button>
-    <div id="documentOutput"></div>
-  </div>
-</section>
+    <!-- Subscription CTA -->
+    <section class="cta" id="subscribe">
+      <h2>Subscribe to Unlock Pro Tools</h2>
+      <button class="btn-subscribe">Start Now</button>
+    </section>
 
-  </main>  <script>
-    const stripePublicKey = "pk_test_51RgY4aRCl8umQAWcaCMNmqrIu2jDE6gKn2g5b38eLxWLH8CQQ4yzy70n7qscEszCBgdId9weHkByCC1Myk07FAvp00knqygX45";
-    const chatGPTKey = "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";
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2025 LexOmega. All rights reserved.</p>
+    </footer>
 
-    function subscribe(plan) {
-      alert(`Redirecting to Stripe for ${plan} subscription.`);
-      // Replace these URLs with your actual Stripe Checkout URLs
-      const urls = {
-        free: "#", // No payment for free tier
-        pro: "https://checkout.stripe.com/pay/pro-plan-placeholder",
-        executive: "https://checkout.stripe.com/pay/executive-plan-placeholder"
-      };
-      window.location.href = urls[plan];
-    }
-
-    async function generateCaseSummary() {
-      const input = document.getElementById('caseDetails').value;
-      const output = document.getElementById('caseOutput');
-      output.innerHTML = "Generating...";
-      const res = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${chatGPTKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4",
-          messages: [{ role: "user", content: `Summarize this legal case: ${input}` }]
-        })
-      });
-      const data = await res.json();
-      output.innerHTML = data.choices[0].message.content;
-    }
-
-    async function runMockTrial() {
-      const input = document.getElementById('trialInput').value;
-      const output = document.getElementById('trialResult');
-      output.innerHTML = "Processing...";
-      const res = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${chatGPTKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4",
-          messages: [{ role: "user", content: `Simulate a mock trial with this statement: ${input}` }]
-        })
-      });
-      const data = await res.json();
-      output.innerHTML = data.choices[0].message.content;
-    }
-
-    async function askAssistant() {
-      const input = document.getElementById('assistantQuery').value;
-      const output = document.getElementById('assistantResponse');
-      output.innerHTML = "Responding...";
-      const res = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${chatGPTKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4",
-          messages: [{ role: "user", content: input }]
-        })
-      });
-      const data = await res.json();
-      output.innerHTML = data.choices[0].message.content;
-    }
-
-    async function generateDocument() {
-      const input = document.getElementById('docRequest').value;
-      const output = document.getElementById('documentOutput');
-      output.innerHTML = "Generating...";
-      const res = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${chatGPTKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4",
-          messages: [{ role: "user", content: `Create this legal document: ${input}` }]
-        })
-      });
-      const data = await res.json();
-      output.innerHTML = data.choices[0].message.content;
-    }
-  </script></body>
+    <!-- Floating Chatbot Button -->
+    <button id="chatbot-toggle">💬</button>
+    <div id="chatbot-container" class="hidden">
+      <iframe
+        src=""
+        id="chatbot-frame"
+        frameborder="0"
+        width="100%"
+        height="400px"
+      ></iframe>
+    </div>
+  </body>
 </html>
