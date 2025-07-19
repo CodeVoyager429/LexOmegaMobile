@@ -2,42 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LexOmega Tools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LexOmega | Tools</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-left">
-      <h1 class="logo">LexOmega Legal AI</h1>
-    </div>
-    <div class="nav-right">
-      <a href="index.html">Home</a>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="tools.html">Tools</a>
-      <a href="documents.html">Documents</a>
-    </div>
+  <nav>
+    <ul class="navbar">
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="dashboard.html">📊 Dashboard</a></li>
+      <li><a href="tools.html" class="active">🛠️ Tools</a></li>
+      <li><a href="documents.html">📄 Documents</a></li>
+      <li><a href="chat.html">💬 Chat</a></li>
+    </ul>
   </nav>
 
   <main class="main-content">
-    <section class="card glowing-card">
-      <h2>🛠️ Legal Tools</h2>
-      <p>Use advanced AI tools for contract drafting, risk analysis, and legal strategy generation.</p>
+    <h1 class="glow-title">🛠️ LexOmega Tool Suite</h1>
+
+    <section class="card">
+      <h2>Legal Tools</h2>
+      <ul>
+        <li>📑 Contract Generator</li>
+        <li>🔎 Case Law Lookup</li>
+        <li>✍️ Auto-Fill Legal Forms</li>
+        <li>💼 Client Summary Builder</li>
+        <li>📚 AI Legal Assistant (ChatBot)</li>
+      </ul>
     </section>
 
-    <section class="card glowing-card">
-      <h2>📑 Document Generator</h2>
-      <p>Auto-generate affidavits, motions, cease and desist letters, and more with smart templates.</p>
-    </section>
-
-    <section class="card glowing-card">
-      <h2>🔍 Legal Research AI</h2>
-      <p>Explore statutes, case law, and generate citations using real-time AI-assisted research.</p>
-    </section>
-
-    <section class="special-message">
-      <p>🌟 *LexOmega: Crafted with Purpose. Designed for Justice.*</p>
+    <section class="card">
+      <h2>Quick Actions</h2>
+      <button onclick="location.href='chat.html'">Launch AI Chat</button>
+      <button onclick="location.href='documents.html'">Go to Documents</button>
     </section>
   </main>
+
+  <footer>
+    <p class="footer-verse">"The Lord will fight for you, and you shall hold your peace." – Exodus 14:14</p>
+  </footer>
 </body>
 </html>
