@@ -2,39 +2,149 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LexOmega Legal AI</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script defer src="chatbot.js"></script>
-  <script src="https://js.stripe.com/v3/"></script>
+  <title>LexOmega | Final Index</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(145deg, #111, #2d2d2d);
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
+    header {
+      background-color: #000;
+      padding: 1.5rem;
+      font-size: 2rem;
+      font-weight: bold;
+      border-bottom: 2px solid gold;
+      color: cyan;
+      text-align: center;
+    }
+    nav {
+      position: sticky;
+      top: 0;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid teal;
+      z-index: 1000;
+    }
+    nav a {
+      color: gold;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    nav a:hover {
+      color: white;
+    }
+    .announcement-bar {
+      background: teal;
+      color: black;
+      padding: 0.5rem;
+      text-align: center;
+      font-weight: bold;
+      animation: scrollText 15s linear infinite;
+    }
+    @keyframes scrollText {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+    section {
+      padding: 3rem 2rem;
+      margin: 2rem auto;
+      max-width: 1000px;
+      background-color: #1e1e1e;
+      border-radius: 15px;
+    }
+    .button {
+      background: gold;
+      color: black;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    .button:hover {
+      background: white;
+      transform: scale(1.05);
+    }
+    footer {
+      background-color: #000;
+      padding: 2rem;
+      text-align: center;
+      color: #aaa;
+    }
+    .floating-chatbot {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: gold;
+      color: black;
+      padding: 0.7rem 1.5rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      z-index: 1000;
+    }
+    .dark-mode {
+      background-color: #000;
+      color: #fff;
+    }
+    @media (max-width: 768px) {
+      nav {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+  <script src="chatbot.js" defer></script>
+  <script src="checkout.js" defer></script>
 </head>
 <body>
-  <header>
-    <div class="logo">LexOmega</div>
-    <nav>
-      <ul>
-        <li><a href="#home">Home</a></li>
-        <li><a href="#dashboard">Dashboard</a></li>
-        <li><a href="#tools">Tools</a></li>
-        <li><a href="#documents">Documents</a></li>
-      </ul>
-    </nav>
-  </header>  <section class="hero" id="home">
-    <h1>LexOmega &mdash; The First AI Law Firm</h1>
-    <p>Welcome to LexOmega: The Future of Legal Intelligence</p>
-    <div class="alert">📢 LexOmega Launch Offer: 30-day free trial. No credit card required.</div>
-  </section>  <section class="account-access">
-    <h2>Account Access</h2>
-    <button class="btn">Login</button>
-    <button class="btn">Create Account</button>
-  </section>  <section class="documents-preview" id="documents">
+  <header>LexOmega — The First AI Law Firm</header>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#dashboard">Dashboard</a>
+    <a href="#tools">Tools</a>
+    <a href="#documents">Documents</a>
+  </nav>
+  <div class="announcement-bar">📢 LexOmega Launch Offer: 30-day free trial. No credit card required.</div>  <section id="home">
+    <h1>Welcome to LexOmega</h1>
+    <p class="tagline">The Future of Legal Intelligence</p>
+    <button class="button" onclick="alert('Get Started')">Get Started</button>
+  </section>  <section id="dashboard">
+    <h2>Live Dashboard Preview</h2>
+    <p>Track activity, analyze insights, and manage client data in real-time.</p>
+  </section>  <section id="tools">
+    <h2>Smart Tools & Features</h2>
+    <ul>
+      <li>LexCore Legal Engine</li>
+      <li>Smart Notary / Contract Generator</li>
+      <li>AI Chat Legal Assistant</li>
+      <li>Scheduler & Mock Trial Modules</li>
+    </ul>
+  </section>  <section id="documents">
     <h2>Embedded Legal Document Preview</h2>
-    <!-- Example embedded content -->
-    <iframe src="document.html" width="100%" height="400"></iframe>
-  </section>  <footer>
+    <iframe src="sample-legal-doc.html" width="100%" height="400px" style="border: none;"></iframe>
+  </section>  <section id="login">
+    <h2>Account Access</h2>
+    <button class="button">Login</button>
+    <button class="button">Create Account</button>
+  </section>  <section id="darkmode">
+    <h2>Toggle Dark Mode</h2>
+    <button class="button" id="toggle-dark">🌙 Toggle</button>
+  </section>  <div class="floating-chatbot" onclick="alert('Chatbot opening soon!')">💬 Chat</div>  <footer>
     <p>&copy; 2025 LexOmega. All rights reserved.</p>
-    <p><em>'I am the way, the truth, and the life. No one comes to the Father except through Me.' &mdash; John 14:6</em></p>
-  </footer>  <button id="chat-toggle" class="floating-chat">
-    💬 Chat
-  </button>
-</body>
+    <p><em>"Jesus said to him, 'I am the way, the truth, and the life. No one comes to the Father except through Me.' — John 14:6</em></p>
+  </footer>  <script>
+    document.getElementById('toggle-dark').addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+  </script></body>
 </html>
