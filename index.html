@@ -1,96 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LexOmega | Legal AI Hub</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <style>
-    body {
-      background: radial-gradient(circle at top, #1e293b, #0f172a);
-      color: #e2e8f0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .glow {
-      text-shadow: 0 0 5px #00f2ff, 0 0 10px #00f2ff;
-    }
-    .card {
-      background: #1e293b;
-      border-radius: 1rem;
-      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-    }
-  </style>
+  <title>LexOmega | Home</title>  <!-- External Stylesheets -->  <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="p-6" x-data="{ tab: 'home' }">
+<body>
+  <!-- Real-Time Announcement -->
+  <div class="announcement">⚖️ Welcome to LexOmega – Where Law Meets Intelligence!</div>  <!-- Login Button --><a href="login.html" class="login-btn">Login</a>
 
-  <header class="flex justify-between items-center py-4">
-    <h1 class="text-3xl font-bold glow">LexOmega Legal AI</h1>
-    <nav class="space-x-4">
-      <button class="hover:underline" @click="tab = 'home'">Home</button>
-      <button class="hover:underline" @click="tab = 'dashboard'">Dashboard</button>
-      <button class="hover:underline" @click="tab = 'tools'">Tools</button>
-      <button class="hover:underline" @click="tab = 'docs'">Documents</button>
-    </nav>
-  </header>
-
-  <!-- External navigation links -->
-  <div class="space-x-4 mb-6">
-    <a href="mocktrial.html" class="hover:underline font-semibold text-white transition duration-200 ease-in-out">🧑‍⚖️ Mock Trial</a>
-    <a href="chat.html" class="hover:underline font-semibold text-white transition duration-200 ease-in-out">💬 Chat Assistant</a>
-  </div>
-
-  <main class="mt-8">
-    <!-- Home -->
-    <div x-show="tab === 'home'" class="transition-all">
-      <div class="card p-6 text-lg">
-        <h2 class="text-2xl font-semibold glow mb-4">Welcome to LexOmega</h2>
-        <p>This is your one-stop legal AI hub. Generate legal documents, interact with your smart legal assistant, and manage mock trials.</p>
-      </div>
+  <!-- Navigation Bar -->  <nav>
+    <a href="#home">Home</a>
+    <a href="#dashboard">Dashboard</a>
+    <a href="#legal-tools">Legal Tools</a>
+    <a href="#chat">Chat</a>
+    <a href="#messenger">Messenger</a>
+    <a href="#support">Support</a>
+    <a href="#contact">Contact</a>
+    <a href="terms-of-service.html">Terms</a>
+    <a href="privacy.html">Privacy</a>
+  </nav>  <!-- Hero Section -->  <section id="home" class="hero">
+    <h1>LexOmega</h1>
+    <p>Your Ultimate AI Legal Intelligence Platform for Contracts, Support, and More</p>
+    <a href="#dashboard"><button class="cta-button">Launch Dashboard</button></a>
+  </section>  <!-- Embedded Legal Document Preview -->  <iframe class="iframe-preview" src="/documents/sample-contract.html"></iframe>  <!-- Dashboard Section -->  <section id="dashboard" class="dashboard-preview">
+    <h2>Live Dashboard Preview</h2>
+    <div class="card-grid">
+      <div class="card">Documents</div>
+      <div class="card">Mock Trial</div>
+      <div class="card">Chat Archive</div>
+      <div class="card">Scheduler</div>
     </div>
-
-    <!-- Dashboard -->
-    <div x-show="tab === 'dashboard'" class="transition-all">
-      <div class="card p-6">
-        <h2 class="text-xl font-bold glow mb-2">Your Dashboard</h2>
-        <ul class="list-disc ml-5">
-          <li>Subscription Status: <strong>Active</strong></li>
-          <li>Documents Generated: 14</li>
-          <li>Mock Trials Run: 3</li>
-          <li>Plan: Pro Tier</li>
-        </ul>
+  </section>  <!-- Maka Pro Tools Section -->  <section id="maka-pro" class="section">
+    <h2>Maka Pro Tools</h2>
+    <p>Advanced litigation, contract creation & case summarization modules</p>
+  </section>  <!-- XQ Dashboard Section -->  <section id="xq-dashboard" class="section">
+    <h2>XQ Dashboard</h2>
+    <p>Realtime analytics, client activity, and integrated visual logs</p>
+  </section>  <!-- Legal Tools Section -->  <section id="legal-tools" class="section">
+    <h2>Legal Tools</h2>
+    <ul>
+      <li>LexCore Legal Engine</li>
+      <li>Smart Contract Generator</li>
+      <li>Case Navigator</li>
+    </ul>
+  </section>  <!-- Messenger Section -->  <section id="messenger" class="section">
+    <h2>LexOmega Messenger</h2>
+    <p>Connect securely with legal advisors in real-time.</p>
+    <div class="messenger-ui">
+      <div class="message-inbox">
+        <p><strong>Client:</strong> I need help with a contract issue.</p>
+        <p><strong>LexBot:</strong> Sure! Upload it or describe it below.</p>
       </div>
+      <textarea placeholder="Type your message..."></textarea>
+      <button class="cta-button">Send</button>
     </div>
-
-    <!-- Tools -->
-    <div x-show="tab === 'tools'" class="transition-all">
-      <div class="grid md:grid-cols-2 gap-4">
-        <div class="card p-4">
-          <h3 class="text-lg font-bold mb-2">Document Generator</h3>
-          <button class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white">Launch Tool</button>
-        </div>
-        <div class="card p-4">
-          <h3 class="text-lg font-bold mb-2">Smart Legal Bot</h3>
-          <button class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white">Check It Out</button>
-        </div>
-        <div class="card p-4">
-          <h3 class="text-lg font-bold mb-2">Mock Trial Engine</h3>
-          <button class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white">Start Trial</button>
-        </div>
-        <div class="card p-4">
-          <h3 class="text-lg font-bold mb-2">Legal Coaching</h3>
-          <button class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white">Schedule Now</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Docs -->
-    <div x-show="tab === 'docs'" class="transition-all">
-      <div class="card p-6">
-        <h2 class="text-xl font-bold glow mb-2">Help & Documentation</h2>
-        <p>Explore FAQs, legal topics, and system guides to get the most from LexOmega.</p>
-      </div>
-    </div>
-  </main>
-</body>
+  </section>  <!-- Subscribe Section -->  <section id="subscribe" class="section">
+    <h2>Subscribe to LexOmega</h2>
+    <form id="subscription-form">
+      <input type="email" placeholder="Enter your email" required />
+      <button type="submit" id="checkout-button">Subscribe Now</button>
+    </form>
+  </section>  <!-- Contact Section -->  <section id="contact" class="section">
+    <h2>Contact Us</h2>
+    <p>Email: support@lexomega.ai</p>
+  </section>  <!-- Floating Buttons -->  <div id="chatbot-button" class="floating-support">💬</div>
+  <div id="darkmode-toggle">🌙 Dark Mode</div>  <!-- Footer -->  <footer>
+    <p>"For the Lord gives wisdom; from His mouth come knowledge and understanding." – Proverbs 2:6 (NKJV)</p>
+    <p>&copy; 2025 LexOmega. All rights reserved.</p>
+  </footer>  <!-- External Scripts -->  <script src="chatbot.js" defer></script>  <script src="checkout.js" defer></script></body>
 </html>
