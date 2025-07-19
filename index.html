@@ -1,207 +1,152 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LexOmega | The First AI Law Firm</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body {
+    * {
       margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(145deg, #111, #2d2d2d);
-      color: #f5f5f5;
+      padding: 0;
+      box-sizing: border-box;
       scroll-behavior: smooth;
     }
-
-    header {
-      text-align: center;
-      padding: 1.5rem;
-      background-color: #000;
-      color: cyan;
-      font-size: 2rem;
-      font-weight: bold;
-      border-bottom: 2px solid gold;
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to bottom, #111, #2d2d2d);
+      color: #fff;
+      padding-bottom: 100px;
     }
-
+    header {
+      background: #000;
+      text-align: center;
+      padding: 1.5rem 1rem 0.5rem;
+      border-bottom: 3px solid gold;
+    }
+    header h1 {
+      color: cyan;
+      font-size: 1.8rem;
+    }
     nav {
       display: flex;
       justify-content: center;
       background: #111;
-      padding: 0.8rem 0;
       border-bottom: 2px solid gold;
     }
-
     nav a {
       color: gold;
-      margin: 0 1.2rem;
       text-decoration: none;
+      padding: 0.75rem 1.5rem;
       font-weight: bold;
-      font-size: 1rem;
     }
-
     nav a:hover {
-      color: white;
+      background: #2d2d2d;
     }
-
     .announcement {
       background: teal;
       color: black;
+      text-align: center;
+      padding: 0.5rem;
       font-weight: bold;
-      padding: 0.7rem;
+    }
+    .hero {
       text-align: center;
+      padding: 2rem;
     }
-
-    section {
-      max-width: 960px;
-      margin: 2rem auto;
-      padding: 1rem;
-    }
-
-    .hero h1 {
+    .hero h2 {
+      font-size: 2rem;
       color: cyan;
-      font-size: 2.2rem;
-      text-align: center;
+    }
+    .hero p {
+      font-style: italic;
+      margin-top: 0.5rem;
+      color: #ccc;
+    }
+    section {
+      padding: 2rem 1.5rem;
+    }
+    h3 {
+      color: #fff;
       margin-bottom: 0.5rem;
     }
-
-    .cta {
-      font-style: italic;
-      text-align: center;
-      font-size: 1.1rem;
-    }
-
-    .dashboard-preview, .legal-preview {
-      background-color: #1e1e1e;
-      border-radius: 10px;
-      padding: 1.2rem;
-      margin-top: 2rem;
-    }
-
-    .dashboard-preview h2,
-    .legal-preview h2 {
-      margin-top: 0;
-      color: #fff;
-    }
-
-    .account-access {
-      text-align: center;
-      margin-top: 2rem;
-    }
-
-    .account-access button {
-      background-color: gold;
-      color: black;
-      padding: 0.8rem 1.5rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      margin: 0 0.5rem;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-
-    .floating-chat {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: gold;
-      color: black;
-      font-weight: bold;
-      border-radius: 30px;
-      padding: 0.6rem 1.2rem;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-      z-index: 1000;
-      cursor: pointer;
+    .account-buttons {
       display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .floating-chat:hover {
-      background-color: #ffcc00;
-    }
-
-    footer {
-      background-color: #111;
-      color: #ccc;
-      text-align: center;
-      padding: 1rem 1rem 2.5rem; /* extra space above chatbot */
-      font-size: 0.9rem;
-    }
-
-    iframe {
-      border: none;
-      border-radius: 8px;
-      width: 100%;
-      height: 300px;
+      justify-content: center;
+      gap: 1rem;
       margin-top: 1rem;
     }
-
-    @media (max-width: 600px) {
-      nav {
-        flex-wrap: wrap;
-      }
-      nav a {
-        margin: 0.5rem 0.7rem;
-      }
-      .account-access button {
-        margin: 0.5rem auto;
-        display: block;
-      }
+    .account-buttons button {
+      background: gold;
+      color: black;
+      padding: 0.7rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    iframe {
+      width: 100%;
+      height: 200px;
+      border: none;
+      margin-top: 1rem;
+      border-radius: 8px;
+    }
+    .chat-button {
+      position: fixed;
+      bottom: 1.2rem;
+      right: 1.2rem;
+      background: gold;
+      color: black;
+      border: none;
+      border-radius: 50px;
+      padding: 0.8rem 1.2rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      z-index: 999;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #ccc;
+      padding: 2rem 1rem 1rem;
+      background: #111;
+      border-top: 2px solid gold;
+    }
+    footer span {
+      display: block;
+      margin-bottom: 0.3rem;
     }
   </style>
 </head>
-
-<body>
-
-  <header>LexOmega — The First AI Law Firm</header>
-
-  <nav>
-    <a href="#home">Home</a>
-    <a href="#dashboard">Dashboard</a>
-    <a href="#tools">Tools</a>
-    <a href="#documents">Documents</a>
-  </nav>
-
-  <div class="announcement">
+<body>  <header>
+    <h1>LexOmega &mdash; The First AI Law Firm</h1>
+  </header>  <nav>
+    <a href="#">Home</a>
+    <a href="#">Dashboard</a>
+    <a href="#">Tools</a>
+    <a href="#">Documents</a>
+  </nav>  <div class="announcement">
     📢 LexOmega Launch Offer: 30-day free trial. No credit card required.
-  </div>
-
-  <section id="home" class="hero">
-    <h1>Welcome to LexOmega</h1>
-    <p class="cta">The Future of Legal Intelligence</p>
-  </section>
-
-  <section id="dashboard" class="dashboard-preview">
-    <h2>Live Dashboard Preview</h2>
+  </div>  <section class="hero">
+    <h2>Welcome to LexOmega</h2>
+    <p>The Future of Legal Intelligence</p>
+  </section>  <section>
+    <h3>Live Dashboard Preview</h3>
     <p>Analytics, case tracking, document generation and real-time alerts.</p>
-  </section>
-
-  <section id="account" class="account-access">
-    <button>Login</button>
-    <button>Create Account</button>
-  </section>
-
-  <section id="tools" class="legal-preview">
-    <h2>Embedded Legal Document Preview</h2>
-    <iframe src="clean-document-preview.html"></iframe>
-  </section>
-
-  <div class="floating-chat" onclick="launchChatbot()">
-    💬 Chat
-  </div>
+    <div class="account-buttons">
+      <button>Login</button>
+      <button>Create Account</button>
+    </div>
+  </section>  <section>
+    <h3>Embedded Legal Document Preview</h3>
+    <iframe srcdoc="<h2 style='color: cyan;'>LexOmega &mdash; Document Sample</h2><p style='color: #ccc;'>This is a preview of a legal document.</p>"></iframe>
+  </section><button class="chat-button">💬 Chat</button>
 
   <footer>
-    <p>"Jesus said to him, 'I am the way, the truth, and the life. No one comes to the Father except through Me.'" — John 14:6</p>
-    <p>&copy; 2025 LexOmega. All rights reserved.</p>
-  </footer>
-
-  <script>
-    function launchChatbot() {
-      alert("Launching LexOmega Chatbot...");
-    }
-  </script>
-
-</body>
+    <span>"Jesus said to him, 'I am the way, the truth, and the life. No one comes to the Father except through Me.' — John 14:6"</span>
+    <span>© 2025 LexOmega. All rights reserved.</span>
+  </footer></body>
 </html>
