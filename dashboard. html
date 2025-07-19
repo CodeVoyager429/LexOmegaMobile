@@ -2,42 +2,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LexOmega Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LexOmega | Dashboard</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-left">
-      <h1 class="logo">LexOmega Legal AI</h1>
-    </div>
-    <div class="nav-right">
-      <a href="index.html">Home</a>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="tools.html">Tools</a>
-      <a href="documents.html">Documents</a>
-    </div>
+  <nav>
+    <ul class="navbar">
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="dashboard.html" class="active">📊 Dashboard</a></li>
+      <li><a href="legal-tools.html">⚖️ Legal Tools</a></li>
+      <li><a href="documents.html">📄 Documents</a></li>
+      <li><a href="chat.html">💬 Chat</a></li>
+    </ul>
   </nav>
 
   <main class="main-content">
-    <section class="card glowing-card">
-      <h2>📊 Your Legal Dashboard</h2>
-      <p>Manage your AI tools, legal activity, documents, and connected services from this central hub.</p>
+    <h1 class="glow-title">📊 LexOmega Dashboard</h1>
+    <section class="card">
+      <h2>System Overview</h2>
+      <p>Welcome to your LexOmega command center. View your legal tools, case activity, and AI interactions all in one place.</p>
     </section>
 
-    <section class="card glowing-card">
-      <h2>⚙️ Configuration</h2>
-      <p>Customize your assistant, control privacy settings, and manage permissions from here.</p>
+    <section class="card">
+      <h2>Recent Activity</h2>
+      <ul>
+        <li>📝 Uploaded: "NDA-Client2025.pdf"</li>
+        <li>🔍 Accessed: Legal Analyzer Tool</li>
+        <li>📨 Sent: AI-assisted Case Summary</li>
+      </ul>
     </section>
 
-    <section class="card glowing-card">
-      <h2>🔐 Security Status</h2>
-      <p>Encryption Enabled • Smart Session • All Systems Go</p>
-    </section>
-
-    <section class="special-message">
-      <p>🌟 *LexOmega: Crafted with Purpose. Designed for Justice.*</p>
+    <section class="card">
+      <h2>Quick Access</h2>
+      <button onclick="location.href='legal-tools.html'">Launch Legal Tools</button>
+      <button onclick="location.href='documents.html'">View Documents</button>
     </section>
   </main>
+
+  <footer>
+    <p class="footer-verse">"Commit your works to the Lord, and your thoughts will be established." – Proverbs 16:3</p>
+  </footer>
 </body>
 </html>
