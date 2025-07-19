@@ -1,62 +1,43 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lex Omega Dashboard</title>
-  <link rel="stylesheet" href="css/dashboard.css" />
+  <title>LexOmega Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<!-- Navigation Bar -->
-<nav style="background-color: #2b2e4a; padding: 10px 0; text-align: center;">
-  <a href="index.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: bold;">Home</a>
-  <a href="lex-tools.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: bold;">Legal Tools</a>
-  <a href="case-tracking.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: bold;">Case Tracking</a>
-  <a href="faq.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: bold;">FAQ</a>
-  <a href="support.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: bold;">Support</a>
-  <a href="login.html" style="color: white; margin: 0 15px; text-decoration: none; font-weight: bold;">Login</a>
-</nav>
-  <header>
-    <h1>Welcome to Lex Omega</h1>
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="#">Legal Tools</a></li>
-        <li><a href="#">Case Tracker</a></li>
-        <li><a href="#">Logout</a></li>
-      </ul>
-    </nav>
-  </header>  <main>
-    <section class="profile-overview">
-      <h2>Your Profile</h2>
-      <p>Name: John Doe</p>
-      <p>Status: Active Client</p>
-    </section><section class="alerts">
-  <h2>Recent Alerts</h2>
-  <ul>
-    <li>Upcoming court date: August 14th</li>
-    <li>New document uploaded by legal team</li>
-  </ul>
-</section>
+  <nav class="navbar">
+    <div class="nav-left">
+      <h1 class="logo">LexOmega Legal AI</h1>
+    </div>
+    <div class="nav-right">
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="tools.html">Tools</a>
+      <a href="documents.html">Documents</a>
+    </div>
+  </nav>
 
-<section class="quick-links">
-  <h2>Quick Links</h2>
-  <div class="link-grid">
-    <a href="#">Find Legal Help</a>
-    <a href="#">Upload Documents</a>
-    <a href="#">View Case Files</a>
-    <a href="#">Schedule Meeting</a>
-  </div>
-</section>
+  <main class="main-content">
+    <section class="card glowing-card">
+      <h2>📊 Your Legal Dashboard</h2>
+      <p>Manage your AI tools, legal activity, documents, and connected services from this central hub.</p>
+    </section>
 
-<section class="daily-message">
-  <h2>Daily Legal Wisdom</h2>
-  <blockquote>
-    "Justice delayed is justice denied." – William E. Gladstone
-  </blockquote>
-</section>
+    <section class="card glowing-card">
+      <h2>⚙️ Configuration</h2>
+      <p>Customize your assistant, control privacy settings, and manage permissions from here.</p>
+    </section>
 
-  </main>  <footer>
-    <p>&copy; 2025 Lex Omega. All rights reserved.</p>
-  </footer>  <script src="js/dashboard.js"></script></body>
+    <section class="card glowing-card">
+      <h2>🔐 Security Status</h2>
+      <p>Encryption Enabled • Smart Session • All Systems Go</p>
+    </section>
+
+    <section class="special-message">
+      <p>🌟 *LexOmega: Crafted with Purpose. Designed for Justice.*</p>
+    </section>
+  </main>
+</body>
 </html>
