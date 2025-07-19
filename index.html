@@ -1,71 +1,206 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LexOmega | Home</title>  <!-- External Stylesheets -->  <link rel="stylesheet" href="styles.css" />
+  <title>LexOmega | Home</title>
+  
+  <!-- Styles -->
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(145deg, #1b1b1b, #2d2d2d);
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #111;
+      padding: 1.5rem;
+      font-size: 2rem;
+      font-weight: bold;
+      border-bottom: 2px solid gold;
+      color: gold;
+    }
+    .button-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 3rem;
+    }
+    button {
+      background: gold;
+      border: none;
+      color: black;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      min-width: 250px;
+    }
+    button:hover {
+      background-color: white;
+      transform: scale(1.05);
+    }
+    .section {
+      padding: 2rem;
+      margin-top: 2rem;
+      background-color: #1e1e1e;
+      border-radius: 15px;
+      display: none;
+    }
+    input, select {
+      padding: 0.7rem;
+      width: 80%;
+      margin: 1rem auto;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+    .output-box {
+      margin-top: 1rem;
+      font-style: italic;
+      color: #aaa;
+    }
+    .floating-support {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: gold;
+      color: black;
+      padding: 0.7rem 1.2rem;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    /* Dark Mode */
+    .dark-mode {
+      background-color: #000;
+      color: #fff;
+    }
+  </style>
+
+  <!-- Scripts -->
+  <script src="chatbot.js" defer></script>
+  <script src="checkout.js" defer></script>
 </head>
 <body>
-  <!-- Real-Time Announcement -->
-  <div class="announcement">⚖️ Welcome to LexOmega – Where Law Meets Intelligence!</div>  <!-- Login Button --><a href="login.html" class="login-btn">Login</a>
+  <header>LexOmega — First AI Law Firm</header>
 
-  <!-- Navigation Bar -->  <nav>
-    <a href="#home">Home</a>
-    <a href="#dashboard">Dashboard</a>
-    <a href="#legal-tools">Legal Tools</a>
-    <a href="#chat">Chat</a>
-    <a href="#messenger">Messenger</a>
-    <a href="#support">Support</a>
-    <a href="#contact">Contact</a>
-    <a href="terms-of-service.html">Terms</a>
-    <a href="privacy.html">Privacy</a>
-  </nav>  <!-- Hero Section -->  <section id="home" class="hero">
-    <h1>LexOmega</h1>
-    <p>Your Ultimate AI Legal Intelligence Platform for Contracts, Support, and More</p>
-    <a href="#dashboard"><button class="cta-button">Launch Dashboard</button></a>
-  </section>  <!-- Embedded Legal Document Preview -->  <iframe class="iframe-preview" src="/documents/sample-contract.html"></iframe>  <!-- Dashboard Section -->  <section id="dashboard" class="dashboard-preview">
-    <h2>Live Dashboard Preview</h2>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#dashboard">Dashboard</a></li>
+      <li><a href="#legal-tools">Legal Tools</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="#subscribe">Subscribe</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="home">
+    <h1>Welcome to LexOmega</h1>
+    <p class="tagline">The Future of Legal Intelligence</p>
+  </section>
+
+  <!-- Dashboard Section -->
+  <section id="dashboard" class="section">
+    <h2>Dashboard</h2>
     <div class="card-grid">
       <div class="card">Documents</div>
       <div class="card">Mock Trial</div>
       <div class="card">Chat Archive</div>
       <div class="card">Scheduler</div>
     </div>
-  </section>  <!-- Maka Pro Tools Section -->  <section id="maka-pro" class="section">
+  </section>
+
+  <!-- Maka Pro Section -->
+  <section id="maka-pro" class="section">
     <h2>Maka Pro Tools</h2>
     <p>Advanced litigation, contract creation & case summarization modules</p>
-  </section>  <!-- XQ Dashboard Section -->  <section id="xq-dashboard" class="section">
+  </section>
+
+  <!-- XQ Dashboard Section -->
+  <section id="xq-dashboard" class="section">
     <h2>XQ Dashboard</h2>
     <p>Realtime analytics, client activity, and integrated visual logs</p>
-  </section>  <!-- Legal Tools Section -->  <section id="legal-tools" class="section">
+  </section>
+
+  <!-- Legal Tools Section -->
+  <section id="legal-tools" class="section">
     <h2>Legal Tools</h2>
     <ul>
       <li>LexCore Legal Engine</li>
       <li>Smart Contract Generator</li>
       <li>Case Navigator</li>
     </ul>
-  </section>  <!-- Messenger Section -->  <section id="messenger" class="section">
-    <h2>LexOmega Messenger</h2>
-    <p>Connect securely with legal advisors in real-time.</p>
-    <div class="messenger-ui">
-      <div class="message-inbox">
-        <p><strong>Client:</strong> I need help with a contract issue.</p>
-        <p><strong>LexBot:</strong> Sure! Upload it or describe it below.</p>
-      </div>
-      <textarea placeholder="Type your message..."></textarea>
-      <button class="cta-button">Send</button>
-    </div>
-  </section>  <!-- Subscribe Section -->  <section id="subscribe" class="section">
+  </section>
+
+  <!-- Subscribe Section -->
+  <section id="subscribe" class="section">
     <h2>Subscribe to LexOmega</h2>
     <form id="subscription-form">
       <input type="email" placeholder="Enter your email" required />
       <button type="submit" id="checkout-button">Subscribe Now</button>
     </form>
-  </section>  <!-- Contact Section -->  <section id="contact" class="section">
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="section">
     <h2>Contact Us</h2>
     <p>Email: support@lexomega.ai</p>
-  </section>  <!-- Floating Buttons -->  <div id="chatbot-button" class="floating-support">💬</div>
-  <div id="darkmode-toggle">🌙 Dark Mode</div>  <!-- Footer -->  <footer>
-    <p>"For the Lord gives wisdom; from His mouth come knowledge and understanding." – Proverbs 2:6 (NKJV)</p>
+  </section>
+
+  <!-- Chatbot Button -->
+  <div id="chatbot-button" class="floating-support">💬</div>
+
+  <!-- Footer -->
+  <footer>
     <p>&copy; 2025 LexOmega. All rights reserved.</p>
-  </footer>  <!-- External Scripts -->  <script src="chatbot.js" defer></script>  <script src="checkout.js" defer></script></body>
+  </footer>
+
+  <script>
+    // Smooth Scroll for Navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // Dark Mode Toggle
+    const darkModeButton = document.createElement('button');
+    darkModeButton.innerHTML = '🌙 Toggle Dark Mode';
+    document.body.appendChild(darkModeButton);
+    darkModeButton.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+
+    // Function for toggling sections visibility
+    function toggleSection(id) {
+      document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
+      document.getElementById(id).style.display = 'block';
+    }
+
+    // Stripe Subscription integration (when the form is submitted)
+    document.getElementById('subscription-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = document.querySelector('input[type="email"]').value;
+      alert(`Processing your subscription for ${email}`);
+      // Implement your Stripe logic here
+    });
+
+    // Chatbot interaction (placeholder)
+    document.getElementById('chatbot-button').addEventListener('click', () => {
+      alert('Chatbot functionality will be added soon!');
+    });
+  </script>
+</body>
 </html>
