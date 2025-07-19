@@ -2,54 +2,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>XOmega | LexOmega Unified Portal</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>LexOmega – Where Law Meets Intelligence</title>
+  <link rel="stylesheet" href="styles.css" />
   <script defer src="chatbot.js"></script>
   <script defer src="checkout.js"></script>
 </head>
 <body>
-  <div class="announcement">⚖️ Welcome to LexOmega – Where Law Meets Intelligence!</div>
-  <header class="site-header">
-    <span class="logo">LexOmega Portal | Powered by XOmega</span>
-    <a href="login.html" class="login-button">Login</a>
-  </header>
-  <nav class="main-nav">
-    <a href="index.html">Home</a>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="tools.html">Legal Tools</a>
-    <a href="chat.html">Chat</a>
-    <a href="support.html">Support</a>
-    <a href="contact.html">Contact</a>
-    <a href="terms-of-service.html">Terms</a>
-    <a href="privacy.html">Privacy</a>
-  </nav>  <section class="hero">
-    <h1>Your Ultimate AI Legal Intelligence Platform</h1>
-    <p>Contracts, Support, and More — Powered by XOmega</p>
-    <button onclick="location.href='dashboard.html'">Launch Dashboard</button>
-  </section>  <section class="dashboard-preview">
+  <!-- Announcement Bar -->
+  <div class="announcement">⚖️ Welcome to LexOmega – Where Law Meets Intelligence!</div>  <!-- Navigation Bar -->  <nav class="navbar">
+    <div class="nav-left">LexOmega</div>
+    <ul class="nav-right">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="tools.html">Tools</a></li>
+      <li><a href="chat.html">Chat</a></li>
+      <li><a href="support.html">Support</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="terms-of-service.html">Terms</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+      <li><a href="login.html" class="login-btn">Login</a></li>
+    </ul>
+  </nav>  <!-- Hero Section -->  <header class="hero">
+    <h1>LexOmega</h1>
+    <p>Your Ultimate AI Legal Intelligence Platform for Contracts, Support, and More</p>
+    <a href="dashboard.html" class="cta-button">Launch Dashboard</a>
+  </header>  <!-- Smart Documents -->  <section class="smart-docs">
+    <h2>SmartDocuments</h2>
+    <p>Create, manage, and review legal documents in real time.</p>
+    <iframe src="documents/sample-contract.html" class="document-preview"></iframe>
+  </section>  <!-- Smart Notary -->  <section class="smart-notary">
+    <h2>SmartNotary</h2>
+    <p>Digitally notarize contracts with timestamp and validation log.</p>
+    <button onclick="alert('SmartNotary Signature Captured!')">Notarize Document</button>
+  </section>  <!-- Dashboard Preview -->  <section class="dashboard-preview">
     <h2>Live Dashboard Preview</h2>
-    <p>This section will showcase a visual snapshot of the current AI legal assistant state, metrics, and analytics tools once launched.</p>
-  </section>  <section class="embedded-pdf">
-    <iframe src="/documents/sample-contract.html" title="Sample Legal Document Preview"></iframe>
-  </section>  <section class="smart-buttons">
-    <button onclick="location.href='smart-notary.html'">Smart Notary</button>
-    <button onclick="location.href='smart-contract.html'">Smart Contract</button>
-  </section>  <section class="stripe-checkout">
-    <button onclick="startCheckout()">💳 Pay with Stripe</button>
-  </section><button class="floating-button" onclick="toggleChat()">💬 Chat</button> <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
-
-  <footer class="site-footer">
-    <p><em>"For the Lord gives wisdom; from His mouth come knowledge and understanding." – Proverbs 2:6 (NKJV)</em></p>
-  </footer>  <script>
-    function toggleChat() {
-      alert("Chatbot is currently loading. Please wait...");
-    }
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-      alert("Dark mode toggled!");
-    }
-    function startCheckout() {
-      alert("Redirecting to Stripe checkout...");
-    }
-  </script></body>
-</html>
+    <p>Preview of real-time legal interactions and workflows.</p>
+    <div class="preview-box">[Embedded Dashboard Preview Here]</div>
+  </section>  <!-- LexOmega Tools -->  <section class="tools">
+    <h2>LexOmega Pro Tools</h2>
+    <ul>
+      <li>LexCore Legal Engine</li>
+      <li>Smart Contract Generator</li>
+      <li>Case Navigator</li>
+    </ul>
+  </section>  <!-- Subscribe -->  <section class="subscribe">
+    <h2>Subscribe to LexOmega</h2>
+    <input type="email" placeholder="Enter your email" />
+    <button>Subscribe Now</button>
+  </section>  <!-- Contact Info -->  <section class="contact">
+    <h2>Contact Us</h2>
+    <p>Email: support@lexomega.ai</p>
+  </section>  <!-- Chatbot Button -->  <div class="chatbot-float" onclick="toggleChat()">💬</div>
