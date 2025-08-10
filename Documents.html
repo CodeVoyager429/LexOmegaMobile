@@ -1,43 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LexOmega Documents</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LexOmega | Documents</title>
+  <style>
+    :root{--bg:#0c0c0c;--card:#111;--text:#eaeaea;--muted:#b9b9b9;--accent:#ffd21a;--teal:#08979c;--cyan:#1fe0ff;--border:#2a2a2a;--shadow:0 10px 24px rgba(0,0,0,.35);--radius:12px}
+    *{box-sizing:border-box}html,body{height:100%;background:var(--bg);color:var(--text);margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto}
+    a{color:#19d2ff}
+    .nav{position:sticky;top:0;z-index:50;background:#0b0b0b;border-bottom:3px solid var(--accent);box-shadow:var(--shadow)}
+    .nav-inner{max-width:1100px;margin:0 auto;padding:14px 18px;display:flex;gap:22px;overflow-x:auto}
+    .nav a{color:var(--accent);font-weight:700;letter-spacing:.4px;padding:6px 10px;border-radius:8px;text-decoration:none}
+    .nav a:hover{background:rgba(255,210,26,.12)}
+    .promo{background:var(--teal);color:#081414;padding:12px 18px;font-weight:700;text-align:center}
+    .wrap{max-width:1100px;margin:28px auto 80px;padding:0 18px}
+    h1{font-size:clamp(30px,5vw,44px);margin:8px 0 8px;color:var(--cyan);font-weight:800}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px;border-bottom:1px solid var(--border);text-align:left}
+    .btn{appearance:none;border:0;cursor:pointer;padding:8px 12px;border-radius:8px;background:var(--accent);color:#151515;font-weight:800}
+  </style>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-left">
-      <h1 class="logo">LexOmega Legal AI</h1>
-    </div>
-    <div class="nav-right">
-      <a href="index.html">Home</a>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="tools.html">Tools</a>
-      <a href="documents.html">Documents</a>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/index.html">Home</a>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/tools.html">Tools</a>
+      <a href="/documents.html">Documents</a>
     </div>
   </nav>
+  <div class="promo">📢 <strong>LexOmega Launch Offer:</strong> 10-day free trial. No credit card required.</div>
 
-  <main class="main-content">
-    <section class="card glowing-card">
-      <h2>📂 Document Center</h2>
-      <p>View, manage, and export all your legal documents from a secure dashboard.</p>
-    </section>
+  <main class="wrap">
+    <h1>Documents</h1>
 
-    <section class="card glowing-card">
-      <h2>📤 Upload New Documents</h2>
-      <p>Securely upload legal files and attach metadata for AI-enhanced analysis.</p>
-    </section>
-
-    <section class="card glowing-card">
-      <h2>🧾 Smart Filing System</h2>
-      <p>Automatically organize documents by case type, urgency, or jurisdiction.</p>
-    </section>
-
-    <section class="special-message">
-      <p>🌟 *LexOmega: Crafted with Purpose. Designed for Justice.*</p>
+    <section class="card" style="overflow:auto">
+      <table>
+        <thead><tr><th>Title</th><th>Type</th><th>Updated</th><th></th></tr></thead>
+        <tbody id="docRows">
+          <tr><td colspan="4">Loading…</td></tr>
+        </tbody>
+      </table>
     </section>
   </main>
+
+  <script>
+    const token = localStorage.getItem('lexomega_token');
+    if (!token) location.href = '/index.html#login-required';
+
+    async function loadDocs(){
+      const tbody = document.getElementById('docRows');
+      try{
+        // Replace with your real endpoint
+        const res = await fetch('/api/documents', { headers:{Authorization:`Bearer ${token}`}});
+        const data = await res.json().catch(()=>({items:[]}));
+        const items = data.items?.length ? data.items : [
+          { id:'1', title:'NDA_v3.pdf', type:'PDF', updated:'Today' },
+          { id:'2', title:'Motion_to_Dismiss.docx', type:'DOCX', updated:'Yesterday' }
+        ];
+        tbody.innerHTML = '';
+        items.forEach(d=>{
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${d.title}</td>
+            <td>${d.type || '—'}</td>
+            <td>${d.updated || '—'}</td>
+            <td><button class="btn" data-id="${d.id}">View</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+        tbody.querySelectorAll('button').forEach(btn=>{
+          btn.onclick = ()=> alert('Viewer coming soon for doc '+btn.dataset.id);
+        });
+      }catch(_){
+        tbody.innerHTML = '<tr><td colspan="4">Failed to load documents.</td></tr>';
+      }
+    }
+    loadDocs();
+  </script>
 </body>
 </html>
