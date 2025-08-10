@@ -1,47 +1,95 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LexOmega | Dashboard</title>
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root{--bg:#0c0c0c;--card:#111;--text:#eaeaea;--muted:#b9b9b9;--accent:#ffd21a;--accent-strong:#ffcc00;--teal:#08979c;--cyan:#1fe0ff;--border:#2a2a2a;--shadow:0 10px 24px rgba(0,0,0,.35);--radius:12px}
+    *{box-sizing:border-box}html,body{height:100%;background:var(--bg);color:var(--text);margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial}
+    a{color:inherit;text-decoration:none}
+    .nav{position:sticky;top:0;z-index:50;background:#0b0b0b;border-bottom:3px solid var(--accent);box-shadow:var(--shadow)}
+    .nav-inner{max-width:1100px;margin:0 auto;padding:14px 18px;display:flex;gap:22px;overflow-x:auto}
+    .nav a{color:var(--accent);font-weight:700;letter-spacing:.4px;padding:6px 10px;border-radius:8px}
+    .nav a:hover{background:rgba(255,210,26,.12)}
+    .promo{background:var(--teal);color:#081414;padding:12px 18px;font-weight:700;text-align:center}
+    .wrap{max-width:1100px;margin:28px auto 80px;padding:0 18px}
+    h1{font-size:clamp(30px,5vw,44px);margin:8px 0 8px;color:var(--cyan);font-weight:800}
+    .sub{color:var(--muted);margin-bottom:22px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:18px 0 26px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+    .kpi{font-size:34px;font-weight:800}
+    .muted{color:var(--muted)}
+    .btn{appearance:none;border:0;cursor:pointer;padding:10px 16px;border-radius:10px;background:var(--accent);color:#151515;font-weight:800}
+    .toprow{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  </style>
 </head>
 <body>
-  <nav>
-    <ul class="navbar">
-      <li><a href="index.html">🏠 Home</a></li>
-      <li><a href="dashboard.html" class="active">📊 Dashboard</a></li>
-      <li><a href="legal-tools.html">⚖️ Legal Tools</a></li>
-      <li><a href="documents.html">📄 Documents</a></li>
-      <li><a href="chat.html">💬 Chat</a></li>
-    </ul>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/index.html">Home</a>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/tools.html">Tools</a>
+      <a href="/documents.html">Documents</a>
+    </div>
   </nav>
+  <div class="promo">📢 <strong>LexOmega Launch Offer:</strong> 10-day free trial. No credit card required.</div>
 
-  <main class="main-content">
-    <h1 class="glow-title">📊 LexOmega Dashboard</h1>
-    <section class="card">
-      <h2>System Overview</h2>
-      <p>Welcome to your LexOmega command center. View your legal tools, case activity, and AI interactions all in one place.</p>
+  <main class="wrap">
+    <div class="toprow">
+      <div>
+        <h1 id="greeting">Dashboard</h1>
+        <div class="sub">Analytics, case tracking, and alerts at a glance.</div>
+      </div>
+      <button class="btn" id="logoutBtn">Logout</button>
+    </div>
+
+    <section class="grid">
+      <div class="card"><div class="muted">Open Cases</div><div class="kpi" id="kpiCases">—</div></div>
+      <div class="card"><div class="muted">Documents</div><div class="kpi" id="kpiDocs">—</div></div>
+      <div class="card"><div class="muted">Alerts (24h)</div><div class="kpi" id="kpiAlerts">—</div></div>
     </section>
 
     <section class="card">
-      <h2>Recent Activity</h2>
-      <ul>
-        <li>📝 Uploaded: "NDA-Client2025.pdf"</li>
-        <li>🔍 Accessed: Legal Analyzer Tool</li>
-        <li>📨 Sent: AI-assisted Case Summary</li>
+      <h3 style="margin:6px 0 12px;">Recent Activity</h3>
+      <ul id="activity" class="muted" style="margin:0; padding-left:18px;">
+        <li>Loading…</li>
       </ul>
-    </section>
-
-    <section class="card">
-      <h2>Quick Access</h2>
-      <button onclick="location.href='legal-tools.html'">Launch Legal Tools</button>
-      <button onclick="location.href='documents.html'">View Documents</button>
     </section>
   </main>
 
-  <footer>
-    <p class="footer-verse">"Commit your works to the Lord, and your thoughts will be established." – Proverbs 16:3</p>
-  </footer>
+  <script>
+    const token = localStorage.getItem('lexomega_token');
+    if (!token) {
+      location.href = '/index.html#login-required';
+    }
+
+    async function bootstrap(){
+      try{
+        const me = await fetch('/api/auth/me', { headers:{Authorization:`Bearer ${token}`} }).then(r=>r.json()).catch(()=>null);
+        const name = (me && me.user && (me.user.name || me.user.username)) || 'LexOmega User';
+        document.getElementById('greeting').textContent = `Welcome, ${name}`;
+
+        // Example KPIs — replace with your real endpoints when ready
+        document.getElementById('kpiCases').textContent  = (me && me.user && me.user.casesCount)  || '12';
+        document.getElementById('kpiDocs').textContent   = (me && me.user && me.user.docsCount)   || '34';
+        document.getElementById('kpiAlerts').textContent = (me && me.user && me.user.alerts24h)   || '3';
+
+        const list = document.getElementById('activity');
+        list.innerHTML = '';
+        ['Filed motion in Case #2025-14','Uploaded “NDA_v3.pdf”','New alert: Hearing scheduled 8/28'].forEach(item=>{
+          const li=document.createElement('li'); li.textContent=item; list.appendChild(li);
+        });
+      }catch(_){ /* keep silent for now */ }
+    }
+
+    document.getElementById('logoutBtn').onclick = ()=>{
+      localStorage.removeItem('lexomega_token');
+      localStorage.removeItem('lexomega_user');
+      location.href = '/index.html#logged-out';
+    };
+
+    bootstrap();
+  </script>
 </body>
 </html>
