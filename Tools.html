@@ -1,45 +1,100 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LexOmega | Tools</title>
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root{--bg:#0c0c0c;--card:#111;--text:#eaeaea;--muted:#b9b9b9;--accent:#ffd21a;--teal:#08979c;--cyan:#1fe0ff;--border:#2a2a2a;--shadow:0 10px 24px rgba(0,0,0,.35);--radius:12px}
+    *{box-sizing:border-box}html,body{height:100%;background:var(--bg);color:var(--text);margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto}
+    a{color:inherit;text-decoration:none}
+    .nav{position:sticky;top:0;z-index:50;background:#0b0b0b;border-bottom:3px solid var(--accent);box-shadow:var(--shadow)}
+    .nav-inner{max-width:1100px;margin:0 auto;padding:14px 18px;display:flex;gap:22px;overflow-x:auto}
+    .nav a{color:var(--accent);font-weight:700;letter-spacing:.4px;padding:6px 10px;border-radius:8px}
+    .nav a:hover{background:rgba(255,210,26,.12)}
+    .promo{background:var(--teal);color:#081414;padding:12px 18px;font-weight:700;text-align:center}
+    .wrap{max-width:1100px;margin:28px auto 80px;padding:0 18px}
+    h1{font-size:clamp(30px,5vw,44px);margin:8px 0 8px;color:var(--cyan);font-weight:800}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:16px 0 26px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+    .btn{appearance:none;border:0;cursor:pointer;padding:12px 16px;border-radius:10px;background:var(--accent);color:#151515;font-weight:800}
+    .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+    .input, textarea{background:#141414;border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 12px;font-size:16px}
+    .muted{color:#b9b9b9}
+  </style>
 </head>
 <body>
-  <nav>
-    <ul class="navbar">
-      <li><a href="index.html">🏠 Home</a></li>
-      <li><a href="dashboard.html">📊 Dashboard</a></li>
-      <li><a href="tools.html" class="active">🛠️ Tools</a></li>
-      <li><a href="documents.html">📄 Documents</a></li>
-      <li><a href="chat.html">💬 Chat</a></li>
-    </ul>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/index.html">Home</a>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/tools.html">Tools</a>
+      <a href="/documents.html">Documents</a>
+    </div>
   </nav>
+  <div class="promo">📢 <strong>LexOmega Launch Offer:</strong> 10-day free trial. No credit card required.</div>
 
-  <main class="main-content">
-    <h1 class="glow-title">🛠️ LexOmega Tool Suite</h1>
+  <main class="wrap">
+    <h1>Tools</h1>
 
-    <section class="card">
-      <h2>Legal Tools</h2>
-      <ul>
-        <li>📑 Contract Generator</li>
-        <li>🔎 Case Law Lookup</li>
-        <li>✍️ Auto-Fill Legal Forms</li>
-        <li>💼 Client Summary Builder</li>
-        <li>📚 AI Legal Assistant (ChatBot)</li>
-      </ul>
-    </section>
+    <section class="grid">
+      <div class="card">
+        <h3>Smart Search</h3>
+        <p class="muted">Find cases and precedents fast.</p>
+        <div class="field">
+          <input class="input" id="q" placeholder="Search query…" />
+        </div>
+        <button class="btn" id="doSearch">Search</button>
+        <ul id="results" class="muted" style="margin-top:10px;padding-left:18px"></ul>
+      </div>
 
-    <section class="card">
-      <h2>Quick Actions</h2>
-      <button onclick="location.href='chat.html'">Launch AI Chat</button>
-      <button onclick="location.href='documents.html'">Go to Documents</button>
+      <div class="card">
+        <h3>Generate Document</h3>
+        <p class="muted">Draft a document from a short brief.</p>
+        <div class="field">
+          <label for="brief">Brief</label>
+          <textarea id="brief" rows="5" placeholder="Describe the document you need…"></textarea>
+        </div>
+        <button class="btn" id="genDoc">Generate</button>
+        <div id="genOut" class="muted" style="margin-top:10px"></div>
+      </div>
     </section>
   </main>
 
-  <footer>
-    <p class="footer-verse">"The Lord will fight for you, and you shall hold your peace." – Exodus 14:14</p>
-  </footer>
+  <script>
+    const token = localStorage.getItem('lexomega_token');
+    if (!token) location.href = '/index.html#login-required';
+
+    document.getElementById('doSearch').onclick = async ()=>{
+      const q = document.getElementById('q').value.trim();
+      const list = document.getElementById('results');
+      list.innerHTML = '<li>Searching…</li>';
+      try{
+        // Replace with your real search endpoint when ready
+        const res = await fetch('/api/tools/search?q='+encodeURIComponent(q), { headers:{Authorization:`Bearer ${token}`}});
+        const data = await res.json().catch(()=>({items:[]}));
+        list.innerHTML = '';
+        (data.items?.length ? data.items : ['No results']).forEach(i=>{
+          const li = document.createElement('li'); li.textContent = i.title || i; list.appendChild(li);
+        });
+      }catch(_){ list.innerHTML = '<li>Search failed.</li>'; }
+    };
+
+    document.getElementById('genDoc').onclick = async ()=>{
+      const brief = document.getElementById('brief').value.trim();
+      const out = document.getElementById('genOut');
+      if (!brief){ out.textContent = 'Please enter a brief.'; return; }
+      out.textContent = 'Generating…';
+      try{
+        const res = await fetch('/api/documents', {
+          method:'POST',
+          headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`},
+          body: JSON.stringify({ brief })
+        });
+        const data = await res.json().catch(()=>null);
+        out.textContent = data?.summary || 'Your draft is ready (sample).';
+      }catch(_){ out.textContent = 'Generation failed.'; }
+    };
+  </script>
 </body>
 </html>
