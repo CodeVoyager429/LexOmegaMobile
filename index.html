@@ -150,6 +150,24 @@
     .hide{display:none !important}
     .spacer{height:14px}
     .pill{display:inline-flex; align-items:center; gap:8px; background:#151515; border:1px solid var(--line); border-radius:999px; padding:6px 10px; font-size:12px; color:var(--muted)}
+
+    /* ============ Ask Lex: FAB + Chat ============ */
+    .fab{position:fixed; right:18px; bottom:18px; z-index:70}
+    .fab button{width:56px;height:56px;border-radius:50%;border:0;background:var(--accent);color:#111;font-weight:900;box-shadow:0 10px 24px rgba(255,208,0,.25);cursor:pointer}
+    .fab .mini{margin-left:8px;width:44px;height:44px;border-radius:50%;background:#1b1b1b;border:1px solid var(--line);color:var(--text)}
+    .chat{position:fixed; right:18px; bottom:88px; width:min(440px,92vw); background:var(--panel); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); display:none; flex-direction:column; overflow:hidden; z-index:69}
+    .chat header{display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid var(--line); background:#171717}
+    .chat header .ttl{font-weight:800}
+    .chat main{max-height:50vh; overflow:auto; padding:12px}
+    .chat .row{display:flex; gap:10px; margin-bottom:10px}
+    .chat .me{justify-content:flex-end}
+    .bubble{max-width:85%; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:#0f0f0f}
+    .bubble.me{background:#202020}
+    .chat footer{display:flex; gap:8px; padding:10px; border-top:1px solid var(--line); background:#141414}
+    .chat input{flex:1; background:#121212; border:1px solid #262626; color:var(--text); padding:10px 12px; border-radius:10px; outline:none}
+    .chat input:focus{box-shadow:var(--focus); border-color:#3b3b3b}
+    .chat .mic{width:42px; height:42px; border-radius:10px; background:#1b1b1b; border:1px solid var(--line); color:var(--text)}
+    .sr-only{position:absolute; left:-9999px}
   </style>
 </head>
 <body>
@@ -161,6 +179,7 @@
       <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
       <a href="tools.html" data-nav="tools">Tools</a>
       <a href="documents.html" data-nav="documents">Documents</a>
+      <a href="#" id="askLexLink">Ask&nbsp;Lex</a>
     </div>
   </nav>
 
@@ -177,6 +196,7 @@
         <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
         <a href="tools.html" data-nav="tools">Tools</a>
         <a href="documents.html" data-nav="documents">Documents</a>
+        <a href="#" id="askLexTop">Ask&nbsp;Lex</a>
       </div>
 
       <button class="hamburger" id="hamburger" aria-label="Open menu">
@@ -268,6 +288,29 @@
     </div>
   </div>
 
+  <!-- Floating Ask Lex -->
+  <div class="fab" aria-live="polite">
+    <button id="fabMain" title="Ask Lex">?</button>
+    <button class="mini" id="fabMic" title="Voice" aria-pressed="false">🎤</button>
+  </div>
+
+  <!-- Ask Lex Chat Panel -->
+  <section class="chat" id="chatPanel" aria-labelledby="chatTitle" role="dialog" aria-modal="false">
+    <header>
+      <div class="ttl" id="chatTitle">Ask Lex</div>
+      <div style="display:flex; gap:8px; align-items:center">
+        <button class="mic" id="micBtn" title="Start/Stop voice">🎤</button>
+        <button class="mic" id="closeChat" title="Close">✕</button>
+      </div>
+    </header>
+    <main id="chatLog" aria-live="polite" aria-label="Conversation"></main>
+    <footer>
+      <label for="chatInput" class="sr-only">Type your question</label>
+      <input id="chatInput" placeholder='Ask anything. Try: "Go to Tools" or "Search cases for Wilson v. Hart".' />
+      <button class="btn" id="sendBtn">Send</button>
+    </footer>
+  </section>
+
   <script>
     /* =========================================================
        Front-end polish + demo auth (no backend required)
@@ -281,7 +324,8 @@
       login: '/api/auth/login',          // POST {email,password}
       register: '/api/auth/register',    // POST {name,email,password}
       me: '/api/auth/me',                // GET bearer token
-      documentsSample: '/api/documents/sample' // GET sample preview (optional)
+      documentsSample: '/api/documents/sample', // GET sample preview (optional)
+      assist: '/api/assist'              // optional assistant; we fallback if missing
     };
 
     // ---- Nav ----
@@ -375,7 +419,7 @@
       setAuthState(null);
     }
 
-    // ---- Wire UI ----
+    // Wire UI
     qs('#btnLogin').addEventListener('click', ()=> openModal('loginModal'));
     qs('#btnCreate').addEventListener('click', ()=> openModal('registerModal'));
 
@@ -415,6 +459,115 @@
       }else{
         setAuthState(currentUser()?.user || null);
       }
+    })();
+
+    /* =========================================================
+       Ask Lex: Floating button, chat, intents, and voice nav
+       ========================================================= */
+    const AskLex = (()=> {
+      const END = { assist: ENDPOINTS.assist };
+
+      // Chat UI
+      const chat = {
+        panel: qs('#chatPanel'),
+        log: qs('#chatLog'),
+        input: qs('#chatInput'),
+        open(){ this.panel.style.display='flex'; this.input.focus(); },
+        close(){ this.panel.style.display='none'; },
+        add(text, who='bot'){
+          const row=document.createElement('div'); row.className='row '+(who==='me'?'me':'');
+          const b=document.createElement('div'); b.className='bubble '+(who==='me'?'me':''); b.textContent=text;
+          row.appendChild(b); this.log.appendChild(row); this.log.scrollTop=this.log.scrollHeight;
+        }
+      };
+
+      // Floating buttons
+      qs('#fabMain').addEventListener('click', ()=> chat.open());
+      qs('#askLexTop').addEventListener('click', (e)=>{ e.preventDefault(); chat.open(); });
+      qs('#askLexLink').addEventListener('click', (e)=>{ e.preventDefault(); chat.open(); });
+      qs('#openChatFromCard')?.addEventListener('click', ()=> chat.open());
+      qs('#closeChat').addEventListener('click', ()=> chat.close());
+
+      // Voice: SpeechRecognition + SpeechSynthesis
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const synth = window.speechSynthesis;
+      let rec = null, listening=false;
+
+      function speak(text){
+        try{ const u = new SpeechSynthesisUtterance(text); synth.speak(u); }catch{}
+      }
+      function toggleMic(state){
+        const btn = qs('#micBtn'); const fabMic = qs('#fabMic');
+        listening = state != null ? state : !listening;
+        btn.setAttribute('aria-pressed', String(listening));
+        fabMic.setAttribute('aria-pressed', String(listening));
+      }
+      function startListening(){
+        if(!SR){ chat.add("Voice not supported on this device/browser.", 'bot'); return; }
+        if(rec){ try{ rec.stop(); }catch{} }
+        rec = new SR(); rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=1;
+        rec.onresult = (e)=>{ const t=e.results[0][0].transcript; handleUserMessage(t, true); };
+        rec.onend = ()=> toggleMic(false);
+        rec.onerror = ()=> toggleMic(false);
+        rec.start(); toggleMic(true);
+      }
+      qs('#micBtn').addEventListener('click', ()=> listening ? (rec&&rec.stop(), toggleMic(false)) : startListening());
+      qs('#fabMic').addEventListener('click', ()=> listening ? (rec&&rec.stop(), toggleMic(false)) : (chat.open(), startListening()));
+
+      // Send / Enter
+      qs('#sendBtn').addEventListener('click', ()=> {
+        const t=chat.input.value.trim(); if(t){ chat.input.value=''; handleUserMessage(t); }
+      });
+      qs('#chatInput').addEventListener('keydown', (e)=>{
+        if(e.key==='Enter'){ e.preventDefault(); const t=chat.input.value.trim(); if(t){ chat.input.value=''; handleUserMessage(t); } }
+      });
+
+      // Intents (navigate & actions)
+      const intents = [
+        { match:/\b(go|navigate|open).*(home)\b/i, run:()=> nav('index.html') },
+        { match:/\b(go|navigate|open).*(tool|tools)\b/i, run:()=> nav('tools.html') },
+        { match:/\b(go|navigate|open).*(document|docs)\b/i, run:()=> nav('documents.html') },
+        { match:/\b(go|navigate|open).*(dashboard)\b/i, run:()=> nav('dashboard.html') },
+        { match:/\bscroll (down|lower)\b/i, run:()=> window.scrollBy({top:600,behavior:'smooth'}) },
+        { match:/\bscroll (up|higher)\b/i, run:()=> window.scrollBy({top:-600,behavior:'smooth'}) },
+        { match:/\b(open|start).*(notary)\b/i, run:()=> nav('tools.html') },
+        { match:/\b(search).*(case|cases)\b/i, run:(t)=> reply(`Open Tools → "Search Cases", then type: ${extractQuery(t)}`) },
+        { match:/\b(generate).*(document|doc)\b/i, run:()=> reply('Open Tools → "Generate Document", pick template, enter matter, click Generate.') }
+      ];
+      function nav(path){ reply(`Navigating to ${path.replace('.html','')}…`, true); setTimeout(()=>{ window.location.href = path; }, 450); }
+      function extractQuery(t){ const m=t.match(/for (.+)$/i); return m?m[1]:'your query'; }
+      function reply(text, noVoice){ chat.add(text,'bot'); if(!noVoice) speak(text); }
+
+      // Assistant call (optional backend)
+      async function assistCall(prompt){
+        try{
+          const r = await fetch(END.assist, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt }) });
+          if(!r.ok) throw new Error('offline');
+          const data = await r.json();
+          return data?.reply || 'OK.';
+        }catch{
+          // Demo fallback
+          if(/(tool|document|notary|mock|trial|case|dashboard|home|navigate|go)/i.test(prompt)){
+            return 'You can say “Go to Tools”, “Go to Documents”, or ask me to “Scroll down”.';
+          }
+          return 'Ask me to navigate (“Go to Tools”) or ask a question about using LexOmega.';
+        }
+      }
+
+      // Unified handler
+      async function handleUserMessage(text, fromVoice=false){
+        chat.add(text,'me');
+        for(const i of intents){
+          if(text.match(i.match)){ await i.run(text); return; }
+        }
+        const answer = await assistCall(text);
+        reply(answer);
+      }
+
+      // Keyboard shortcut: Shift+L opens chat
+      window.addEventListener('keydown', (e)=>{ if(e.shiftKey && e.key.toLowerCase()==='l'){ chat.open(); } });
+
+      return { open: ()=> chat.open() };
     })();
   </script>
 </body>
