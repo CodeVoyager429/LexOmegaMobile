@@ -1,293 +1,443 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Meta / SEO -->
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>LexOmega | The Future of Legal Intelligence</title>
-  <meta name="description" content="Analytics, case tracking, document generation, and real-time alerts." />
+  <meta name="description" content="LexOmega — analytics, case tracking, legal document generation, and real-time alerts." />
+  <meta property="og:title" content="LexOmega" />
+  <meta property="og:description" content="The Future of Legal Intelligence." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0c0c0c" />
   <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+
   <style>
     :root{
-      --bg:#0c0c0c;
-      --card:#111;
-      --text:#eaeaea;
-      --muted:#b9b9b9;
-      --accent:#ffd21a;   /* LexOmega yellow */
-      --accent-strong:#ffcc00;
-      --teal:#08979c;     /* banner teal */
-      --cyan:#1fe0ff;     /* headline cyan */
-      --border:#2a2a2a;
-      --shadow: 0 10px 24px rgba(0,0,0,.35);
-      --radius: 12px;
+      --bg:#0c0c0c; --card:#111214; --text:#eaeaea; --muted:#b9b9b9;
+      --accent:#ffd21a; --accent-strong:#ffcc00; --teal:#08979c; --cyan:#19d1ff;
+      --border:#2b2b2e; --ok:#1fc77a; --bad:#ff5c5c;
+      --shadow:0 10px 24px rgba(0,0,0,.35); --radius:14px; --radius-sm:10px; --maxw:1100px;
     }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:var(--maxw);margin:0 auto;padding:0 16px}
 
-    /* Reset-ish */
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; background:var(--bg); color:var(--text); margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; }
-    a{ color:inherit; text-decoration:none; }
-    img{ max-width:100%; display:block; }
+    /* Nav (shared) */
+    .nav{position:sticky;top:0;z-index:50;background:#0b0b0c;border-bottom:3px solid var(--accent);box-shadow:var(--shadow)}
+    .nav-inner{height:64px;display:flex;align-items:center;gap:18px}
+    .brand{font-weight:800;letter-spacing:.3px}
+    .spacer{flex:1}
+    .tabs{display:flex;gap:26px}
+    .tab{padding:10px 6px;border-bottom:3px solid transparent;font-weight:800;color:var(--text)}
+    .tab.active{border-color:var(--accent)}
 
-    /* Top nav */
-    .nav{
-      position:sticky; top:0; z-index:50;
-      background:#0b0b0b; border-bottom:3px solid var(--accent);
-      box-shadow:var(--shadow);
-    }
-    .nav-inner{
-      max-width:1100px; margin:0 auto; padding:14px 18px;
-      display:flex; align-items:center; gap:22px;
-      overflow-x:auto;
-    }
-    .nav a{
-      color:var(--accent); font-weight:700; letter-spacing:.4px;
-      padding:6px 10px; border-radius:8px;
-    }
-    .nav a:hover{ background:rgba(255,210,26,.12); }
-
-    /* Promo banner */
-    .promo{
-      background:var(--teal); color:#081414;
-      padding:12px 18px; font-weight:700; text-align:center;
-    }
-
-    /* Main container */
-    .wrap{ max-width:1100px; margin:28px auto 80px; padding:0 18px; }
-
-    h1{
-      font-size: clamp(34px, 6vw, 56px);
-      line-height:1.05; margin:14px 0 10px;
-      color:var(--cyan); font-weight:800;
-      text-shadow: 0 2px 0 rgba(0,0,0,.3);
-    }
-    .subhead{
-      color:var(--muted); font-size:20px; margin-bottom:38px;
-    }
+    /* Banner */
+    .promo{background:var(--teal);color:#051c1c;border-bottom:2px solid #037b7b;box-shadow:var(--shadow)}
+    .promo .inner{display:flex;gap:10px;align-items:center;padding:10px 14px}
+    .promo b{font-weight:800}
 
     /* Sections */
-    .section-title{ font-size:34px; font-weight:800; margin:36px 0 16px; }
-    .lead{ color:var(--muted); font-size:20px; }
+    main{padding:24px 0 80px}
+    section.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin:18px 0;box-shadow:var(--shadow)}
+    .title{font-size:clamp(22px,3.6vw,34px);margin:0 0 6px;font-weight:800}
+    .lead{color:var(--muted);margin:0 0 18px}
+    h1{font-size:clamp(32px,5vw,56px);margin:8px 0 6px;color:var(--cyan);font-weight:800}
 
-    .actions{ display:flex; gap:22px; margin:26px 0 36px; flex-wrap:wrap; }
+    /* Buttons / Inputs */
+    .row{display:flex;gap:14px;flex-wrap:wrap}
+    .btn{appearance:none;border:0;cursor:pointer;font-weight:800;padding:14px 20px;border-radius:12px}
+    .btn-primary{background:var(--accent);color:#171717;box-shadow:0 8px 18px rgba(255,210,26,.25)}
+    .btn-ghost{background:transparent;border:2px solid var(--accent);color:var(--accent)}
+    .btn-slim{padding:10px 14px;border-radius:10px}
+    .field{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+    .input,textarea{background:#151518;border:1px solid var(--border);color:var(--text);border-radius:12px;padding:12px 14px}
+    .muted{color:var(--muted)}
+    .grid{display:grid;gap:16px}
+    @media(min-width:760px){.grid.cols-3{grid-template-columns:repeat(3,1fr)} .grid.cols-2{grid-template-columns:repeat(2,1fr)}}
 
-    .btn{
-      appearance:none; border:0; cursor:pointer;
-      padding:16px 28px; border-radius:12px;
-      background:var(--accent); color:#151515;
-      font-weight:800; font-size:18px; letter-spacing:.2px;
-      box-shadow:0 8px 18px rgba(255,210,26,.25);
-      transition:transform .06s ease, filter .06s ease;
-    }
-    .btn:hover{ filter:brightness(1.05); transform:translateY(-1px); }
-    .btn:active{ transform:translateY(0); }
+    /* KPI Cards */
+    .kpi{background:#101113;border:1px solid var(--border);border-radius:12px;padding:16px}
+    .kpi .label{color:var(--muted);font-size:14px}
+    .kpi .value{font-size:32px;font-weight:800}
 
-    /* Document preview block */
-    .doc-block{
-      background:var(--card); border:1px solid var(--border);
-      border-radius:var(--radius); min-height:220px; padding:20px;
-      display:flex; align-items:center; justify-content:center;
-      margin:14px 0 36px;
-    }
-    .doc-link{
-      color:#18d0ff; font-size:24px; font-weight:800;
-      text-decoration:underline; text-underline-offset:4px;
-    }
+    /* Tables */
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px;border-bottom:1px solid var(--border);text-align:left}
 
-    /* Divider line above verse */
-    .divider{ height:4px; background:var(--accent); opacity:.85; margin:28px 0 18px; }
+    /* Footer */
+    footer{border-top:2px solid var(--accent);padding:20px 0;margin-top:28px}
+    .verse{color:#ddd;text-align:center;max-width:900px;margin:10px auto 0;padding:0 16px;line-height:1.6}
 
-    /* Verse footer */
-    .verse{
-      color:#ddd; text-align:center; max-width:900px; margin:0 auto 110px;
-      padding:0 18px; line-height:1.6; font-size:18px;
-    }
+    /* Modal (Auth) */
+    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:80}
+    .modal{width:min(480px,92vw);background:#111214;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:22px}
+    .modal h3{margin:0 0 10px}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+    .error{color:var(--bad);min-height:18px}
 
-    /* Floating chat button */
-    .chat{
-      position:fixed; right:18px; bottom:18px; z-index:60;
-      background:var(--accent); color:#111;
-      border-radius:999px; padding:14px 18px; font-weight:800;
-      display:flex; align-items:center; gap:10px; box-shadow:var(--shadow);
-    }
-    .chat .bubble{ width:20px; height:20px; background:#fff; border-radius:50%; display:inline-block; position:relative; }
-    .chat .bubble:after{
-      content:""; position:absolute; right:-4px; bottom:-2px;
-      width:8px; height:8px; background:#fff; border-radius:2px;
-      transform:rotate(45deg);
-    }
+    /* Toast */
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:#101114;border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:999px;display:none;z-index:90}
 
-    /* Modal (for login/register) */
-    .modal-backdrop{
-      position:fixed; inset:0; background:rgba(0,0,0,.55); display:none;
-      align-items:center; justify-content:center; z-index:70; padding:18px;
-    }
-    .modal{
-      width:100%; max-width:420px; background:#101010; color:var(--text);
-      border:1px solid var(--border); border-radius:16px; padding:20px;
-      box-shadow:var(--shadow);
-    }
-    .modal h3{ margin:0 0 12px; }
-    .field{ display:flex; flex-direction:column; gap:6px; margin:12px 0; }
-    .input{
-      background:#141414; border:1px solid var(--border); color:var(--text);
-      border-radius:10px; padding:12px 12px; font-size:16px;
-    }
-    .row{ display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
-    .btn-ghost{
-      background:transparent; color:var(--text); border:1px solid var(--border);
-      padding:12px 16px; border-radius:10px; font-weight:700; cursor:pointer;
-    }
-    .error{ color:#ff6b6b; font-weight:700; min-height:18px; margin-top:6px; }
+    /* Simple SPA routing */
+    [data-route]{display:none}
+    [data-route].show{display:block}
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav class="nav">
-    <div class="nav-inner">
-      <a href="#">Home</a>
-      <a href="#dashboard">Dashboard</a>
-      <a href="#tools">Tools</a>
-      <a href="#documents">Documents</a>
+  <!-- NAV (shared) -->
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand">LexOmega</div>
+      <div class="spacer"></div>
+      <nav class="tabs" aria-label="Primary">
+        <a class="tab" data-link href="#home">Home</a>
+        <a class="tab" data-link href="#dashboard">Dashboard</a>
+        <a class="tab" data-link href="#tools">Tools</a>
+        <a class="tab" data-link href="#documents">Documents</a>
+      </nav>
     </div>
-  </nav>
+  </header>
 
-  <!-- PROMO -->
-  <div class="promo">📢 <strong>LexOmega Launch Offer:</strong> 10-day free trial. No credit card required.</div>
-
-  <!-- MAIN -->
-  <main class="wrap">
-    <h1>Welcome to LexOmega</h1>
-    <div class="subhead">The Future of Legal Intelligence</div>
-
-    <section id="dashboard">
-      <div class="section-title">Live Dashboard Preview</div>
-      <p class="lead">Analytics, case tracking, document generation and real-time alerts.</p>
-
-      <div class="actions">
-        <button class="btn" id="loginBtn">Login</button>
-        <button class="btn" id="registerBtn" style="background:var(--accent-strong);">Create Account</button>
-      </div>
-    </section>
-
-    <section id="documents">
-      <div class="section-title">Embedded Legal Document Preview</div>
-      <div class="doc-block">
-        <a class="doc-link" href="#" onclick="alert('Sample viewer coming soon'); return false;">LexOmega — Document Sample</a>
-      </div>
-      <p class="lead">This is a preview of a legal document.</p>
-    </section>
-
-    <div class="divider"></div>
-
-    <footer class="verse">
-      “Jesus said to him, 'I am the way, the truth, and the life. No one comes to the Father except through Me.'” — John 14:6
-    </footer>
-  </main>
-
-  <!-- CHAT -->
-  <a class="chat" href="#chat">
-    <span class="bubble"></span>
-    <span>Chat</span>
-  </a>
-
-  <!-- LOGIN / REGISTER MODALS -->
-  <div class="modal-backdrop" id="authModal">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-      <h3 id="authTitle">Login</h3>
-      <div id="nameField" class="field" style="display:none;">
-        <label for="name">Name</label>
-        <input class="input" id="name" type="text" autocomplete="name" />
-      </div>
-      <div class="field">
-        <label for="email">Email</label>
-        <input class="input" id="email" type="email" autocomplete="email" />
-      </div>
-      <div class="field">
-        <label for="password">Password</label>
-        <input class="input" id="password" type="password" autocomplete="current-password" />
-      </div>
-      <div class="error" id="authError"></div>
-      <div class="row">
-        <button class="btn-ghost" id="cancelAuth">Cancel</button>
-        <button class="btn" id="submitAuth">Continue</button>
-      </div>
+  <!-- Banner -->
+  <div class="promo">
+    <div class="container inner">
+      <span aria-hidden="true">📢</span>
+      <div><b>LexOmega Launch Offer:</b> 10-day free trial. No credit card required.</div>
     </div>
   </div>
 
+  <!-- MAIN -->
+  <main class="container">
+
+    <!-- HOME -->
+    <section data-route="home" class="card">
+      <h1>Welcome to LexOmega</h1>
+      <p class="lead">The Future of Legal Intelligence</p>
+
+      <div class="title">Live Dashboard Preview</div>
+      <p class="lead">Analytics, case tracking, document generation and real-time alerts.</p>
+
+      <div class="row" role="group" aria-label="Primary actions">
+        <button class="btn btn-ghost" id="openLogin">Login</button>
+        <button class="btn btn-primary" id="openRegister">Create Account</button>
+      </div>
+    </section>
+
+    <section data-route="home" class="card">
+      <div class="title">Embedded Legal Document Preview</div>
+      <p class="lead">This is a preview of a legal document.</p>
+      <div style="background:#0d0e10;border:1px dashed var(--border);border-radius:12px;min-height:220px;display:grid;place-items:center;padding:10px">
+        <a class="muted" href="#" onclick="alert('Document viewer coming soon');return false;">LexOmega — Document Sample</a>
+      </div>
+    </section>
+
+    <!-- DASHBOARD (protected) -->
+    <section data-route="dashboard" class="card">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <div class="title" id="dashTitle">Dashboard</div>
+          <p class="lead">Analytics, case tracking, and alerts at a glance.</p>
+        </div>
+        <button class="btn btn-slim btn-ghost" id="logoutBtn">Logout</button>
+      </div>
+
+      <div class="grid cols-3" style="margin-top:6px">
+        <div class="kpi"><div class="label">Open Cases</div><div class="value" id="kpiCases">—</div></div>
+        <div class="kpi"><div class="label">Documents</div><div class="value" id="kpiDocs">—</div></div>
+        <div class="kpi"><div class="label">Alerts (24h)</div><div class="value" id="kpiAlerts">—</div></div>
+      </div>
+
+      <section class="card" style="margin-top:18px">
+        <div class="title">Recent Activity</div>
+        <ul id="activity" class="muted" style="margin:8px 0 0;padding-left:18px">
+          <li>Loading…</li>
+        </ul>
+      </section>
+    </section>
+
+    <!-- TOOLS (protected) -->
+    <section data-route="tools" class="card">
+      <div class="title">Tools</div>
+      <p class="lead">Quick access utilities to speed your workflow.</p>
+
+      <div class="grid cols-2">
+        <div class="card">
+          <div class="title" style="font-size:20px">Smart Search</div>
+          <p class="muted">Find cases and precedents fast.</p>
+          <div class="field">
+            <label for="q">Query</label>
+            <input id="q" class="input" placeholder="Search query…" />
+          </div>
+          <button class="btn btn-primary" id="doSearch">Search</button>
+          <ul id="results" class="muted" style="margin-top:10px;padding-left:18px"></ul>
+        </div>
+
+        <div class="card">
+          <div class="title" style="font-size:20px">Generate Document</div>
+          <p class="muted">Draft from a short brief.</p>
+          <div class="field">
+            <label for="brief">Brief</label>
+            <textarea id="brief" rows="5" class="input" placeholder="Describe the document you need…"></textarea>
+          </div>
+          <button class="btn btn-primary" id="genDoc">Generate</button>
+          <div id="genOut" class="muted" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DOCUMENTS (protected) -->
+    <section data-route="documents" class="card">
+      <div class="title">Documents</div>
+      <p class="lead">Your recent documents.</p>
+
+      <div class="card" style="overflow:auto">
+        <table>
+          <thead><tr><th>Title</th><th>Type</th><th>Updated</th><th></th></tr></thead>
+          <tbody id="docRows"><tr><td colspan="4">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p class="verse">“Jesus said to him, 'I am the way, the truth, and the life. No one comes to the Father except through Me.'” — John 14:6</p>
+      <p class="verse" style="margin-top:8px;">© 2025 LexOmega. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="backdrop" role="dialog" aria-labelledby="authTitle" aria-hidden="true">
+    <div class="modal">
+      <h3 id="authTitle">Login</h3>
+      <form id="authForm" class="grid">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" class="input" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" class="input" minlength="8" autocomplete="current-password" required />
+        </div>
+        <div id="nameRow" class="field" style="display:none">
+          <label for="name">Name</label>
+          <input id="name" type="text" class="input" />
+        </div>
+        <div class="error" id="authErr"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelAuth">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submitAuth">Continue</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
   <script>
-    // ======= CONFIG (adjust if your endpoints differ) =======
-    const ENDPOINTS = {
-      login: '/api/auth/login',
-      register: '/api/auth/register'
+    /* ---------- Configuration (adjust API_BASE if backend is separate) ---------- */
+    const API_BASE = ''; // '' = same origin (Vercel /api). Example external: 'https://lex-omega-backend.vercel.app'
+    const AUTH = {
+      // Using consolidated /api/auth with action query (as we built)
+      login:    `${API_BASE}/api/auth?action=login`,
+      register: `${API_BASE}/api/auth?action=register`,
+      me:       `${API_BASE}/api/auth?action=me`,
+      logout:   `${API_BASE}/api/auth?action=logout`
     };
-    const AFTER_AUTH_REDIRECT = '/dashboard.html'; // change if needed
+    const CAPABILITY = `${API_BASE}/api/capability`; // optional multi-action endpoint for tools/docs (stubs below)
 
-    // ======= UI helpers =======
-    const $ = sel => document.querySelector(sel);
-    const authModal = $('#authModal');
-    const nameField = $('#nameField');
-    const titleEl = $('#authTitle');
-    const emailEl = $('#email');
-    const passEl = $('#password');
-    const nameEl = $('#name');
-    const errEl = $('#authError');
-    let mode = 'login';
+    /* ---------- Helpers ---------- */
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+    const toast = (msg, tone='')=>{
+      const el = $('#toast');
+      el.textContent = msg;
+      el.style.border = `1px solid ${tone==='bad'?'var(--bad)':tone==='ok'?'var(--ok)':'var(--border)'}`;
+      el.style.display='block'; clearTimeout(el._t); el._t=setTimeout(()=>el.style.display='none',2200);
+    };
+    const j = async (r)=>{ const t=await r.text(); try{return t?JSON.parse(t):{};}catch{return {ok:false,error:'Bad JSON'}} };
 
-    function openModal(which){
-      mode = which;
-      titleEl.textContent = which === 'register' ? 'Create Account' : 'Login';
-      nameField.style.display = which === 'register' ? 'block' : 'none';
-      errEl.textContent = '';
-      authModal.style.display = 'flex';
-      (which === 'register' ? nameEl : emailEl).focus({preventScroll:true});
+    /* ---------- SPA Router (hash) ---------- */
+    const routes = ['home','dashboard','tools','documents'];
+    function setActive(route){
+      // tabs
+      $$('.tab').forEach(a=>a.classList.toggle('active', a.getAttribute('href')===`#${route}`));
+      // views
+      routes.forEach(r=>{
+        const els = $$(`[data-route="${r}"]`);
+        els.forEach(el => el.classList.toggle('show', r===route && (!el.dataset.guard || isAuthed())));
+      });
     }
-    function closeModal(){
-      authModal.style.display = 'none';
-      emailEl.value = ''; passEl.value = ''; nameEl.value = ''; errEl.textContent = '';
+    function go(route){ location.hash = `#${route}`; }
+    function currentRoute(){ return (location.hash.replace('#','') || 'home'); }
+
+    /* ---------- Auth state (cookie session + optional local cache) ---------- */
+    function isAuthedCache(){ return !!localStorage.getItem('lexomega_user'); }
+    function isAuthed(){ return isAuthedCache(); } // cookie is source of truth; cache mirrors UI
+
+    async function fetchMe(){
+      const r = await fetch(AUTH.me, { credentials:'include' });
+      if (r.status===401) { localStorage.removeItem('lexomega_user'); return null; }
+      const d = await j(r);
+      if (d?.user) localStorage.setItem('lexomega_user', JSON.stringify(d.user));
+      return d?.user || null;
     }
 
-    $('#loginBtn').addEventListener('click', () => openModal('login'));
-    $('#registerBtn').addEventListener('click', () => openModal('register'));
-    $('#cancelAuth').addEventListener('click', closeModal);
-    authModal.addEventListener('click', (e) => { if (e.target === authModal) closeModal(); });
+    async function requireAuth(route){
+      const ok = await fetchMe();
+      if (!ok){
+        toast('Please sign in to continue','bad');
+        openAuth('login');
+        go('home');
+        return false;
+      }
+      return true;
+    }
 
-    // ======= Auth submit =======
-    $('#submitAuth').addEventListener('click', async () => {
-      const email = emailEl.value.trim();
-      const password = passEl.value;
-      const name = nameEl.value.trim();
+    /* ---------- Auth modal ---------- */
+    const modal = $('#authModal'), nameRow = $('#nameRow'), authTitle = $('#authTitle');
+    const emailEl = $('#email'), passEl = $('#password'), nameEl = $('#name'), authErr = $('#authErr');
 
-      if (!email) { errEl.textContent = 'Email is required.'; return; }
-      if (!password || password.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; return; }
-      if (mode === 'register' && !name) { errEl.textContent = 'Name is required.'; return; }
+    function openAuth(mode){ // 'login' or 'register'
+      authTitle.textContent = mode==='register' ? 'Create Account' : 'Login';
+      nameRow.style.display = mode==='register' ? 'block' : 'none';
+      modal.style.display='grid'; modal.dataset.mode = mode; authErr.textContent='';
+      (mode==='register'?nameEl:emailEl).focus({preventScroll:true});
+    }
+    function closeAuth(){ modal.style.display='none'; emailEl.value=''; passEl.value=''; nameEl.value=''; authErr.textContent=''; }
+
+    $('#openLogin').onclick = ()=> openAuth('login');
+    $('#openRegister').onclick = ()=> openAuth('register');
+    $('#cancelAuth').onclick = closeAuth;
+    modal.addEventListener('click', e=>{ if(e.target===modal) closeAuth(); });
+
+    $('#authForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const mode = modal.dataset.mode || 'login';
+      const email = emailEl.value.trim(), password = passEl.value, name = nameEl.value.trim();
+      if (!email){ authErr.textContent='Email is required.'; return; }
+      if (!password || password.length<8){ authErr.textContent='Password must be at least 8 characters.'; return; }
+      if (mode==='register' && !name){ authErr.textContent='Name is required.'; return; }
 
       try{
-        const res = await fetch(mode === 'register' ? ENDPOINTS.register : ENDPOINTS.login, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(mode === 'register'
-            ? { name, email, password }
-            : { email, password })
+        const r = await fetch(mode==='register' ? AUTH.register : AUTH.login, {
+          method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+          body: JSON.stringify(mode==='register' ? { email, password, name } : { email, password })
         });
-
-        const data = await res.json().catch(() => ({}));
-
-        if (!res.ok || !data.ok) {
-          errEl.textContent = (data && data.error) ? data.error : 'Authentication failed.';
-          return;
-        }
-
-        // store token (and safe user if present)
-        if (data.token) localStorage.setItem('lexomega_token', data.token);
-        if (data.user) localStorage.setItem('lexomega_user', JSON.stringify(data.user));
-
-        // continue
-        closeModal();
-        window.location.href = AFTER_AUTH_REDIRECT;
-      } catch (e){
-        errEl.textContent = 'Network error. Please try again.';
-      }
+        const d = await j(r);
+        if (!r.ok || !d.ok){ authErr.textContent = d.error || 'Authentication failed.'; return; }
+        if (d.user) localStorage.setItem('lexomega_user', JSON.stringify(d.user));
+        toast('You are signed in','ok'); closeAuth();
+        // If user was trying to access a protected route, reroute now:
+        const route = currentRoute();
+        if (['dashboard','tools','documents'].includes(route)) navigate(route); // re-guard
+      }catch{ authErr.textContent='Network error. Please try again.'; }
     });
+
+    $('#logoutBtn').onclick = async ()=>{
+      try{ await fetch(AUTH.logout, { credentials:'include' }); }catch{}
+      localStorage.removeItem('lexomega_user'); toast('Signed out','ok'); go('home');
+    };
+
+    /* ---------- Tools actions (stubs; wire to /api/capability or your real endpoints) ---------- */
+    $('#doSearch').onclick = async ()=>{
+      const q = $('#q').value.trim(); const list = $('#results');
+      if (!q){ list.innerHTML = '<li>Please enter a query.</li>'; return; }
+      list.innerHTML = '<li>Searching…</li>';
+      try{
+        const r = await fetch(`${CAPABILITY}?action=search:cases&q=${encodeURIComponent(q)}`, { credentials:'include' });
+        const d = await j(r); list.innerHTML = '';
+        (d.items?.length? d.items : ['No results']).forEach(it=>{
+          const li=document.createElement('li'); li.textContent = (it.title||it); list.appendChild(li);
+        });
+      }catch{ list.innerHTML = '<li>Search failed.</li>'; }
+    };
+
+    $('#genDoc').onclick = async ()=>{
+      const brief = $('#brief').value.trim(); const out = $('#genOut');
+      if (!brief){ out.textContent='Please enter a brief.'; return; }
+      out.textContent='Generating…';
+      try{
+        const r = await fetch(CAPABILITY, {
+          method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+          body: JSON.stringify({ action:'documents:generate', type:'custom', data:{ brief } })
+        });
+        const d = await j(r);
+        out.textContent = d?.summary || 'Your draft is ready (sample).';
+      }catch{ out.textContent='Generation failed.'; }
+    };
+
+    /* ---------- Documents list (stub) ---------- */
+    async function loadDocs(){
+      const tbody = $('#docRows');
+      try{
+        const r = await fetch(`${CAPABILITY}?action=documents:list`, { credentials:'include' });
+        const d = await j(r);
+        const items = d.items?.length ? d.items : [
+          { id:'1', title:'NDA_v3.pdf', type:'PDF', updated:'Today' },
+          { id:'2', title:'Motion_to_Dismiss.docx', type:'DOCX', updated:'Yesterday' }
+        ];
+        tbody.innerHTML='';
+        items.forEach(doc=>{
+          const tr=document.createElement('tr');
+          tr.innerHTML = `<td>${doc.title}</td><td>${doc.type||'—'}</td><td>${doc.updated||'—'}</td>
+                          <td><button class="btn btn-slim btn-ghost" data-id="${doc.id}">View</button></td>`;
+          tbody.appendChild(tr);
+        });
+        tbody.querySelectorAll('button').forEach(b=>{
+          b.onclick=()=>alert('Viewer coming soon for doc '+b.dataset.id);
+        });
+      }catch{ tbody.innerHTML='<tr><td colspan="4">Failed to load documents.</td></tr>'; }
+    }
+
+    /* ---------- Navigation & Guards ---------- */
+    function highlightUser(){
+      const user = localStorage.getItem('lexomega_user');
+      if (user){
+        try{
+          const u=JSON.parse(user);
+          const t = $('#dashTitle');
+          if (t) t.textContent = `Dashboard — Welcome, ${u.name||u.email||'User'}`;
+          // KPIs (demo)
+          $('#kpiCases').textContent  = u.casesCount ?? '12';
+          $('#kpiDocs').textContent   = u.docsCount  ?? '34';
+          $('#kpiAlerts').textContent = u.alerts24h  ?? '3';
+          const act = $('#activity'); if (act){ act.innerHTML='';
+            ['Filed motion in Case #2025-14','Uploaded “NDA_v3.pdf”','New alert: Hearing scheduled 8/28'].forEach(t=>{
+              const li=document.createElement('li'); li.textContent=t; act.appendChild(li);
+            });
+          }
+        }catch{}
+      }
+    }
+
+    async function navigate(route){
+      // Protect routes
+      if (['dashboard','tools','documents'].includes(route)){
+        const ok = await requireAuth(route);
+        if (!ok) { setActive('home'); return; }
+      }
+      setActive(route);
+      if (route==='documents') loadDocs();
+      if (route==='dashboard') highlightUser();
+    }
+
+    window.addEventListener('hashchange', ()=> navigate(currentRoute()));
+    (async ()=>{
+      // Initial auth ping to warm cache (don’t block)
+      fetchMe().finally(()=>highlightUser());
+      // First paint route
+      const route = routes.includes(currentRoute()) ? currentRoute() : 'home';
+      await navigate(route);
+    })();
   </script>
 </body>
 </html>
