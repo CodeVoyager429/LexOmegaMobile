@@ -1,100 +1,373 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LexOmega | Tools</title>
-  <style>
-    :root{--bg:#0c0c0c;--card:#111;--text:#eaeaea;--muted:#b9b9b9;--accent:#ffd21a;--teal:#08979c;--cyan:#1fe0ff;--border:#2a2a2a;--shadow:0 10px 24px rgba(0,0,0,.35);--radius:12px}
-    *{box-sizing:border-box}html,body{height:100%;background:var(--bg);color:var(--text);margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto}
-    a{color:inherit;text-decoration:none}
-    .nav{position:sticky;top:0;z-index:50;background:#0b0b0b;border-bottom:3px solid var(--accent);box-shadow:var(--shadow)}
-    .nav-inner{max-width:1100px;margin:0 auto;padding:14px 18px;display:flex;gap:22px;overflow-x:auto}
-    .nav a{color:var(--accent);font-weight:700;letter-spacing:.4px;padding:6px 10px;border-radius:8px}
-    .nav a:hover{background:rgba(255,210,26,.12)}
-    .promo{background:var(--teal);color:#081414;padding:12px 18px;font-weight:700;text-align:center}
-    .wrap{max-width:1100px;margin:28px auto 80px;padding:0 18px}
-    h1{font-size:clamp(30px,5vw,44px);margin:8px 0 8px;color:var(--cyan);font-weight:800}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:16px 0 26px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
-    .btn{appearance:none;border:0;cursor:pointer;padding:12px 16px;border-radius:10px;background:var(--accent);color:#151515;font-weight:800}
-    .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
-    .input, textarea{background:#141414;border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 12px;font-size:16px}
-    .muted{color:#b9b9b9}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LexOmega — Tools</title>
+<link rel="icon" href="data:," />
+<meta name="description" content="LexOmega tools: search cases, generate documents, build cases, plan mock trials, and smart notary." />
+<style>
+  :root{--bg:#0b0b0b;--panel:#141414;--text:#eaeaea;--muted:#b7b7b7;--accent:#ffd000;--accent-press:#e0b800;--line:#2a2a2a;--focus:0 0 0 3px rgba(255,208,0,.35);--shadow:0 10px 30px rgba(0,0,0,.45);--radius:14px}
+  *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;color:var(--text);background:var(--bg)}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 18px}
+  header{position:sticky;top:0;background:#141414;border-bottom:1px solid var(--line);box-shadow:0 2px 20px rgba(0,0,0,.25);z-index:40}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+  .brand-badge{background:var(--accent);color:#111;font-weight:900;width:28px;height:28px;display:grid;place-items:center;border-radius:8px;box-shadow:0 6px 16px rgba(255,208,0,.25)}
+  .links{display:flex;gap:26px}.links a{padding:8px 2px;opacity:.9;position:relative}.links a.active,.links a:hover{opacity:1}.links a.active::after,.links a:hover::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:3px;background:var(--accent);border-radius:2px}
+  .hamburger{display:none;border:1px solid var(--line);background:#1a1a1a;width:40px;height:40px;border-radius:10px}
+  .hamburger span{display:block;width:20px;height:2px;background:var(--text);margin:6px auto}
+  @media(max-width:820px){.links{display:none}.hamburger{display:block}.drawer{position:fixed;inset:0 0 0 auto;width:86%;max-width:360px;background:#141414;box-shadow:var(--shadow);transform:translateX(100%);transition:transform .25s}.drawer.open{transform:translateX(0)}.drawer .links{display:flex;flex-direction:column;padding:22px}.drawer .links a{padding:14px 6px;border-bottom:1px solid var(--line)}}
+  .drawer{display:none}@media(max-width:820px){.drawer{display:block}}
+  .banner{background:#0ea5a8;color:#0b0b0b;font-weight:700;border-bottom:3px solid var(--accent)}
+  .banner .wrap{display:flex;align-items:center;gap:12px;padding:10px 18px}
+  h1{font-size:clamp(28px,4.6vw,44px);margin:24px 0 10px}
+  .muted{color:var(--muted)}
+  .row{display:flex;gap:22px;flex-wrap:wrap}.col{flex:1 1 340px;min-width:320px}
+  .card{background:#141414;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+  input,select,textarea{width:100%;background:#121212;border:1px solid #262626;color:var(--text);padding:12px 14px;border-radius:12px;outline:none}
+  input:focus,select:focus,textarea:focus{box-shadow:var(--focus);border-color:#3b3b3b}
+  .btn{appearance:none;border:0;cursor:pointer;background:var(--accent);color:#111;font-weight:800;padding:10px 16px;border-radius:12px;box-shadow:0 10px 18px rgba(255,208,0,.15)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text);box-shadow:none}
+  .list{display:grid;gap:10px}
+  .rowline{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#0f0f0f}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px}
+  .pill{display:inline-flex;align-items:center;gap:8px;background:#151515;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;color:var(--muted)}
+  .k, .ok{color:#10b981} .warn{color:#f59e0b}
+  /* Upgrade modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;place-items:center;z-index:60;backdrop-filter:blur(2px)}
+  .modal{width:min(520px,92vw);background:#141414;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+  .modal h3{margin:0 0 12px}
+  .modal .actions{display:flex;gap:12px;justify-content:flex-end;margin-top:18px}
+</style>
 </head>
 <body>
-  <nav class="nav">
-    <div class="nav-inner">
-      <a href="/index.html">Home</a>
-      <a href="/dashboard.html">Dashboard</a>
-      <a href="/tools.html">Tools</a>
-      <a href="/documents.html">Documents</a>
+<nav class="drawer" id="drawer"><div class="links"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a class="active" href="#">Tools</a><a href="documents.html">Documents</a></div></nav>
+<header>
+  <div class="wrap nav">
+    <div class="brand"><div class="brand-badge">L</div><span>LexOmega</span></div>
+    <div class="links" id="topLinks"><a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a class="active" href="#">Tools</a><a href="documents.html">Documents</a></div>
+    <button class="hamburger" id="hamburger" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="banner"><div class="wrap">📢 LexOmega Launch Offer: <strong>10-day free trial</strong>. No credit card required.</div></div>
+
+<main class="wrap">
+  <h1>Tools</h1>
+  <p class="muted">Search cases, generate documents, build cases, assemble dossiers, plan mock trials, and use Smart Notary.</p>
+
+  <section class="row">
+    <!-- Search Cases -->
+    <article class="card col">
+      <h3>Search Cases</h3>
+      <input id="q" type="text" placeholder="Search by party, citation, judge…" />
+      <div style="height:10px"></div>
+      <button class="btn" id="doSearch">Search</button>
+      <div style="height:14px"></div>
+      <div id="results" class="list"><div class="muted">No results yet.</div></div>
+    </article>
+
+    <!-- Generate Document -->
+    <article class="card col">
+      <h3>Generate Document</h3>
+      <label class="muted">Template</label>
+      <select id="tpl">
+        <option value="demand_letter">Demand Letter</option>
+        <option value="motion_to_compel">Motion to Compel</option>
+        <option value="engagement_agreement">Engagement Agreement</option>
+      </select>
+      <div style="height:10px"></div>
+      <label class="muted">Client / Matter</label>
+      <input id="matter" type="text" placeholder="Acme vs. State, 24-12345" />
+      <div style="height:10px"></div>
+      <label class="muted">Notes (optional)</label>
+      <textarea id="notes" rows="5" placeholder="Key facts, dates, relief sought…"></textarea>
+      <div style="height:10px"></div>
+      <button class="btn" id="gen">Generate</button>
+      <div style="height:14px"></div>
+      <div class="pill">Output: <span id="outStatus">Not started</span></div>
+    </article>
+
+    <!-- Case Builder -->
+    <article class="card col">
+      <h3>Case Builder</h3>
+      <label class="muted">Title</label>
+      <input id="cb_title" type="text" placeholder="e.g., Smith v. City of Metro" />
+      <div style="height:8px"></div>
+      <label class="muted">Parties (comma separated)</label>
+      <input id="cb_parties" type="text" placeholder="Plaintiff, Defendant" />
+      <div style="height:8px"></div>
+      <label class="muted">Claims (comma separated)</label>
+      <input id="cb_claims" type="text" placeholder="Negligence, Breach of Contract" />
+      <div style="height:8px"></div>
+      <label class="muted">Evidence (comma separated)</label>
+      <input id="cb_evidence" type="text" placeholder="Email 5/12, Video clip A, Contract.pdf" />
+      <div style="height:10px"></div>
+      <button class="btn" id="cb_create">Create Case</button>
+      <div style="height:14px"></div>
+      <div id="cb_msg" class="muted">No case created yet.</div>
+    </article>
+
+    <!-- Dossier Assembly -->
+    <article class="card col">
+      <h3>Assemble Dossier / Brief Plan</h3>
+      <label class="muted">Existing Cases</label>
+      <select id="as_cases"></select>
+      <div style="height:10px"></div>
+      <button class="btn" id="as_go">Assemble</button>
+      <div style="height:14px"></div>
+      <pre id="as_out" class="mono" style="white-space:pre-wrap; background:#0f0f0f; border:1px solid #1f1f1f; padding:12px; border-radius:12px; min-height:88px">Waiting…</pre>
+    </article>
+
+    <!-- Mock Trial Generator (STANDARD+) -->
+    <article class="card col">
+      <h3>Mock Trial Generator</h3>
+      <div class="pill">Requires: <strong>STANDARD</strong> <span id="mt_badge" class="muted"></span></div>
+      <div style="height:10px"></div>
+      <label class="muted">Case Summary</label>
+      <textarea id="mt_summary" rows="4" placeholder="Short case narrative…"></textarea>
+      <div style="height:8px"></div>
+      <label class="muted">Issues (comma separated)</label>
+      <input id="mt_issues" type="text" placeholder="Causation, Damages, Liability" />
+      <div style="height:8px"></div>
+      <label class="muted">Witnesses (comma separated)</label>
+      <input id="mt_witnesses" type="text" placeholder="Dr. Lee, Officer Gomez, J. Rivera" />
+      <div style="height:10px"></div>
+      <button class="btn" id="mt_go">Generate Plan</button>
+      <div style="height:14px"></div>
+      <pre id="mt_out" class="mono" style="white-space:pre-wrap; background:#0f0f0f; border:1px solid #1f1f1f; padding:12px; border-radius:12px; min-height:120px">Waiting…</pre>
+    </article>
+
+    <!-- Smart Notary (STANDARD preview, PRO create/file) -->
+    <article class="card col">
+      <h3>Smart Notary</h3>
+      <div class="pill">Preview: <strong>STANDARD+</strong> • Create/File: <strong>PRO</strong> <span id="nt_badge" class="muted"></span></div>
+      <div style="height:10px"></div>
+      <label class="muted">Document ID</label>
+      <input id="nt_docId" type="text" placeholder="doc_123 (from Documents)" />
+      <div style="height:8px"></div>
+      <label class="muted">Signer Name</label>
+      <input id="nt_signerName" type="text" placeholder="Jane Doe" />
+      <div style="height:8px"></div>
+      <label class="muted">Signer Email</label>
+      <input id="nt_signerEmail" type="email" placeholder="jane@example.com" />
+      <div style="height:10px"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" id="nt_preview">Preview</button>
+        <button class="btn ghost" id="nt_create">Create</button>
+        <button class="btn ghost" id="nt_file">File</button>
+      </div>
+      <div style="height:12px"></div>
+      <pre id="nt_out" class="mono" style="white-space:pre-wrap; background:#0f0f0f; border:1px solid #1f1f1f; padding:12px; border-radius:12px; min-height:120px">Waiting…</pre>
+    </article>
+  </section>
+</main>
+
+<footer><div class="wrap" style="border-top:3px solid var(--accent); margin-top:36px; padding:22px 0">
+  <div class="muted" style="text-align:center">“Jesus said to him, 'I am the way, the truth, and the life. No one comes to the Father except through Me.'” — John 14:6</div>
+</div></footer>
+
+<!-- Upgrade Modal -->
+<div class="modal-backdrop" id="upgradeModal">
+  <div class="modal">
+    <h3>Upgrade Required</h3>
+    <div class="muted" id="upgradeMsg">This feature needs a higher plan.</div>
+    <div class="actions">
+      <a class="btn" href="pricing.html">See Plans</a>
+      <button class="btn ghost" data-close="upgradeModal">Cancel</button>
     </div>
-  </nav>
-  <div class="promo">📢 <strong>LexOmega Launch Offer:</strong> 10-day free trial. No credit card required.</div>
+  </div>
+</div>
 
-  <main class="wrap">
-    <h1>Tools</h1>
+<script>
+  /* ------------------ CONFIG ------------------ */
+  const ENDPOINTS = {
+    search: '/api/tools/search',
+    generate: '/api/tools/generate',
+    cases: '/api/cases',
+    assemble: '/api/cases?act=assemble',
+    mocktrial: '/api/mocktrial/generate',
+    notaryPreview: '/api/notary?action=preview',
+    notaryCreate: '/api/notary?action=create',
+    notaryFile: '/api/notary?action=file',
+    me: '/api/auth/me' // should return { ok:true, user:{ tier:"FREE|STANDARD|PRO", ... } }
+  };
 
-    <section class="grid">
-      <div class="card">
-        <h3>Smart Search</h3>
-        <p class="muted">Find cases and precedents fast.</p>
-        <div class="field">
-          <input class="input" id="q" placeholder="Search query…" />
+  /* ------------------ NAV ------------------ */
+  const drawer = document.getElementById('drawer');
+  document.getElementById('hamburger').onclick = ()=> drawer.classList.toggle('open');
+
+  /* ------------------ HELPERS ------------------ */
+  async function post(url, body){
+    const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    if(!r.ok) throw new Error(await r.text() || 'Request failed'); return r.json();
+  }
+  async function get(url){
+    const r = await fetch(url); if(!r.ok) throw new Error(await r.text() || 'Request failed'); return r.json();
+  }
+
+  function qs(s,el=document){return el.querySelector(s)}
+  function openModal(id){ qs('#'+id).style.display='grid'; }
+  function closeModal(id){ qs('#'+id).style.display='none'; }
+  document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',e=>closeModal(e.target.getAttribute('data-close'))));
+
+  /* ------------------ TIER DETECTION ------------------ */
+  const TIERS = { FREE:0, STANDARD:1, PRO:2 };
+  let USER_TIER = 'FREE';
+  function tierOK(required){
+    const r = TIERS[(required||'FREE').toUpperCase()] ?? 0;
+    const u = TIERS[(USER_TIER||'FREE').toUpperCase()] ?? 0;
+    return u >= r;
+  }
+  async function loadTier(){
+    try{
+      const data = await get(ENDPOINTS.me);
+      USER_TIER = (data?.user?.tier || 'FREE').toUpperCase();
+    }catch{
+      // fallback for now; you can also set a default on backend
+      USER_TIER = 'FREE';
+    }
+    qs('#mt_badge').textContent = `• Your tier: ${USER_TIER}`;
+    qs('#nt_badge').textContent = `• Your tier: ${USER_TIER}`;
+  }
+  function requireTier(required, featureLabel){
+    if(tierOK(required)) return true;
+    const msg = `“${featureLabel}” requires ${required}. Your plan: ${USER_TIER}.`;
+    qs('#upgradeMsg').textContent = msg;
+    openModal('upgradeModal');
+    return false;
+  }
+
+  /* ------------------ SEARCH CASES ------------------ */
+  function renderResults(items){
+    const box = document.getElementById('results'); box.innerHTML='';
+    if(!items.length){ box.innerHTML='<div class="muted">No results.</div>'; return; }
+    items.forEach(r=>{
+      const row=document.createElement('div'); row.className='rowline';
+      row.innerHTML = `<div>
+          <div style="font-weight:700">${r.title}</div>
+          <div class="muted" style="font-size:13px">${r.citation||'—'} • ${r.court||'—'} • ${r.year||'—'}</div>
         </div>
-        <button class="btn" id="doSearch">Search</button>
-        <ul id="results" class="muted" style="margin-top:10px;padding-left:18px"></ul>
-      </div>
+        <a class="btn ghost" href="#">Open</a>`;
+      box.appendChild(row);
+    });
+  }
+  document.getElementById('doSearch').onclick = async ()=>{
+    const q = document.getElementById('q').value.trim();
+    if(!q) return alert('Enter a query');
+    try{ renderResults((await get(ENDPOINTS.search+'?q='+encodeURIComponent(q))).items||[]); }
+    catch(e){ alert(e.message||'Search error'); }
+  };
 
-      <div class="card">
-        <h3>Generate Document</h3>
-        <p class="muted">Draft a document from a short brief.</p>
-        <div class="field">
-          <label for="brief">Brief</label>
-          <textarea id="brief" rows="5" placeholder="Describe the document you need…"></textarea>
-        </div>
-        <button class="btn" id="genDoc">Generate</button>
-        <div id="genOut" class="muted" style="margin-top:10px"></div>
-      </div>
-    </section>
-  </main>
+  /* ------------------ GENERATE DOCUMENT ------------------ */
+  document.getElementById('gen').onclick = async ()=>{
+    const tpl = document.getElementById('tpl').value;
+    const matter = document.getElementById('matter').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+    if(!matter) return alert('Please enter a matter');
+    const out = document.getElementById('outStatus'); out.textContent='Generating…';
+    try{
+      const res = await post(ENDPOINTS.generate, { template:tpl, matter, notes });
+      out.innerHTML = `Ready: <a href="${res.url}">${res.name}</a>`;
+    }catch(e){ out.textContent='Error'; alert(e.message||'Generation error'); }
+  };
 
-  <script>
-    const token = localStorage.getItem('lexomega_token');
-    if (!token) location.href = '/index.html#login-required';
+  /* ------------------ CASE BUILDER ------------------ */
+  async function refreshCaseList(){
+    const sel = document.getElementById('as_cases'); sel.innerHTML='';
+    try{
+      const data = await get(ENDPOINTS.cases);
+      (data.items||[]).forEach(c=>{
+        const o=document.createElement('option'); o.value=c.id; o.textContent=c.title; sel.appendChild(o);
+      });
+    }catch{ /* ignore for now */ }
+  }
+  document.getElementById('cb_create').onclick = async ()=>{
+    const title = document.getElementById('cb_title').value.trim();
+    const parties = document.getElementById('cb_parties').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const claims = document.getElementById('cb_claims').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const evidence = document.getElementById('cb_evidence').value.split(',').map(s=>s.trim()).filter(Boolean);
+    if(!title) return alert('Title is required');
+    const msg = document.getElementById('cb_msg');
+    try{
+      const data = await post(ENDPOINTS.cases, { title, parties, claims, evidence });
+      msg.textContent = `Case created: ${data.case?.title || title}`;
+      await refreshCaseList();
+    }catch(e){ msg.textContent='Error creating case'; alert(e.message||'Case error'); }
+  };
 
-    document.getElementById('doSearch').onclick = async ()=>{
-      const q = document.getElementById('q').value.trim();
-      const list = document.getElementById('results');
-      list.innerHTML = '<li>Searching…</li>';
-      try{
-        // Replace with your real search endpoint when ready
-        const res = await fetch('/api/tools/search?q='+encodeURIComponent(q), { headers:{Authorization:`Bearer ${token}`}});
-        const data = await res.json().catch(()=>({items:[]}));
-        list.innerHTML = '';
-        (data.items?.length ? data.items : ['No results']).forEach(i=>{
-          const li = document.createElement('li'); li.textContent = i.title || i; list.appendChild(li);
-        });
-      }catch(_){ list.innerHTML = '<li>Search failed.</li>'; }
-    };
+  /* ------------------ DOSSIER ASSEMBLY ------------------ */
+  document.getElementById('as_go').onclick = async ()=>{
+    const id = document.getElementById('as_cases').value;
+    const out = document.getElementById('as_out'); out.textContent='Assembling…';
+    if(!id) return (out.textContent='Please select a case.');
+    try{
+      const data = await post(ENDPOINTS.assemble, { id });
+      const { dossier, tasks, summary } = data;
+      out.textContent = `${summary}\n\nOutline:\n- ${dossier.outline.join('\n- ')}\n\nTasks:\n- ${tasks.join('\n- ')}`;
+    }catch(e){ out.textContent='Error assembling dossier'; alert(e.message||'Assemble error'); }
+  };
 
-    document.getElementById('genDoc').onclick = async ()=>{
-      const brief = document.getElementById('brief').value.trim();
-      const out = document.getElementById('genOut');
-      if (!brief){ out.textContent = 'Please enter a brief.'; return; }
-      out.textContent = 'Generating…';
-      try{
-        const res = await fetch('/api/documents', {
-          method:'POST',
-          headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`},
-          body: JSON.stringify({ brief })
-        });
-        const data = await res.json().catch(()=>null);
-        out.textContent = data?.summary || 'Your draft is ready (sample).';
-      }catch(_){ out.textContent = 'Generation failed.'; }
-    };
-  </script>
+  /* ------------------ MOCK TRIAL (STANDARD+) ------------------ */
+  document.getElementById('mt_go').onclick = async ()=>{
+    if(!requireTier('STANDARD','Mock Trial Generator')) return;
+    const summary = document.getElementById('mt_summary').value.trim();
+    const issues = document.getElementById('mt_issues').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const witnesses = document.getElementById('mt_witnesses').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const out = document.getElementById('mt_out'); out.textContent='Generating plan…';
+    if(!summary) return (out.textContent='Please enter a case summary.');
+    try{
+      const data = await post(ENDPOINTS.mocktrial, { summary, issues, witnesses });
+      out.textContent =
+        `Estimated: ${data.estimatedDurationDays} day(s)\n\n` +
+        `Objections: ${data.objections.join(', ')}\n` +
+        `Jury Notes: ${data.juryNotes.join('; ')}\n\n` +
+        `OPENING:\n${data.script.opening}\n`;
+    }catch(e){ out.textContent='Error generating mock-trial plan'; alert(e.message||'Mock-trial error'); }
+  };
+
+  /* ------------------ SMART NOTARY ------------------ */
+  let lastNotaryId = null;
+
+  document.getElementById('nt_preview').onclick = async ()=>{
+    if(!requireTier('STANDARD','Smart Notary Preview')) return;
+    const docId = qs('#nt_docId').value.trim();
+    const signerName = qs('#nt_signerName').value.trim();
+    const signerEmail = qs('#nt_signerEmail').value.trim();
+    const out = qs('#nt_out'); out.textContent = 'Previewing…';
+    try{
+      const data = await post(ENDPOINTS.notaryPreview, { docId, signerName, signerEmail });
+      out.textContent = `Preview:\n${JSON.stringify(data.preview, null, 2)}`;
+    }catch(e){ out.textContent='Error'; alert(e.message||'Preview error'); }
+  };
+
+  document.getElementById('nt_create').onclick = async ()=>{
+    if(!requireTier('PRO','Smart Notary Create')) return;
+    const docId = qs('#nt_docId').value.trim();
+    const signerName = qs('#nt_signerName').value.trim();
+    const signerEmail = qs('#nt_signerEmail').value.trim();
+    const out = qs('#nt_out'); out.textContent = 'Creating…';
+    try{
+      const data = await post(ENDPOINTS.notaryCreate, { docId, signerName, signerEmail });
+      lastNotaryId = data.request?.id || null;
+      out.textContent = `Created request: ${lastNotaryId}\nStatus: ${data.request?.status}`;
+    }catch(e){ out.textContent='Error'; alert(e.message||'Create error'); }
+  };
+
+  document.getElementById('nt_file').onclick = async ()=>{
+    if(!requireTier('PRO','Smart Notary File')) return;
+    const out = qs('#nt_out');
+    if(!lastNotaryId) return (out.textContent='Create a notary request first.');
+    out.textContent = 'Filing…';
+    try{
+      const data = await post(ENDPOINTS.notaryFile, { requestId: lastNotaryId });
+      out.textContent = `Filed: ${data.request?.id}\nStatus: ${data.request?.status}\nFiledAt: ${data.request?.filedAt}`;
+    }catch(e){ out.textContent='Error'; alert(e.message||'File error'); }
+  };
+
+  /* ------------------ INIT ------------------ */
+  loadTier().then(refreshCaseList);
+</script>
 </body>
 </html>
