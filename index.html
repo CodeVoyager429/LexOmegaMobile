@@ -1,574 +1,449 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LexOmega | The Future of Legal Intelligence</title>
-  <meta name="description" content="LexOmega — analytics, case tracking, document generation, and real-time legal intelligence." />
-  <link rel="icon" href="data:," />
-
-  <style>
-    /* ============ Design Tokens ============ */
-    :root{
-      --bg:#0b0b0b;           /* page background */
-      --panel:#141414;        /* card & header background */
-      --text:#eaeaea;         /* primary text */
-      --muted:#b7b7b7;        /* secondary text */
-      --accent:#ffd000;       /* LexOmega yellow accent */
-      --accent-press:#e0b800; /* pressed yellow */
-      --line:#2a2a2a;         /* separators */
-      --ok:#10b981;           /* success */
-      --warn:#f59e0b;         /* warning */
-      --focus: 0 0 0 3px rgba(255,208,0,.35);
-      --shadow: 0 10px 30px rgba(0,0,0,.45);
-      --radius: 14px;
-    }
-
-    /* ============ Base ============ */
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
-      color:var(--text);
-      background:var(--bg);
-      line-height:1.55;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-    }
-    a{color:inherit;text-decoration:none}
-    img{max-width:100%;display:block}
-
-    /* ============ Layout ============ */
-    .wrap{max-width:1100px;margin:0 auto;padding:0 18px}
-    .row{display:flex;gap:22px;flex-wrap:wrap}
-    .col{flex:1 1 320px}
-
-    /* ============ Header / Nav ============ */
-    header{
-      position:sticky; top:0; z-index:50;
-      background:var(--panel);
-      border-bottom:1px solid var(--line);
-      box-shadow:0 2px 20px rgba(0,0,0,.25);
-    }
-    .nav{
-      display:flex; align-items:center; justify-content:space-between;
-      height:64px;
-    }
-    .brand{display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.2px}
-    .brand-badge{
-      background:var(--accent); color:#111; font-weight:900;
-      width:28px;height:28px;display:grid;place-items:center;border-radius:8px;
-      box-shadow:0 6px 16px rgba(255,208,0,.25);
-    }
-    .nav-links{display:flex; gap:26px; align-items:center}
-    .nav-links a{
-      padding:8px 2px; position:relative; color:var(--text); opacity:.9
-    }
-    .nav-links a:hover{opacity:1}
-    .nav-links a.active{color:var(--text)}
-    .nav-links a.active::after,
-    .nav-links a:hover::after{
-      content:""; position:absolute; left:0; right:0; bottom:-8px; height:3px;
-      background:var(--accent); border-radius:2px; transform-origin:left; animation:underline .2s ease-out;
-    }
-    @keyframes underline{from{transform:scaleX(.2)}to{transform:scaleX(1)}}
-
-    .hamburger{display:none;border:1px solid var(--line); background:#1a1a1a; width:40px;height:40px;border-radius:10px}
-    .hamburger span{display:block;width:20px;height:2px;background:var(--text);margin:6px auto}
-
-    @media (max-width: 820px){
-      .nav-links{display:none}
-      .hamburger{display:block}
-      .drawer{position:fixed; inset:0 0 0 auto; width:86%; max-width:360px;
-        background:var(--panel); box-shadow:var(--shadow); transform:translateX(100%);
-        transition:transform .25s ease-out; display:flex; flex-direction:column}
-      .drawer.open{transform:translateX(0)}
-      .drawer .links{display:flex; flex-direction:column; padding:22px}
-      .drawer .links a{padding:14px 6px; border-bottom:1px solid var(--line)}
-    }
-
-    /* ============ Promo Banner ============ */
-    .banner{
-      background:#0ea5a8; color:#0b0b0b; font-weight:700;
-      border-bottom: 3px solid var(--accent);
-    }
-    .banner .wrap{display:flex; align-items:center; gap:12px; padding:10px 18px}
-    .badge{font-size:20px}
-
-    /* ============ Hero & Cards ============ */
-    .hero{
-      padding:44px 0 20px;
-    }
-    h1{font-size: clamp(32px, 5vw, 56px); margin:0 0 10px; color:#3ce1ff}
-    .subhead{color:var(--muted); font-size:clamp(16px,2.4vw,20px)}
-
-    .card{
-      background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
-      box-shadow: var(--shadow);
-      padding:22px;
-    }
-    .card h2{margin:0 0 6px; font-size:clamp(22px,3.2vw,32px)}
-    .muted{color:var(--muted)}
-    .cta-row{display:flex; gap:16px; margin-top:18px; flex-wrap:wrap}
-
-    /* ============ Buttons & Inputs ============ */
-    .btn{
-      appearance:none; border:0; cursor:pointer; user-select:none;
-      background:var(--accent); color:#111; font-weight:800; padding:12px 20px;
-      border-radius:14px; box-shadow:0 10px 18px rgba(255,208,0,.15);
-      transition:transform .06s ease, box-shadow .12s ease, background .12s ease;
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn:active{background:var(--accent-press); transform:translateY(0); box-shadow:0 6px 12px rgba(255,208,0,.12)}
-    .btn.ghost{
-      background:transparent; border:1px solid var(--line); color:var(--text); box-shadow:none;
-    }
-    .btn.ghost:hover{border-color:#3b3b3b}
-
-    input[type="email"], input[type="password"], input[type="text"]{
-      width:100%; background:#121212; border:1px solid #262626; color:var(--text);
-      padding:12px 14px; border-radius:12px; outline:none;
-    }
-    input:focus{box-shadow:var(--focus); border-color:#3b3b3b}
-
-    /* ============ Modal ============ */
-    .modal-backdrop{
-      position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; place-items:center; z-index:60;
-      backdrop-filter: blur(2px);
-    }
-    .modal{width:min(520px, 92vw); background:var(--panel); border:1px solid var(--line);
-      border-radius:16px; padding:22px; box-shadow:var(--shadow); transform:translateY(6px); opacity:.98}
-    .modal h3{margin:0 0 12px; font-size:20px}
-    .modal .actions{display:flex; gap:12px; justify-content:flex-end; margin-top:18px}
-
-    /* ============ Footer ============ */
-    footer{border-top:3px solid var(--accent); margin-top:36px; background:#101010}
-    .verse{padding:22px; text-align:center; color:var(--muted); max-width:900px; margin:0 auto}
-
-    /* ============ Tiny helpers ============ */
-    .hide{display:none !important}
-    .spacer{height:14px}
-    .pill{display:inline-flex; align-items:center; gap:8px; background:#151515; border:1px solid var(--line); border-radius:999px; padding:6px 10px; font-size:12px; color:var(--muted)}
-
-    /* ============ Ask Lex: FAB + Chat ============ */
-    .fab{position:fixed; right:18px; bottom:18px; z-index:70}
-    .fab button{width:56px;height:56px;border-radius:50%;border:0;background:var(--accent);color:#111;font-weight:900;box-shadow:0 10px 24px rgba(255,208,0,.25);cursor:pointer}
-    .fab .mini{margin-left:8px;width:44px;height:44px;border-radius:50%;background:#1b1b1b;border:1px solid var(--line);color:var(--text)}
-    .chat{position:fixed; right:18px; bottom:88px; width:min(440px,92vw); background:var(--panel); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); display:none; flex-direction:column; overflow:hidden; z-index:69}
-    .chat header{display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid var(--line); background:#171717}
-    .chat header .ttl{font-weight:800}
-    .chat main{max-height:50vh; overflow:auto; padding:12px}
-    .chat .row{display:flex; gap:10px; margin-bottom:10px}
-    .chat .me{justify-content:flex-end}
-    .bubble{max-width:85%; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:#0f0f0f}
-    .bubble.me{background:#202020}
-    .chat footer{display:flex; gap:8px; padding:10px; border-top:1px solid var(--line); background:#141414}
-    .chat input{flex:1; background:#121212; border:1px solid #262626; color:var(--text); padding:10px 12px; border-radius:10px; outline:none}
-    .chat input:focus{box-shadow:var(--focus); border-color:#3b3b3b}
-    .chat .mic{width:42px; height:42px; border-radius:10px; background:#1b1b1b; border:1px solid var(--line); color:var(--text)}
-    .sr-only{position:absolute; left:-9999px}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>LexOmega | Unified App</title>
+<meta name="description" content="LexOmega — legal intelligence: documents, mock trials, notary, case search, Ask Lex."/>
+<link rel="icon" href="data:,">
+<style>
+  :root{
+    --bg:#0b0b0b; --panel:#141414; --text:#eaeaea; --muted:#b7b7b7;
+    --accent:#ffd000; --accent-press:#e0b800; --line:#2a2a2a;
+    --ok:#10b981; --warn:#f59e0b; --radius:14px; --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 18px}
+  header{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 2px 20px rgba(0,0,0,.25)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+  .badge{background:var(--accent);color:#111;font-weight:900;width:28px;height:28px;display:grid;place-items:center;border-radius:8px;box-shadow:0 6px 16px rgba(255,208,0,.25)}
+  .tabs{display:flex;gap:18px;flex-wrap:wrap}
+  .tab{padding:10px 12px;border-radius:10px;border:1px solid var(--line);cursor:pointer;user-select:none}
+  .tab.active{background:var(--accent);color:#111;border-color:transparent;font-weight:800}
+  .banner{background:#0ea5a8;color:#0b0b0b;border-bottom:3px solid var(--accent)}
+  .banner .wrap{display:flex;align-items:center;gap:10px;padding:10px 18px}
+  .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
+  .card{grid-column:span 12;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+  @media(min-width:900px){ .span6{grid-column:span 6} .span4{grid-column:span 4} }
+  h1{margin:10px 0 6px;font-size:clamp(28px,4.6vw,40px);color:#3ce1ff}
+  h2{margin:0 0 8px;font-size:clamp(20px,3.4vw,24px)}
+  .muted{color:var(--muted)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .btn{appearance:none;border:0;cursor:pointer;background:var(--accent);color:#111;font-weight:800;padding:10px 16px;border-radius:12px;box-shadow:0 10px 18px rgba(255,208,0,.15)}
+  .btn:hover{transform:translateY(-1px)} .btn:active{background:var(--accent-press)}
+  .ghost{background:transparent;border:1px solid var(--line);color:var(--text);box-shadow:none}
+  input,textarea,select{width:100%;background:#121212;border:1px solid #262626;color:var(--text);padding:10px 12px;border-radius:10px;outline:none}
+  input:focus,textarea:focus,select:focus{border-color:#3b3b3b;box-shadow:0 0 0 3px rgba(255,208,0,.18)}
+  textarea{min-height:110px;resize:vertical}
+  .pill{display:inline-flex;align-items:center;gap:8px;background:#151515;border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);font-size:12px}
+  footer{border-top:3px solid var(--accent);margin-top:30px;background:#101010}
+  .verse{padding:18px;text-align:center;color:var(--muted);max-width:900px;margin:0 auto}
+  /* Ask Lex floating */
+  .lex-fab{position:fixed;right:18px;bottom:18px;z-index:70;background:var(--accent);color:#111;border:0;border-radius:999px;width:56px;height:56px;display:grid;place-items:center;font-weight:900;box-shadow:0 14px 26px rgba(255,208,0,.22)}
+  .drawer{position:fixed;inset:auto 0 0 auto;width:min(520px,92vw);transform:translateX(105%);transition:transform .25s ease-out;background:var(--panel);border-left:1px solid var(--line);box-shadow:var(--shadow);z-index:75}
+  .drawer.open{transform:translateX(0)}
+  .drawer header{position:sticky;top:0;border-bottom:1px solid var(--line)}
+  .chatlog{padding:14px;height:min(60vh,540px);overflow:auto;display:flex;flex-direction:column;gap:10px}
+  .msg{background:#111;border:1px solid #242424;border-radius:12px;padding:10px}
+  .msg.me{background:#132; border-color:#243}
+  .mini{font-size:12px;color:var(--muted)}
+</style>
 </head>
 <body>
 
-  <!-- Drawer (mobile) -->
-  <nav class="drawer" id="drawer">
-    <div class="links">
-      <a href="#" data-nav="home" class="active">Home</a>
-      <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
-      <a href="tools.html" data-nav="tools">Tools</a>
-      <a href="documents.html" data-nav="documents">Documents</a>
-      <a href="#" id="askLexLink">Ask&nbsp;Lex</a>
-    </div>
-  </nav>
-
-  <!-- Header / Nav -->
-  <header>
-    <div class="wrap nav">
-      <div class="brand">
-        <div class="brand-badge">L</div>
-        <span>LexOmega</span>
-      </div>
-
-      <div class="nav-links" id="navLinks">
-        <a href="#" class="active" data-nav="home">Home</a>
-        <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
-        <a href="tools.html" data-nav="tools">Tools</a>
-        <a href="documents.html" data-nav="documents">Documents</a>
-        <a href="#" id="askLexTop">Ask&nbsp;Lex</a>
-      </div>
-
-      <button class="hamburger" id="hamburger" aria-label="Open menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </header>
-
-  <!-- Promo Banner -->
-  <div class="banner">
-    <div class="wrap">
-      <span class="badge">📢</span>
-      <div>LexOmega Launch Offer: <strong>10-day free trial</strong>. No credit card required.</div>
+<header>
+  <div class="wrap nav">
+    <div class="brand"><div class="badge">L</div><span>LexOmega</span></div>
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-tab="home">Home</div>
+      <div class="tab" data-tab="dashboard">Dashboard</div>
+      <div class="tab" data-tab="tools">Tools</div>
+      <div class="tab" data-tab="documents">Documents</div>
+      <div class="tab" data-tab="notary">Notary</div>
     </div>
   </div>
+</header>
 
-  <!-- Main -->
-  <main class="wrap">
-    <section class="hero">
+<div class="banner"><div class="wrap">📢 <b>10-day free trial</b>. No credit card required.</div></div>
+
+<main class="wrap">
+  <section id="home" class="grid">
+    <div class="card span6">
       <h1>Welcome to LexOmega</h1>
-      <div class="subhead">The Future of Legal Intelligence</div>
-    </section>
-
-    <section class="row">
-      <!-- Live Dashboard Preview -->
-      <article class="card col">
-        <h2>Live Dashboard Preview</h2>
-        <p class="muted">Analytics, case tracking, document generation and real-time alerts.</p>
-        <div class="cta-row">
-          <button class="btn" id="btnLogin">Login</button>
-          <button class="btn ghost" id="btnCreate">Create Account</button>
-        </div>
-        <div class="spacer"></div>
+      <p class="muted">The Future of Legal Intelligence</p>
+      <div class="row">
+        <button class="btn" id="btnLogin">Login</button>
+        <button class="btn ghost" id="btnRegister">Create Account</button>
         <span class="pill">Status: <span id="authState">Signed out</span></span>
-      </article>
-
-      <!-- Embedded Legal Document Preview -->
-      <article class="card col">
-        <h2>Embedded Legal Document Preview</h2>
-        <a class="muted" href="#" id="docLink"><strong>LexOmega — Document Sample</strong></a>
-        <div class="spacer"></div>
-        <div style="height:180px; border:1px dashed #2e2e2e; border-radius:12px; display:grid; place-items:center; color:#7d7d7d;">
-          <div>Document preview placeholder</div>
-        </div>
-      </article>
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <footer>
-    <div class="verse">
-      “Jesus said to him, 'I am the way, the truth, and the life.
-      No one comes to the Father except through Me.'” — John 14:6
-    </div>
-  </footer>
-
-  <!-- Login Modal -->
-  <div class="modal-backdrop" id="loginModal">
-    <div class="modal">
-      <h3>Login</h3>
-      <label class="muted" for="loginEmail">Email</label>
-      <input id="loginEmail" type="email" placeholder="you@example.com" />
-      <div class="spacer"></div>
-      <label class="muted" for="loginPassword">Password</label>
-      <input id="loginPassword" type="password" placeholder="••••••••" />
-      <div class="actions">
-        <button class="btn ghost" data-close="loginModal">Cancel</button>
-        <button class="btn" id="loginContinue">Continue</button>
       </div>
     </div>
-  </div>
-
-  <!-- Register Modal -->
-  <div class="modal-backdrop" id="registerModal">
-    <div class="modal">
-      <h3>Create Account</h3>
-      <label class="muted" for="regName">Name</label>
-      <input id="regName" type="text" placeholder="Full name" />
-      <div class="spacer"></div>
-      <label class="muted" for="regEmail">Email</label>
-      <input id="regEmail" type="email" placeholder="you@example.com" />
-      <div class="spacer"></div>
-      <label class="muted" for="regPassword">Password</label>
-      <input id="regPassword" type="password" placeholder="At least 8 characters" />
-      <div class="actions">
-        <button class="btn ghost" data-close="registerModal">Cancel</button>
-        <button class="btn" id="regContinue">Create Account</button>
+    <div class="card span6">
+      <h2>Quick Actions</h2>
+      <div class="row">
+        <button class="btn" id="qaGenNDA">Generate NDA</button>
+        <button class="btn ghost" id="qaMockTrial">Start Mock Trial</button>
       </div>
+      <p class="mini muted">These call your live unified API.</p>
     </div>
-  </div>
-
-  <!-- Floating Ask Lex -->
-  <div class="fab" aria-live="polite">
-    <button id="fabMain" title="Ask Lex">?</button>
-    <button class="mini" id="fabMic" title="Voice" aria-pressed="false">🎤</button>
-  </div>
-
-  <!-- Ask Lex Chat Panel -->
-  <section class="chat" id="chatPanel" aria-labelledby="chatTitle" role="dialog" aria-modal="false">
-    <header>
-      <div class="ttl" id="chatTitle">Ask Lex</div>
-      <div style="display:flex; gap:8px; align-items:center">
-        <button class="mic" id="micBtn" title="Start/Stop voice">🎤</button>
-        <button class="mic" id="closeChat" title="Close">✕</button>
-      </div>
-    </header>
-    <main id="chatLog" aria-live="polite" aria-label="Conversation"></main>
-    <footer>
-      <label for="chatInput" class="sr-only">Type your question</label>
-      <input id="chatInput" placeholder='Ask anything. Try: "Go to Tools" or "Search cases for Wilson v. Hart".' />
-      <button class="btn" id="sendBtn">Send</button>
-    </footer>
   </section>
 
-  <script>
-    /* =========================================================
-       Front-end polish + demo auth (no backend required)
-       When your API is live, set USE_DEMO=false and update
-       the ENDPOINTS object to call real routes.
-       ========================================================= */
+  <section id="dashboard" class="grid" hidden>
+    <div class="card span6">
+      <h2>Stats</h2>
+      <div id="dashStats" class="muted">Signed in to see stats.</div>
+    </div>
+    <div class="card span6">
+      <h2>Recent Documents</h2>
+      <div id="dashDocs" class="muted">–</div>
+    </div>
+  </section>
 
-    const USE_DEMO = true; // <-- flip to false to use real endpoints later
+  <section id="tools" class="grid" hidden>
+    <div class="card span6">
+      <h2>Case Search</h2>
+      <input id="searchQuery" placeholder="e.g., Fourth Amendment traffic stop"/>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="btnSearch">Search</button>
+      </div>
+      <div id="searchResults" class="mini muted" style="margin-top:10px">–</div>
+    </div>
+    <div class="card span6">
+      <h2>Mock Trial</h2>
+      <textarea id="claim" placeholder="Enter plaintiff claim…"></textarea>
+      <div style="height:8px"></div>
+      <textarea id="defense" placeholder="Enter defense argument…"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="btnTrial">Simulate</button>
+      </div>
+      <div id="trialOut" class="mini muted" style="margin-top:10px">–</div>
+    </div>
+  </section>
 
-    const ENDPOINTS = {
-      login: '/api/auth/login',          // POST {email,password}
-      register: '/api/auth/register',    // POST {name,email,password}
-      me: '/api/auth/me',                // GET bearer token
-      documentsSample: '/api/documents/sample', // GET sample preview (optional)
-      assist: '/api/assist'              // optional assistant; we fallback if missing
-    };
+  <section id="documents" class="grid" hidden>
+    <div class="card span6">
+      <h2>Your Documents</h2>
+      <div class="row">
+        <button class="btn" id="btnListDocs">Refresh List</button>
+      </div>
+      <div id="docList" class="mini muted" style="margin-top:10px">–</div>
+    </div>
+    <div class="card span6">
+      <h2>Generate Document</h2>
+      <div class="row"><input id="docType" placeholder="Type (e.g., NDA)"></div>
+      <div class="row"><input id="partyA" placeholder="Party A"></div>
+      <div class="row"><input id="partyB" placeholder="Party B"></div>
+      <div class="row"><input id="jurisdiction" placeholder="Jurisdiction (optional)"></div>
+      <div class="row"><textarea id="terms" placeholder="Key terms (optional)"></textarea></div>
+      <div class="row"><button class="btn" id="btnGenDoc">Generate</button></div>
+      <pre id="docOut" class="mini muted" style="white-space:pre-wrap;margin-top:10px">–</pre>
+    </div>
+  </section>
 
-    // ---- Nav ----
-    const drawer = document.getElementById('drawer');
-    document.getElementById('hamburger').addEventListener('click', () => {
-      drawer.classList.toggle('open');
+  <section id="notary" class="grid" hidden>
+    <div class="card span6">
+      <h2>Create Notary Session</h2>
+      <div class="row"><input id="nDocId" placeholder="Document ID (from list)"></div>
+      <div class="row"><input id="nName" placeholder="Signer full name"></div>
+      <div class="row"><input id="nEmail" placeholder="Signer email"></div>
+      <div class="row"><button class="btn" id="btnNotaryCreate">Create Session</button></div>
+      <div id="notaryCreateOut" class="mini muted" style="margin-top:10px">–</div>
+    </div>
+    <div class="card span6">
+      <h2>Lookup Notary Session</h2>
+      <div class="row"><input id="nLookupId" placeholder="notary_XXXXXX"></div>
+      <div class="row"><button class="btn ghost" id="btnNotaryGet">Get</button></div>
+      <div id="notaryGetOut" class="mini muted" style="margin-top:10px">–</div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="verse">“I am the way, the truth, and the life.” — John 14:6</div></footer>
+
+<!-- Ask Lex floating panel -->
+<button class="lex-fab" id="lexFab">💬</button>
+<aside class="drawer" id="lexDrawer" aria-hidden="true">
+  <header class="row" style="padding:10px 14px;justify-content:space-between;background:var(--panel)">
+    <strong>Ask Lex</strong>
+    <button class="btn ghost" id="lexClose">Close</button>
+  </header>
+  <div class="chatlog" id="chatLog"></div>
+  <div style="padding:12px;border-top:1px solid var(--line)">
+    <input id="lexInput" placeholder="Ask a question… (Enter to send)"/>
+  </div>
+</aside>
+
+<!-- Login Modal -->
+<div id="loginModal" hidden style="position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.6);z-index:80">
+  <div class="card" style="width:min(460px,92vw)">
+    <h2>Login</h2>
+    <input id="loginEmail" placeholder="you@example.com" style="margin:6px 0">
+    <input id="loginPassword" type="password" placeholder="Password" style="margin:6px 0">
+    <div class="row" style="justify-content:flex-end;margin-top:8px">
+      <button class="btn ghost" data-close="loginModal">Cancel</button>
+      <button class="btn" id="loginGo">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- Register Modal -->
+<div id="registerModal" hidden style="position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.6);z-index:80">
+  <div class="card" style="width:min(460px,92vw)">
+    <h2>Create Account</h2>
+    <input id="regName" placeholder="Full name" style="margin:6px 0">
+    <input id="regEmail" placeholder="you@example.com" style="margin:6px 0">
+    <input id="regPassword" type="password" placeholder="At least 8 chars (mixed case & number)" style="margin:6px 0">
+    <div class="row" style="justify-content:flex-end;margin-top:8px">
+      <button class="btn ghost" data-close="registerModal">Cancel</button>
+      <button class="btn" id="registerGo">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===========================
+   One-file controller (SPA)
+   =========================== */
+const API = '/api';
+const storageKey = 'lexomega.auth';
+const $ = (s,el=document)=>el.querySelector(s);
+const $$= (s,el=document)=>[...el.querySelectorAll(s)];
+const auth = {
+  get(){ try{return JSON.parse(localStorage.getItem(storageKey))}catch{return null} },
+  set(v){ localStorage.setItem(storageKey, JSON.stringify(v)); },
+  clear(){ localStorage.removeItem(storageKey); }
+};
+function bearer(){ return auth.get()?.token ? { 'Authorization':'Bearer '+auth.get().token } : {}; }
+function setAuthState(){
+  const u = auth.get()?.user;
+  $('#authState').textContent = u ? ('Signed in as ' + (u.username||u.email)) : 'Signed out';
+}
+function showTab(id){
+  $$('#tabs .tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===id));
+  ['home','dashboard','tools','documents','notary'].forEach(x=> $('#' + x).hidden = (x!==id));
+}
+function toast(el, html){ el.innerHTML = '<span class="muted">'+html+'</span>'; }
+
+/* ---------- Tabs ---------- */
+$('#tabs').addEventListener('click',(e)=>{
+  const t = e.target.closest('.tab'); if(!t) return;
+  showTab(t.dataset.tab);
+});
+
+/* ---------- Modals ---------- */
+function openModal(id){ $('#'+id).hidden=false; }
+function closeModal(id){ $('#'+id).hidden=true; }
+$$('[data-close]').forEach(b=> b.addEventListener('click', e=> closeModal(e.target.getAttribute('data-close'))));
+
+/* ---------- Ask Lex drawer ---------- */
+$('#lexFab').addEventListener('click', ()=> { $('#lexDrawer').classList.add('open'); $('#lexDrawer').ariaHidden='false'; $('#lexInput').focus(); });
+$('#lexClose').addEventListener('click', ()=> { $('#lexDrawer').classList.remove('open'); $('#lexDrawer').ariaHidden='true'; });
+
+function pushMsg(who, text){
+  const div = document.createElement('div');
+  div.className = 'msg ' + (who==='me'?'me':'bot');
+  div.innerHTML = text.replace(/</g,'&lt;');
+  $('#chatLog').appendChild(div);
+  $('#chatLog').scrollTop = $('#chatLog').scrollHeight;
+}
+
+/* ---------- Fetch helper ---------- */
+async function api(path, opts={}){
+  const headers = { 'Content-Type':'application/json', ...bearer(), ...(opts.headers||{}) };
+  const res = await fetch(API+path, { ...opts, headers });
+  let data = null; try { data = await res.json(); } catch { data = null; }
+  if (!res.ok || data?.ok===false) {
+    const msg = data?.error?.message || (res.status+' '+res.statusText);
+    throw new Error(msg);
+  }
+  return data;
+}
+
+/* ---------- Auth flows ---------- */
+$('#btnLogin').addEventListener('click', ()=> openModal('loginModal'));
+$('#btnRegister').addEventListener('click', ()=> openModal('registerModal'));
+
+$('#loginGo').addEventListener('click', async ()=>{
+  try{
+    const email = $('#loginEmail').value.trim();
+    const password = $('#loginPassword').value;
+    const out = await api('/auth/login',{ method:'POST', body: JSON.stringify({ email, password }) });
+    auth.set(out.data || out); // supports both {ok,data:{token,user}} and {token,user}
+    setAuthState(); closeModal('loginModal');
+  }catch(e){ alert(e.message); }
+});
+
+$('#registerGo').addEventListener('click', async ()=>{
+  try{
+    const name = $('#regName').value.trim();
+    const email = $('#regEmail').value.trim();
+    const password = $('#regPassword').value;
+    const out = await api('/auth/register',{ method:'POST', body: JSON.stringify({ name, email, password }) });
+    auth.set(out.data || out);
+    setAuthState(); closeModal('registerModal');
+  }catch(e){ alert(e.message); }
+});
+
+/* ---------- Quick Actions ---------- */
+$('#qaGenNDA').addEventListener('click', async ()=>{
+  try{
+    const idem = cryptoRandom();
+    const out = await api('/documents/generate',{
+      method:'POST',
+      headers:{ 'Idempotency-Key': idem },
+      body: JSON.stringify({ type:'NDA', partyA:'Company A', partyB:'Company B', jurisdiction:'US' })
     });
-    drawer.addEventListener('click', e=>{
-      if(e.target.matches('a')) drawer.classList.remove('open');
+    alert('Generated: ' + (out.data?.document?.title || out.document?.title));
+  }catch(e){ alert(e.message); }
+});
+
+$('#qaMockTrial').addEventListener('click', async ()=>{
+  try{
+    const out = await api('/trial/simulate',{
+      method:'POST',
+      body: JSON.stringify({ claim:'Breach of contract regarding delivery terms.', defense:'Force majeure due to port closure.' })
     });
+    $('#trialOut').textContent = out.data?.transcript || out.result?.transcript || JSON.stringify(out,null,2);
+    showTab('tools');
+  }catch(e){ alert(e.message); }
+});
 
-    // ---- Helpers ----
-    const qs = (s,el=document)=>el.querySelector(s);
-    const qsa = (s,el=document)=>[...el.querySelectorAll(s)];
-    const storage = {
-      set(k,v){localStorage.setItem(k, JSON.stringify(v));},
-      get(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}},
-      del(k){localStorage.removeItem(k)}
-    };
+/* ---------- Dashboard ---------- */
+async function loadDashboard(){
+  try{
+    const list = await api('/documents/list');
+    $('#dashDocs').innerHTML = (list.data?.items || list.items || []).slice(0,5).map(d=>`• ${d.title}`).join('<br>') || 'No docs yet.';
+    $('#dashStats').innerHTML = `Docs: ${(list.data?.meta?.total ?? (list.items?.length||0))}`;
+  }catch{ $('#dashDocs').textContent = 'Sign in to view.'; }
+}
 
-    const authKey = 'lexomega.auth';
+/* ---------- Tools: Search ---------- */
+$('#btnSearch').addEventListener('click', async ()=>{
+  const q = $('#searchQuery').value.trim();
+  if (!q) return alert('Enter a query');
+  try{
+    const out = await api('/tools/search',{ method:'POST', body: JSON.stringify({ query:q }) });
+    const items = out.data?.result?.items || out.result?.items || [];
+    $('#searchResults').innerHTML = items.length
+      ? items.map(i=>`<div class="msg"><b>${i.title}</b><br><span class="mini">${i.summary||''}</span></div>`).join('')
+      : 'No results.';
+  }catch(e){ alert(e.message); }
+});
 
-    function setAuthState(user){
-      const state = qs('#authState');
-      if(user){
-        state.textContent = 'Signed in as ' + (user.username || user.email || 'user');
-      }else{
-        state.textContent = 'Signed out';
-      }
-    }
+/* ---------- Tools: Trial ---------- */
+$('#btnTrial').addEventListener('click', async ()=>{
+  const claim = $('#claim').value.trim();
+  const defense = $('#defense').value.trim();
+  if(!claim||!defense) return alert('Enter claim and defense');
+  try{
+    const out = await api('/trial/simulate',{ method:'POST', body: JSON.stringify({ claim, defense }) });
+    $('#trialOut').textContent = out.data?.transcript || out.result?.transcript || JSON.stringify(out,null,2);
+  }catch(e){ alert(e.message); }
+});
 
-    function openModal(id){ qs('#'+id).style.display='grid'; }
-    function closeModal(id){ qs('#'+id).style.display='none'; }
-    qsa('[data-close]').forEach(btn=>btn.addEventListener('click', e=>{
-      closeModal(e.target.getAttribute('data-close'));
-    }));
-
-    // Close on ESC
-    document.addEventListener('keydown', (e)=>{
-      if(e.key === 'Escape'){ closeModal('loginModal'); closeModal('registerModal'); }
+/* ---------- Documents ---------- */
+$('#btnListDocs').addEventListener('click', loadDocs);
+async function loadDocs(){
+  try{
+    const out = await api('/documents/list');
+    const items = out.data?.items || out.items || [];
+    $('#docList').innerHTML = items.length
+      ? items.map(d=>`<div class="row" style="justify-content:space-between"><span>${d.title}</span><button class="btn ghost" data-doc="${d.id}">Open</button></div>`).join('')
+      : 'No documents yet.';
+  }catch(e){ $('#docList').textContent = e.message; }
+}
+$('#docList').addEventListener('click', async (e)=>{
+  const id = e.target.getAttribute('data-doc'); if(!id) return;
+  try{
+    const res = await api('/documents/get?id='+encodeURIComponent(id));
+    const md = res.data?.document?.markdown || res.document?.markdown || '(no content)';
+    $('#docOut').textContent = md;
+  }catch(e){ alert(e.message); }
+});
+$('#btnGenDoc').addEventListener('click', async ()=>{
+  const type = $('#docType').value.trim();
+  const partyA = $('#partyA').value.trim();
+  const partyB = $('#partyB').value.trim();
+  const jurisdiction = $('#jurisdiction').value.trim();
+  const terms = $('#terms').value.trim();
+  if(!type||!partyA||!partyB) return alert('Type, Party A, Party B required');
+  try{
+    const idem = cryptoRandom();
+    const out = await api('/documents/generate',{
+      method:'POST',
+      headers:{ 'Idempotency-Key': idem },
+      body: JSON.stringify({ type, partyA, partyB, jurisdiction, terms })
     });
+    const md = out.data?.document?.markdown || out.document?.markdown || 'Generated.';
+    $('#docOut').textContent = md;
+    await loadDocs();
+  }catch(e){ alert(e.message); }
+});
 
-    // ---- Demo + Real Auth Flows ----
-    async function apiLogin(email, password){
-      if(USE_DEMO){
-        // Simple front-end only “success”
-        if(!email || !password || password.length < 3){
-          throw new Error('Invalid credentials');
-        }
-        return {
-          token: 'demo.' + btoa(email).slice(0,10),
-          user: { id:'u_demo', email, username: email.split('@')[0], role:'user' }
-        };
-      }
-      const res = await fetch(ENDPOINTS.login, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({email, password})
-      });
-      if(!res.ok) throw new Error('Login failed');
-      return res.json();
-    }
-
-    async function apiRegister(name, email, password){
-      if(USE_DEMO){
-        if(!name || !email || !password || password.length<8){
-          throw new Error('Please fill all fields (password ≥ 8)');
-        }
-        return {
-          token:'demo.'+btoa(email).slice(0,10),
-          user:{ id:'u_demo', email, username:name, role:'user' }
-        };
-      }
-      const res = await fetch(ENDPOINTS.register, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({name, email, password})
-      });
-      if(!res.ok) throw new Error('Registration failed');
-      return res.json();
-    }
-
-    // Persisted session
-    function currentUser(){
-      return storage.get(authKey);
-    }
-    function saveSession(payload){
-      storage.set(authKey, payload);
-      setAuthState(payload?.user);
-    }
-    function signOut(){
-      storage.del(authKey);
-      setAuthState(null);
-    }
-
-    // Wire UI
-    qs('#btnLogin').addEventListener('click', ()=> openModal('loginModal'));
-    qs('#btnCreate').addEventListener('click', ()=> openModal('registerModal'));
-
-    qs('#loginContinue').addEventListener('click', async ()=>{
-      const email = qs('#loginEmail').value.trim();
-      const password = qs('#loginPassword').value;
-      try{
-        const data = await apiLogin(email, password);
-        saveSession(data);
-        closeModal('loginModal');
-      }catch(err){ alert(err.message || 'Login error'); }
+/* ---------- Notary ---------- */
+$('#btnNotaryCreate').addEventListener('click', async ()=>{
+  const docId = $('#nDocId').value.trim();
+  const signerName = $('#nName').value.trim();
+  const signerEmail = $('#nEmail').value.trim();
+  if (!docId||!signerName||!signerEmail) return alert('Fill all fields');
+  try{
+    const idem = cryptoRandom();
+    const out = await api('/notary/create',{
+      method:'POST',
+      headers:{ 'Idempotency-Key': idem },
+      body: JSON.stringify({ docId, signerName, signerEmail })
     });
+    const s = out.data?.session || out.session;
+    $('#notaryCreateOut').innerHTML = `Session: <b>${s.id}</b><br>Link: <a href="${s.link}" target="_blank">${s.link}</a>`;
+  }catch(e){ alert(e.message); }
+});
+$('#btnNotaryGet').addEventListener('click', async ()=>{
+  const id = $('#nLookupId').value.trim();
+  if(!id) return alert('Enter notary id');
+  try{
+    const out = await api('/notary/get?id='+encodeURIComponent(id));
+    const s = out.data?.session || out.session;
+    $('#notaryGetOut').textContent = JSON.stringify(s,null,2);
+  }catch(e){ alert(e.message); }
+});
 
-    qs('#regContinue').addEventListener('click', async ()=>{
-      const name = qs('#regName').value.trim();
-      const email = qs('#regEmail').value.trim();
-      const password = qs('#regPassword').value;
-      try{
-        const data = await apiRegister(name, email, password);
-        saveSession(data);
-        closeModal('registerModal');
-      }catch(err){ alert(err.message || 'Registration error'); }
-    });
+/* ---------- Ask Lex ---------- */
+$('#lexInput').addEventListener('keydown', async (e)=>{
+  if(e.key!=='Enter') return;
+  const msg = e.target.value.trim(); if(!msg) return;
+  pushMsg('me', msg); e.target.value='';
+  try{
+    const out = await api('/chat/assist',{ method:'POST', body: JSON.stringify({ message: msg }) });
+    const reply = out.data?.reply || out.reply || '(no reply)';
+    pushMsg('bot', reply);
+  }catch(err){ pushMsg('bot', 'Error: '+err.message); }
+});
 
-    // Simulated document link
-    qs('#docLink').addEventListener('click', (e)=>{
-      e.preventDefault();
-      alert('Sample document preview (placeholder).');
-    });
+/* ---------- Helpers ---------- */
+function cryptoRandom(){
+  // Quick Idempotency-Key generator
+  const a = crypto.getRandomValues(new Uint8Array(16));
+  return Array.from(a, b=>b.toString(16).padStart(2,'0')).join('');
+}
 
-    // Init on load
-    (function init(){
-      // Optional dev backdoor: ?dev=1 seeds a demo session
-      const params = new URLSearchParams(location.search);
-      if(params.get('dev')==='1' && !currentUser()){
-        saveSession({token:'demo.auto', user:{id:'u_demo', email:'demo@lexomega.ai', username:'demo', role:'user'}});
-      }else{
-        setAuthState(currentUser()?.user || null);
-      }
-    })();
+/* ---------- Init ---------- */
+(function init(){
+  // optional backdoor: ?dev=1 seeds a session by calling /auth/login with demo user
+  const params = new URLSearchParams(location.search);
+  if(params.get('dev')==='1' && !auth.get()){
+    // create demo quickly
+    fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'demo@lexomega.ai',password:'Password!23'})})
+      .then(r=>r.json()).then(data=>{ auth.set(data.data||data); setAuthState(); loadDashboard(); })
+      .catch(()=> setAuthState());
+  } else {
+    setAuthState();
+    if(auth.get()) loadDashboard();
+  }
 
-    /* =========================================================
-       Ask Lex: Floating button, chat, intents, and voice nav
-       ========================================================= */
-    const AskLex = (()=> {
-      const END = { assist: ENDPOINTS.assist };
-
-      // Chat UI
-      const chat = {
-        panel: qs('#chatPanel'),
-        log: qs('#chatLog'),
-        input: qs('#chatInput'),
-        open(){ this.panel.style.display='flex'; this.input.focus(); },
-        close(){ this.panel.style.display='none'; },
-        add(text, who='bot'){
-          const row=document.createElement('div'); row.className='row '+(who==='me'?'me':'');
-          const b=document.createElement('div'); b.className='bubble '+(who==='me'?'me':''); b.textContent=text;
-          row.appendChild(b); this.log.appendChild(row); this.log.scrollTop=this.log.scrollHeight;
-        }
-      };
-
-      // Floating buttons
-      qs('#fabMain').addEventListener('click', ()=> chat.open());
-      qs('#askLexTop').addEventListener('click', (e)=>{ e.preventDefault(); chat.open(); });
-      qs('#askLexLink').addEventListener('click', (e)=>{ e.preventDefault(); chat.open(); });
-      qs('#openChatFromCard')?.addEventListener('click', ()=> chat.open());
-      qs('#closeChat').addEventListener('click', ()=> chat.close());
-
-      // Voice: SpeechRecognition + SpeechSynthesis
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const synth = window.speechSynthesis;
-      let rec = null, listening=false;
-
-      function speak(text){
-        try{ const u = new SpeechSynthesisUtterance(text); synth.speak(u); }catch{}
-      }
-      function toggleMic(state){
-        const btn = qs('#micBtn'); const fabMic = qs('#fabMic');
-        listening = state != null ? state : !listening;
-        btn.setAttribute('aria-pressed', String(listening));
-        fabMic.setAttribute('aria-pressed', String(listening));
-      }
-      function startListening(){
-        if(!SR){ chat.add("Voice not supported on this device/browser.", 'bot'); return; }
-        if(rec){ try{ rec.stop(); }catch{} }
-        rec = new SR(); rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=1;
-        rec.onresult = (e)=>{ const t=e.results[0][0].transcript; handleUserMessage(t, true); };
-        rec.onend = ()=> toggleMic(false);
-        rec.onerror = ()=> toggleMic(false);
-        rec.start(); toggleMic(true);
-      }
-      qs('#micBtn').addEventListener('click', ()=> listening ? (rec&&rec.stop(), toggleMic(false)) : startListening());
-      qs('#fabMic').addEventListener('click', ()=> listening ? (rec&&rec.stop(), toggleMic(false)) : (chat.open(), startListening()));
-
-      // Send / Enter
-      qs('#sendBtn').addEventListener('click', ()=> {
-        const t=chat.input.value.trim(); if(t){ chat.input.value=''; handleUserMessage(t); }
-      });
-      qs('#chatInput').addEventListener('keydown', (e)=>{
-        if(e.key==='Enter'){ e.preventDefault(); const t=chat.input.value.trim(); if(t){ chat.input.value=''; handleUserMessage(t); } }
-      });
-
-      // Intents (navigate & actions)
-      const intents = [
-        { match:/\b(go|navigate|open).*(home)\b/i, run:()=> nav('index.html') },
-        { match:/\b(go|navigate|open).*(tool|tools)\b/i, run:()=> nav('tools.html') },
-        { match:/\b(go|navigate|open).*(document|docs)\b/i, run:()=> nav('documents.html') },
-        { match:/\b(go|navigate|open).*(dashboard)\b/i, run:()=> nav('dashboard.html') },
-        { match:/\bscroll (down|lower)\b/i, run:()=> window.scrollBy({top:600,behavior:'smooth'}) },
-        { match:/\bscroll (up|higher)\b/i, run:()=> window.scrollBy({top:-600,behavior:'smooth'}) },
-        { match:/\b(open|start).*(notary)\b/i, run:()=> nav('tools.html') },
-        { match:/\b(search).*(case|cases)\b/i, run:(t)=> reply(`Open Tools → "Search Cases", then type: ${extractQuery(t)}`) },
-        { match:/\b(generate).*(document|doc)\b/i, run:()=> reply('Open Tools → "Generate Document", pick template, enter matter, click Generate.') }
-      ];
-      function nav(path){ reply(`Navigating to ${path.replace('.html','')}…`, true); setTimeout(()=>{ window.location.href = path; }, 450); }
-      function extractQuery(t){ const m=t.match(/for (.+)$/i); return m?m[1]:'your query'; }
-      function reply(text, noVoice){ chat.add(text,'bot'); if(!noVoice) speak(text); }
-
-      // Assistant call (optional backend)
-      async function assistCall(prompt){
-        try{
-          const r = await fetch(END.assist, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt }) });
-          if(!r.ok) throw new Error('offline');
-          const data = await r.json();
-          return data?.reply || 'OK.';
-        }catch{
-          // Demo fallback
-          if(/(tool|document|notary|mock|trial|case|dashboard|home|navigate|go)/i.test(prompt)){
-            return 'You can say “Go to Tools”, “Go to Documents”, or ask me to “Scroll down”.';
-          }
-          return 'Ask me to navigate (“Go to Tools”) or ask a question about using LexOmega.';
-        }
-      }
-
-      // Unified handler
-      async function handleUserMessage(text, fromVoice=false){
-        chat.add(text,'me');
-        for(const i of intents){
-          if(text.match(i.match)){ await i.run(text); return; }
-        }
-        const answer = await assistCall(text);
-        reply(answer);
-      }
-
-      // Keyboard shortcut: Shift+L opens chat
-      window.addEventListener('keydown', (e)=>{ if(e.shiftKey && e.key.toLowerCase()==='l'){ chat.open(); } });
-
-      return { open: ()=> chat.open() };
-    })();
-  </script>
+  // Default tab after login
+  $('#btnListDocs').click();
+})();
+</script>
 </body>
 </html>
