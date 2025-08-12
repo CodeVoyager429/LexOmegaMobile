@@ -6,7 +6,6 @@
   <title>LexOmega | Unified Legal Intelligence</title>
   <meta name="description" content="LexOmega — analytics, case tracking, document generation, notary, and real-time legal intelligence."/>
   <link rel="icon" href="data:,"/>
-
   <style>
     /* ===================== DESIGN TOKENS ===================== */
     :root{
@@ -154,7 +153,6 @@
   </style>
 </head>
 <body>
-
   <!-- Drawer (mobile) -->
   <nav class="drawer" id="drawer">
     <div class="links">
@@ -319,18 +317,35 @@
 
   <script>
     /* =========================================================
-       FRONT-END CONTROLLER (ALL LIVE — DEMO OFF)
+       FRONT-END CONTROLLER (wired to backend base URL)
        ========================================================= */
-    const USE_DEMO = false; // 🔴 live mode
+
+    // CHANGE THIS if your backend domain is different:
+    const DEFAULT_BACKEND = 'https://lex-omega-backend.vercel.app';
+
+    // Auto-detect: if this page is served from the backend domain, use same-origin.
+    const SAME_ORIGIN_BACKEND = (()=>{
+      try{
+        const host = location.origin;
+        return host.includes('lex-omega-backend.vercel.app') ? host : null;
+      }catch{ return null; }
+    })();
+
+    // Allow manual override via ?backend=... for quick testing
+    const urlBackend = new URLSearchParams(location.search).get('backend');
+
+    const BACKEND = urlBackend || SAME_ORIGIN_BACKEND || DEFAULT_BACKEND;
+
     const API = {
-      login: '/api/auth/login',
-      register: '/api/auth/register',
-      me: '/api/auth/me',
-      stats: '/api/dashboard/stats',
-      documentsList: '/api/documents/list',
-      documentsGenerate: '/api/documents/generate',
-      searchCases: '/api/cases/search',
-      chat: '/api/assistant/chat'
+      login: `${BACKEND}/api/auth/login`,
+      register: `${BACKEND}/api/auth/register`,
+      me: `${BACKEND}/api/auth/me`,
+      stats: `${BACKEND}/api/dashboard/stats`,
+      documentsList: `${BACKEND}/api/documents/list`,
+      documentsGenerate: `${BACKEND}/api/documents/generate`,
+      searchCases: `${BACKEND}/api/cases/search`,
+      chat: `${BACKEND}/api/assistant/chat`,
+      status: `${BACKEND}/api/status`
     };
 
     // ====== DOM helpers ======
@@ -569,7 +584,7 @@
     }
 
     // ====== Init ======
-    (function init(){
+    (async function init(){
       const params = new URLSearchParams(location.search);
       if(params.get('dev')==='1'){
         saveSession({token:'demo.auto', user:{id:'u_demo', email:'demo@lexomega.ai', username:'demo', role:'user'}});
@@ -578,7 +593,15 @@
         if(existing) saveSession(existing);
         else setAuthState(null);
       }
-      refreshAll();
+
+      // quick backend health ping (shows toast if not reachable)
+      try{
+        await apiFetch(API.status, { method:'GET' });
+      }catch{
+        showToast('Backend not reachable. Check deployment / CORS.', 'warn');
+      }
+
+      await refreshAll();
     })();
 
     async function refreshAll(){
