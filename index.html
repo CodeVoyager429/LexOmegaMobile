@@ -128,11 +128,11 @@
     /* ===================== CHAT (Ask Lex) ===================== */
     .fab{
       position:fixed;right:18px;bottom:18px;background:var(--accent);color:#111;width:60px;height:60px;border-radius:999px;
-      display:grid;place-items:center;font-weight:900;box-shadow:0 18px 36px rgba(255,208,0,.25);z-index:55;border:0;cursor:pointer
+      display:grid;place-items:center;font-weight:900;box-shadow:0 18px 36px rgba(255,208,0,.25);z-index:65;border:0;cursor:pointer
     }
     .chat{
       position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:3px solid var(--accent);box-shadow:var(--shadow);
-      transform:translateY(100%);transition:transform .22s ease-out;z-index:65
+      transform:translateY(100%);transition:transform .22s ease-out;z-index:64
     }
     .chat.open{transform:translateY(0)}
     .chat-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
@@ -320,10 +320,10 @@
        FRONT-END CONTROLLER (wired to backend base URL)
        ========================================================= */
 
-    // CHANGE THIS if your backend domain is different:
+    // If your backend domain differs, change DEFAULT_BACKEND:
     const DEFAULT_BACKEND = 'https://lex-omega-backend.vercel.app';
 
-    // Auto-detect: if this page is served from the backend domain, use same-origin.
+    // Auto-detect: if page is served from backend domain, use same-origin (helps preview branches)
     const SAME_ORIGIN_BACKEND = (()=>{
       try{
         const host = location.origin;
@@ -331,7 +331,7 @@
       }catch{ return null; }
     })();
 
-    // Allow manual override via ?backend=... for quick testing
+    // Quick override via ?backend=... (useful for testing envs)
     const urlBackend = new URLSearchParams(location.search).get('backend');
 
     const BACKEND = urlBackend || SAME_ORIGIN_BACKEND || DEFAULT_BACKEND;
@@ -382,7 +382,7 @@
       const token = currentUser()?.token;
       const headers = Object.assign({'Content-Type':'application/json'}, opts.headers || {});
       if(token) headers['Authorization'] = 'Bearer ' + token;
-      const res = await fetch(url, Object.assign({}, opts, { headers }));
+      const res = await fetch(url, Object.assign({}, opts, { headers, credentials:'include' }));
       if(res.status === 405){
         throw new Error('Method not allowed (405) — check backend route + method.');
       }
@@ -419,7 +419,7 @@
     let toastTimer;
     function showToast(msg, type='info'){
       toast.textContent = msg;
-      toast.style.borderColor = type==='error'? 'var(--err)' : (type==='warn'? 'var(--warn)' : 'var(--line)');
+      toast.style.borderColor = type==='error'? 'var(--err)' : (type==='warn'? 'var(--warn)' : 'var(--line)';
       toast.classList.add('show');
       clearTimeout(toastTimer);
       toastTimer = setTimeout(()=> toast.classList.remove('show'), 2600);
@@ -483,8 +483,9 @@
     async function loadRecentDocs(){
       try{
         const list = await apiFetch(API.documentsList, { method:'GET' });
-        if(!list || !list.length){ qs('#recentDocs').textContent='No recent documents.'; return; }
-        qs('#recentDocs').innerHTML = list.slice(0,6).map(d=>`• ${d.title} <span class="muted">(${new Date(d.createdAt).toLocaleDateString()})</span>`).join('<br/>');
+        if(!list || !list.items || !list.items.length){ qs('#recentDocs').textContent='No recent documents.'; return; }
+        const items = list.items;
+        qs('#recentDocs').innerHTML = items.slice(0,6).map(d=>`• ${d.title} <span class="muted">(${new Date(d.created_at||d.createdAt).toLocaleDateString()})</span>`).join('<br/>');
       }catch(err){
         qs('#recentDocs').textContent = 'Unable to fetch documents.';
       }
@@ -496,11 +497,12 @@
       qs('#caseResults').textContent = 'Searching…';
       try{
         const res = await apiFetch(API.searchCases, { method:'POST', body:JSON.stringify({ q }) });
-        if(!res || !res.results || !res.results.length){
+        const results = res?.results || [];
+        if(!results.length){
           qs('#caseResults').textContent = 'No results.';
           return;
         }
-        qs('#caseResults').innerHTML = res.results.map(r=>{
+        qs('#caseResults').innerHTML = results.map(r=>{
           return `<div style="margin:10px 0"><strong>${r.citation||'Result'}</strong><div class="muted">${r.summary||''}</div></div>`;
         }).join('');
       }catch(err){
@@ -574,7 +576,7 @@
       else { rec.stop(); }
     });
 
-    // Simple voice navigation
+    // Simple voice/navigation intents
     function handleVoiceCommand(text){
       const t = (text||'').toLowerCase();
       if(t.includes('go to tools') || t.includes('open tools')) location.href='tools.html';
@@ -594,7 +596,7 @@
         else setAuthState(null);
       }
 
-      // quick backend health ping (shows toast if not reachable)
+      // quick backend health ping (toast warns if not reachable / CORS)
       try{
         await apiFetch(API.status, { method:'GET' });
       }catch{
