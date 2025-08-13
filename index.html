@@ -128,11 +128,11 @@
     /* ===================== CHAT (Ask Lex) ===================== */
     .fab{
       position:fixed;right:18px;bottom:18px;background:var(--accent);color:#111;width:60px;height:60px;border-radius:999px;
-      display:grid;place-items:center;font-weight:900;box-shadow:0 18px 36px rgba(255,208,0,.25);z-index:65;border:0;cursor:pointer
+      display:grid;place-items:center;font-weight:900;box-shadow:0 18px 36px rgba(255,208,0,.25);z-index:55;border:0;cursor:pointer
     }
     .chat{
       position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:3px solid var(--accent);box-shadow:var(--shadow);
-      transform:translateY(100%);transition:transform .22s ease-out;z-index:64
+      transform:translateY(100%);transition:transform .22s ease-out;z-index:65
     }
     .chat.open{transform:translateY(0)}
     .chat-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
@@ -317,35 +317,31 @@
 
   <script>
     /* =========================================================
-       FRONT-END CONTROLLER (wired to backend base URL)
+       FRONT-END CONTROLLER (live, cookie-session + CSRF)
        ========================================================= */
 
-    // If your backend domain differs, change DEFAULT_BACKEND:
+    // ---- Backend base URL detection (keeps your current look; only wiring changes) ----
     const DEFAULT_BACKEND = 'https://lex-omega-backend.vercel.app';
-
-    // Auto-detect: if page is served from backend domain, use same-origin (helps preview branches)
-    const SAME_ORIGIN_BACKEND = (()=>{
-      try{
-        const host = location.origin;
-        return host.includes('lex-omega-backend.vercel.app') ? host : null;
-      }catch{ return null; }
-    })();
-
-    // Quick override via ?backend=... (useful for testing envs)
     const urlBackend = new URLSearchParams(location.search).get('backend');
-
+    const SAME_ORIGIN_BACKEND = (() => {
+      try {
+        const host = location.origin;
+        return (host.includes('lex-omega-backend.vercel.app')) ? host : null;
+      } catch { return null; }
+    })();
     const BACKEND = urlBackend || SAME_ORIGIN_BACKEND || DEFAULT_BACKEND;
 
     const API = {
-      login: `${BACKEND}/api/auth/login`,
-      register: `${BACKEND}/api/auth/register`,
-      me: `${BACKEND}/api/auth/me`,
-      stats: `${BACKEND}/api/dashboard/stats`,
-      documentsList: `${BACKEND}/api/documents/list`,
-      documentsGenerate: `${BACKEND}/api/documents/generate`,
-      searchCases: `${BACKEND}/api/cases/search`,
-      chat: `${BACKEND}/api/assistant/chat`,
-      status: `${BACKEND}/api/status`
+      login:            `${BACKEND}/api/auth/login`,
+      register:         `${BACKEND}/api/auth/register`,
+      me:               `${BACKEND}/api/auth/me`,
+      stats:            `${BACKEND}/api/dashboard/stats`,
+      documentsList:    `${BACKEND}/api/documents/list`,
+      documentsGenerate:`${BACKEND}/api/documents/generate`,
+      searchCases:      `${BACKEND}/api/cases/search`,
+      chat:             `${BACKEND}/api/assistant/chat`,
+      status:           `${BACKEND}/api/status`,
+      logout:           `${BACKEND}/api/auth/logout`
     };
 
     // ====== DOM helpers ======
@@ -377,21 +373,41 @@
       state.textContent = user ? 'Signed in as ' + (user.username || user.email || 'user') : 'Signed out';
     }
 
-    // ====== Global fetch wrapper ======
+    // ====== Cookie utilities (for CSRF) ======
+    function readCookie(name){
+      const m = document.cookie.match('(?:^|; )'+name.replace(/([.$?*|{}()[\]\\/+^])/g,'\\$1')+'=([^;]*)');
+      return m ? decodeURIComponent(m[1]) : '';
+    }
+    function needsCsrf(method){ return ['POST','PATCH','DELETE'].includes(String(method||'').toUpperCase()); }
+
+    // ====== Global fetch wrapper (sends cookies + CSRF) ======
     async function apiFetch(url, opts={}){
       const token = currentUser()?.token;
+      const method = (opts.method || 'GET').toUpperCase();
       const headers = Object.assign({'Content-Type':'application/json'}, opts.headers || {});
       if(token) headers['Authorization'] = 'Bearer ' + token;
-      const res = await fetch(url, Object.assign({}, opts, { headers, credentials:'include' }));
-      if(res.status === 405){
-        throw new Error('Method not allowed (405) — check backend route + method.');
+
+      // CSRF: reflect server-issued lo_csrf cookie on state-changing requests
+      if(needsCsrf(method)){
+        const csrf = readCookie('lo_csrf');
+        if(csrf) headers['X-CSRF-Token'] = csrf;
       }
+
+      const res = await fetch(url, Object.assign({}, opts, {
+        headers,
+        credentials: 'include' // <-- allow session cookie across origins
+      }));
+
       if(res.status === 401){
         signOut();
-        throw new Error('Session expired. Please sign in again.');
+        throw new Error('Session expired / not signed in.');
+      }
+      if(res.status === 405){
+        throw new Error('405 Method not allowed — check route + verb.');
       }
       if(!res.ok){
-        const text = await res.text().catch(()=> '');
+        let text = '';
+        try { text = await res.text(); } catch {}
         throw new Error(text || ('Request failed: '+res.status));
       }
       const ct = res.headers.get('content-type')||'';
@@ -408,18 +424,18 @@
     qsa('[data-close]').forEach(btn=>btn.addEventListener('click', e=>{
       closeModal(e.target.getAttribute('data-close'));
     }));
-    // tap outside to close
+    // click outside to close
     qsa('.modal-backdrop').forEach(backdrop=>{
       backdrop.addEventListener('click',(e)=>{ if(e.target===backdrop) backdrop.style.display='none'; });
     });
-    // ESC to close
+    // ESC
     document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ closeModal('loginModal'); closeModal('registerModal'); } });
 
     // ====== Toasts ======
     let toastTimer;
     function showToast(msg, type='info'){
       toast.textContent = msg;
-      toast.style.borderColor = type==='error'? 'var(--err)' : (type==='warn'? 'var(--warn)' : 'var(--line)';
+      toast.style.borderColor = (type==='error') ? 'var(--err)' : (type==='warn' ? 'var(--warn)' : 'var(--line)');
       toast.classList.add('show');
       clearTimeout(toastTimer);
       toastTimer = setTimeout(()=> toast.classList.remove('show'), 2600);
@@ -428,7 +444,13 @@
     // ====== Auth flows ======
     qs('#btnLogin').addEventListener('click', ()=> openModal('loginModal'));
     qs('#btnCreate').addEventListener('click', ()=> openModal('registerModal'));
-    qs('#btnLogout').addEventListener('click', ()=> { signOut(); showToast('Signed out'); });
+    qs('#btnLogout').addEventListener('click', async ()=>{
+      try {
+        await apiFetch(API.logout, { method:'POST', body:JSON.stringify({}) });
+      } catch {}
+      signOut();
+      showToast('Signed out');
+    });
 
     qs('#guestContinue').addEventListener('click',(e)=>{
       e.preventDefault();
@@ -483,9 +505,11 @@
     async function loadRecentDocs(){
       try{
         const list = await apiFetch(API.documentsList, { method:'GET' });
-        if(!list || !list.items || !list.items.length){ qs('#recentDocs').textContent='No recent documents.'; return; }
-        const items = list.items;
-        qs('#recentDocs').innerHTML = items.slice(0,6).map(d=>`• ${d.title} <span class="muted">(${new Date(d.created_at||d.createdAt).toLocaleDateString()})</span>`).join('<br/>');
+        if(!list || !list.items || !list.items.length){
+          qs('#recentDocs').textContent='No recent documents.';
+          return;
+        }
+        qs('#recentDocs').innerHTML = list.items.slice(0,6).map(d=>`• ${d.title} <span class="muted">(${new Date(d.created_at||d.createdAt||Date.now()).toLocaleDateString()})</span>`).join('<br/>');
       }catch(err){
         qs('#recentDocs').textContent = 'Unable to fetch documents.';
       }
@@ -498,10 +522,7 @@
       try{
         const res = await apiFetch(API.searchCases, { method:'POST', body:JSON.stringify({ q }) });
         const results = res?.results || [];
-        if(!results.length){
-          qs('#caseResults').textContent = 'No results.';
-          return;
-        }
+        if(!results.length){ qs('#caseResults').textContent = 'No results.'; return; }
         qs('#caseResults').innerHTML = results.map(r=>{
           return `<div style="margin:10px 0"><strong>${r.citation||'Result'}</strong><div class="muted">${r.summary||''}</div></div>`;
         }).join('');
@@ -529,7 +550,7 @@
       addChat('me', text);
       try{
         const res = await apiFetch(API.chat, { method:'POST', body:JSON.stringify({ message:text }) });
-        handleVoiceCommand(text); // also treat as potential nav
+        handleVoiceCommand(text); // treat as potential nav
         addChat('bot', res.reply || '…');
       }catch(err){
         addChat('bot', 'Error: '+(err.message||'request failed'));
@@ -576,7 +597,7 @@
       else { rec.stop(); }
     });
 
-    // Simple voice/navigation intents
+    // Simple voice navigation
     function handleVoiceCommand(text){
       const t = (text||'').toLowerCase();
       if(t.includes('go to tools') || t.includes('open tools')) location.href='tools.html';
@@ -596,11 +617,11 @@
         else setAuthState(null);
       }
 
-      // quick backend health ping (toast warns if not reachable / CORS)
+      // quick backend health ping (non-blocking)
       try{
         await apiFetch(API.status, { method:'GET' });
-      }catch{
-        showToast('Backend not reachable. Check deployment / CORS.', 'warn');
+      }catch(err){
+        showToast('Backend not reachable / CORS. Check env FRONTEND_URL/HOST.', 'warn');
       }
 
       await refreshAll();
