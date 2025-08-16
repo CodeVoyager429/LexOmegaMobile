@@ -12,85 +12,123 @@ on:
         required: true
         default: "main"
 
+permissions:
+  contents: write
+
 jobs:
   run-ops:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write   # needed to commit back with GITHUB_TOKEN
+    env:
+      SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
     steps:
+      - name: Set up job
+        run: echo "Starting Batch Ops for ${{ github.repository }} on ref ${{ inputs.ref }}"
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref }}
+          ref: ${{ inputs.ref }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
       - name: Parse inputs
         id: parse
+        shell: bash
         run: |
-          OPS="${{ github.event.inputs.ops }}"
-          echo "ops=$OPS" >> $GITHUB_OUTPUT
+          echo "ops=${{ inputs.ops }}" >> "$GITHUB_OUTPUT"
 
-      - name: Setup Node
-        if: contains(steps.parse.outputs.ops, 'normalize') || contains(steps.parse.outputs.ops, 'fmt') || contains(steps.parse.outputs.ops, 'sitemap') || contains(steps.parse.outputs.ops, 'assetcheck') || contains(steps.parse.outputs.ops, 'linkaudit')
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
+      # ✅ Fixed version for sitemap-generator-cli (was 7.7.0 causing 404)
       - name: Install CLI tools
-        if: contains(steps.parse.outputs.ops, 'normalize') || contains(steps.parse.outputs.ops, 'fmt') || contains(steps.parse.outputs.ops, 'sitemap') || contains(steps.parse.outputs.ops, 'assetcheck') || contains(steps.parse.outputs.ops, 'linkaudit')
         run: |
-          npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.7.0
+          npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.4.2
 
-      # --- normalize & format ---
       - name: Normalize filenames (lowercase, no spaces)
         if: contains(steps.parse.outputs.ops, 'normalize')
         shell: bash
         run: |
           set -e
-          find . -type f \( -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.json" \) | while read -r f; do
-            dir=$(dirname "$f"); base=$(basename "$f")
-            norm=$(echo "$base" | tr '[:upper:] ' '[:lower:]-')
-            if [ "$base" != "$norm" ]; then
-              git mv -f "$f" "$dir/$norm" || true
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Lowercase all filenames & replace spaces with '-'
+          find . -path ./.git -prune -o -type f -print0 | while IFS= read -r -d '' f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            lower=$(echo "$base" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+            if [ "$base" != "$lower" ]; then
+              git mv "$f" "$dir/$lower"
             fi
           done
 
       - name: Format code (Prettier)
         if: contains(steps.parse.outputs.ops, 'fmt')
+        shell: bash
         run: |
-          prettier -w "**/*.{html,css,js,json}"
+          prettier -w . --ignore-unknown || true
 
-      # --- sitemap ---
       - name: Generate sitemap.xml
         if: contains(steps.parse.outputs.ops, 'sitemap')
+        shell: bash
         env:
-          SITE_DOMAIN: ${{ secrets.SITE_DOMAIN || env.SITE_DOMAIN }}
-        run: |
-          DOMAIN="${SITE_DOMAIN:-https://echoversellcio.com}"
-          npx --yes sitemap-generator-cli "$DOMAIN" --strip-querystring --max-depth 0 --output ./sitemap.xml || true
-
-      # --- asset check (broken local links/files) ---
-      - name: Asset check (local)
-        if: contains(steps.parse.outputs.ops, 'assetcheck')
-        run: |
-          linkinator . --recurse --silent --skip "^(mailto:|tel:|https?://)" || true
-
-      # --- link audit (external links) ---
-      - name: Link audit (external)
-        if: contains(steps.parse.outputs.ops, 'linkaudit')
-        run: |
-          linkinator . --recurse --silent --filter "https?://" --retry 2 --timeout 10000 || true
-
-      # --- commit any changes ---
-      - name: Commit & push changes
-        if: contains(steps.parse.outputs.ops, 'commit')
+          DOMAIN: ${{ env.SITE_DOMAIN }}
         run: |
           set -e
-          git config user.name "lexomega-bot"
-          git config user.email "bot@users.noreply.github.com"
-          if ! git diff --quiet; then
+          if [ -z "$DOMAIN" ]; then
+            echo "SITE_DOMAIN secret is missing."
+            exit 1
+          fi
+          # Ensure URL has scheme
+          if [[ "$DOMAIN" != http* ]]; then
+            DOMAIN="https://$DOMAIN"
+          fi
+          echo "Generating sitemap for $DOMAIN"
+          # sitemap-generator-cli installs the 'sitemap-generator' bin
+          sitemap-generator "$DOMAIN" --maxDepth 0 --lastMod --stripQuerystring --output ./sitemap.xml
+          test -s ./sitemap.xml || (echo "sitemap.xml is empty" && exit 1)
+
+      - name: Asset check (local)
+        if: contains(steps.parse.outputs.ops, 'assetcheck')
+        shell: bash
+        run: |
+          echo "Running basic asset check..."
+          find . -type f -name "*.html" -print0 | xargs -0 -I{} grep -oE 'src="[^"]+"' "{}" \
+            | sed -E 's/src="([^"]+)"/\1/' \
+            | grep -vE '^(http|https|data:|mailto:|tel:)' \
+            | while read -r p; do
+                [ -f "$p" ] || { echo "Missing asset: $p"; exit 1; }
+              done
+          echo "Assets OK"
+
+      - name: Link audit (external)
+        if: contains(steps.parse.outputs.ops, 'linkaudit')
+        shell: bash
+        env:
+          DOMAIN: ${{ env.SITE_DOMAIN }}
+        run: |
+          if [ -z "$DOMAIN" ]; then
+            echo "SITE_DOMAIN secret is missing."
+            exit 1
+          fi
+          if [[ "$DOMAIN" != http* ]]; then
+            DOMAIN="https://$DOMAIN"
+          fi
+          echo "Checking external links on $DOMAIN"
+          linkinator "$DOMAIN" --verbosity error --skip "mailto:,tel:"
+
+      - name: Commit & push changes
+        if: contains(steps.parse.outputs.ops, 'commit')
+        shell: bash
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
             git add -A
-            git commit -m "chore(bot): batch ops [$GITHUB_RUN_ID]"
+            git commit -m "chore(ci): batch-ops updates (fmt/normalize/sitemap)"
             git push
+            echo "Changes committed & pushed."
           else
             echo "No changes to commit."
           fi
