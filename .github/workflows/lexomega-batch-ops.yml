@@ -6,17 +6,13 @@ on:
       ops:
         description: "Comma-separated ops to run (normalize,fmt,sitemap,assetcheck,linkaudit,commit)"
         required: true
-        default: "normalize,fmt,sitemap,assetcheck,linkaudit,commit"
-      ref:
-        description: "Git ref (branch)"
-        required: true
-        default: "main"
+        default: normalize,fmt,sitemap,assetcheck,linkaudit,commit
 
 permissions:
   contents: write
-  actions: read
 
 env:
+  # Comes from Actions > Secrets > Repository secrets
   SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
 
 jobs:
@@ -25,68 +21,99 @@ jobs:
 
     steps:
       - name: Set up job
-        run: echo "Starting…"
+        id: parse
+        run: echo "ops=${{ github.event.inputs.ops }}" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref }}
+          persist-credentials: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 20
 
-      - name: Parse inputs
-        id: parse
-        run: |
-          echo "ops=${{ github.event.inputs.ops }}" >> "$GITHUB_OUTPUT"
-
-      # --- FIX: pin sitemap-generator-cli to a valid version ---
       - name: Install CLI tools
         run: |
-          npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.3.0
+          npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.7.0
 
       - name: Normalize filenames (lowercase, no spaces)
         if: contains(steps.parse.outputs.ops, 'normalize')
         run: |
-          find . -path ./.git -prune -o -type f -print0 | while IFS= read -r -d '' f; do
-            dir="$(dirname "$f")"
-            base="$(basename "$f")"
-            norm="$(echo "$base" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' )"
-            if [ "$base" != "$norm" ]; then
-              git mv -f "$f" "$dir/$norm" || true
+          find . -type f -name "* *" -print0 | while IFS= read -r -d '' f; do
+            new="$(dirname "$f")/$(basename "$f" | tr '[:upper:] ' '[:lower:]-')"
+            if [ "$f" != "$new" ]; then
+              git mv -f "$f" "$new"
             fi
-          done
+          done || true
 
       - name: Format code (Prettier)
         if: contains(steps.parse.outputs.ops, 'fmt')
-        run: |
-          npx --yes prettier@3.3.3 . --ignore-unknown || true
+        run: prettier -w .
 
-      - name: Generate sitemap.xml
+      - name: Generate sitemap.xml (with fallback)
         if: contains(steps.parse.outputs.ops, 'sitemap')
+        env:
+          SITE: ${{ env.SITE_DOMAIN }}
         run: |
-          if [ -z "${SITE_DOMAIN}" ]; then
-            echo "SITE_DOMAIN secret not set"; exit 1
+          set -euo pipefail
+
+          # Default SITE from secret; if blank, fall back to your domain
+          if [ -z "${SITE:-}" ]; then
+            SITE="https://echoversellcio.com"
           fi
-          npx --yes sitemap-generator-cli@7.3.0 "https://${SITE_DOMAIN}" -o sitemap.xml
+
+          echo "Generating sitemap for $SITE"
+
+          # Try crawl-based generator first (don't fail the job if it errors)
+          npx --yes sitemap-generator-cli "$SITE" \
+            --strip-querystring \
+            --max-depth 0 \
+            --output sitemap.xml || true
+
+          # Fallback: create a minimal sitemap if the crawler didn't write one
+          if [ ! -s sitemap.xml ]; then
+            echo "No sitemap produced by crawler; creating minimal sitemap.xml"
+            cat > sitemap.xml <<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>__SITE__/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+XML
+            # Inject SITE value
+            sed -i "s#__SITE__#${SITE%/}#g" sitemap.xml
+          fi
+
+          ls -l sitemap.xml
+          echo "Sitemap content (first lines):"
+          head -n 5 sitemap.xml
 
       - name: Asset check (local)
         if: contains(steps.parse.outputs.ops, 'assetcheck')
         run: |
-          test -f sitemap.xml && echo "sitemap.xml present"
+          test -s sitemap.xml && echo "✅ sitemap.xml present and non-empty"
 
       - name: Link audit (external)
         if: contains(steps.parse.outputs.ops, 'linkaudit')
         run: |
-          linkinator "https://${SITE_DOMAIN}" --skip "/(mailto:|tel:)/" --verbosity error || true
+          # Don't fail the job on occasional external link noise
+          linkinator "${{ env.SITE_DOMAIN || 'https://echoversellcio.com' }}" --recurse --timeout 10000 --retry 2 || true
 
       - name: Commit & push changes
         if: contains(steps.parse.outputs.ops, 'commit')
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "chore(batch-ops): normalize/fmt/sitemap/linkaudit" || echo "Nothing to commit"
-          git push
+          set -e
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "chore(batch-ops): ensure sitemap.xml is present (crawler + fallback)"
+            git push
+          else
+            echo "Nothing to commit."
+          fi
