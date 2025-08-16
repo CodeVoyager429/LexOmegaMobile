@@ -24,11 +24,13 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-        with: { persist-credentials: true }
+        with:
+          persist-credentials: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with:
+          node-version: 20
 
       - name: Install CLI tools
         run: npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.7.0
@@ -38,8 +40,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          SITE="${SITE_DOMAIN:-https://echoversellcio.com}"
-          SITE="${SITE%/}"
+          if [ -z "${SITE_DOMAIN:-}" ]; then
+            echo "❌ SITE_DOMAIN secret is missing"
+            exit 1
+          fi
+          SITE="${SITE_DOMAIN%/}"
           echo "site=$SITE" >> "$GITHUB_OUTPUT"
 
       - name: Normalize filenames (lowercase, no spaces)
@@ -59,7 +64,12 @@ jobs:
         run: |
           SITE="${{ steps.site.outputs.site }}"
           npx --yes sitemap-generator-cli "$SITE" --strip-querystring --max-depth 0 --output sitemap.generated.xml || true
-          [ -s sitemap.generated.xml ] && mv -f sitemap.generated.xml sitemap.xml || echo "Keeping repo sitemap.xml"
+          if [ -s sitemap.generated.xml ]; then
+            mv -f sitemap.generated.xml sitemap.xml
+            echo "✅ Generated sitemap.xml"
+          else
+            echo "⚠️ Using fallback sitemap.xml from repo"
+          fi
 
       - name: Asset check (local)
         if: contains(steps.parse.outputs.ops, 'assetcheck')
