@@ -1,0 +1,96 @@
+name: LexOmega — Batch Ops
+
+on:
+  workflow_dispatch:
+    inputs:
+      ops:
+        description: "Comma-separated ops to run (normalize,fmt,sitemap,assetcheck,linkaudit,commit)"
+        required: true
+        default: "normalize,fmt,sitemap,assetcheck,linkaudit,commit"
+      ref:
+        description: "Git ref (branch)"
+        required: true
+        default: "main"
+
+jobs:
+  run-ops:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to commit back with GITHUB_TOKEN
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - name: Parse inputs
+        id: parse
+        run: |
+          OPS="${{ github.event.inputs.ops }}"
+          echo "ops=$OPS" >> $GITHUB_OUTPUT
+
+      - name: Setup Node
+        if: contains(steps.parse.outputs.ops, 'normalize') || contains(steps.parse.outputs.ops, 'fmt') || contains(steps.parse.outputs.ops, 'sitemap') || contains(steps.parse.outputs.ops, 'assetcheck') || contains(steps.parse.outputs.ops, 'linkaudit')
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install CLI tools
+        if: contains(steps.parse.outputs.ops, 'normalize') || contains(steps.parse.outputs.ops, 'fmt') || contains(steps.parse.outputs.ops, 'sitemap') || contains(steps.parse.outputs.ops, 'assetcheck') || contains(steps.parse.outputs.ops, 'linkaudit')
+        run: |
+          npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.7.0
+
+      # --- normalize & format ---
+      - name: Normalize filenames (lowercase, no spaces)
+        if: contains(steps.parse.outputs.ops, 'normalize')
+        shell: bash
+        run: |
+          set -e
+          find . -type f \( -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.json" \) | while read -r f; do
+            dir=$(dirname "$f"); base=$(basename "$f")
+            norm=$(echo "$base" | tr '[:upper:] ' '[:lower:]-')
+            if [ "$base" != "$norm" ]; then
+              git mv -f "$f" "$dir/$norm" || true
+            fi
+          done
+
+      - name: Format code (Prettier)
+        if: contains(steps.parse.outputs.ops, 'fmt')
+        run: |
+          prettier -w "**/*.{html,css,js,json}"
+
+      # --- sitemap ---
+      - name: Generate sitemap.xml
+        if: contains(steps.parse.outputs.ops, 'sitemap')
+        env:
+          SITE_DOMAIN: ${{ secrets.SITE_DOMAIN || env.SITE_DOMAIN }}
+        run: |
+          DOMAIN="${SITE_DOMAIN:-https://echoversellcio.com}"
+          npx --yes sitemap-generator-cli "$DOMAIN" --strip-querystring --max-depth 0 --output ./sitemap.xml || true
+
+      # --- asset check (broken local links/files) ---
+      - name: Asset check (local)
+        if: contains(steps.parse.outputs.ops, 'assetcheck')
+        run: |
+          linkinator . --recurse --silent --skip "^(mailto:|tel:|https?://)" || true
+
+      # --- link audit (external links) ---
+      - name: Link audit (external)
+        if: contains(steps.parse.outputs.ops, 'linkaudit')
+        run: |
+          linkinator . --recurse --silent --filter "https?://" --retry 2 --timeout 10000 || true
+
+      # --- commit any changes ---
+      - name: Commit & push changes
+        if: contains(steps.parse.outputs.ops, 'commit')
+        run: |
+          set -e
+          git config user.name "lexomega-bot"
+          git config user.email "bot@users.noreply.github.com"
+          if ! git diff --quiet; then
+            git add -A
+            git commit -m "chore(bot): batch ops [$GITHUB_RUN_ID]"
+            git push
+          else
+            echo "No changes to commit."
+          fi
