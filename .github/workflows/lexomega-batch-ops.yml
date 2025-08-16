@@ -1,4 +1,4 @@
-name: LexOmega — Batch Ops
+name: LexOmega - Batch Ops
 
 on:
   workflow_dispatch:
@@ -6,98 +6,70 @@ on:
       ops:
         description: "Comma-separated ops to run (normalize,fmt,sitemap,assetcheck,linkaudit,commit)"
         required: true
-        type: string
-        default: normalize,fmt,sitemap,assetcheck,linkaudit,commit
-
-env:
-  # Set from the repository secret you already created
-  SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
+        default: "normalize,fmt,sitemap,assetcheck,linkaudit,commit"
 
 jobs:
   run-ops:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up job
+        run: echo "Starting workflow for ${{ github.repository }}"
+
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Parse inputs
-        id: parsed
+        id: parse
         run: |
-          OPS="${{ github.event.inputs.ops }}"
-          OPS_CLEAN=$(echo "$OPS" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
-          echo "ops=$OPS_CLEAN" >> "$GITHUB_OUTPUT"
+          echo "ops=${{ github.event.inputs.ops }}" >> $GITHUB_ENV
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
 
       - name: Install CLI tools
         run: |
-          # Use only versions that exist. 7.7.0 does NOT exist.
-          npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@5.0.0 || {
-            echo "Global install failed, falling back to local install..."
-            npm i --no-fund --no-audit prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@5.0.0
-            echo "PATH=$(pwd)/node_modules/.bin:$PATH" >> $GITHUB_ENV
-          }
+          npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.5.0
 
       - name: Prepare SITE value
-        if: env.SITE_DOMAIN != ''
-        run: |
-          echo "Using SITE_DOMAIN=${SITE_DOMAIN}"
-          echo "SITE=${SITE_DOMAIN}" >> $GITHUB_ENV
+        run: echo "SITE=${{ secrets.SITE_DOMAIN }}" >> $GITHUB_ENV
 
       - name: Normalize filenames (lowercase, no spaces)
-        if: contains(steps.parsed.outputs.ops, 'normalize')
+        if: contains(env.ops, 'normalize')
         run: |
-          git ls-files -z | xargs -0 -I{} bash -c '
-            f="{}"
-            lf=$(echo "$f" | tr "[:upper:]" "[:lower:]" | tr -s " " "-" )
-            if [ "$f" != "$lf" ]; then git mv -f "$f" "$lf"; fi
-          ' || true
+          find . -type f -name "* *" | while read file; do
+            newfile=$(echo $file | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+            if [ "$file" != "$newfile" ]; then
+              git mv "$file" "$newfile" || true
+            fi
+          done
 
       - name: Format code (Prettier)
-        if: contains(steps.parsed.outputs.ops, 'fmt')
-        run: |
-          npx --yes prettier@3.3.3 -w "**/*.{html,css,js,json,md,yml,yaml}" || prettier -w "**/*.{html,css,js,json,md,yml,yaml}" || true
+        if: contains(env.ops, 'fmt')
+        run: prettier --write "**/*.{js,ts,json,md,yml,yaml}"
 
-      - name: Generate sitemap.xml
-        if: contains(steps.parsed.outputs.ops, 'sitemap')
+      - name: Generate sitemap.xml (best-effort)
+        if: contains(env.ops, 'sitemap')
         run: |
-          ROOT_URL="${SITE:-https://example.com}"
-          echo "Generating sitemap for $ROOT_URL"
-          npx --yes sitemap-generator-cli@5.0.0 "$ROOT_URL" --max-depth 0 --last-mod --filepath sitemap.xml --ignore-robots-txt || \
-          sitemap-generator "$ROOT_URL" --max-depth 0 --last-mod --filepath sitemap.xml --ignore-robots-txt || true
-          # Ensure the file exists so later steps don't fail
-          test -f sitemap.xml || echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>' > sitemap.xml
+          sitemap-generator $SITE --output ./sitemap.xml || echo "Sitemap generation skipped"
 
       - name: Asset check (local)
-        if: contains(steps.parsed.outputs.ops, 'assetcheck')
+        if: contains(env.ops, 'assetcheck')
         run: |
-          set -e
-          test -f sitemap.xml && echo "sitemap.xml present" || (echo "sitemap.xml missing"; exit 1)
+          linkinator ./ --recurse --skip "https?://"
 
       - name: Link audit (external)
-        if: contains(steps.parsed.outputs.ops, 'linkaudit')
+        if: contains(env.ops, 'linkaudit')
         run: |
-          # Crawl from index if present; don't fail the whole workflow on link issues
-          if [ -f index.html ]; then
-            npx --yes linkinator@5.0.1 "index.html" --recurse --silent --timeout 20000 || true
-          else
-            echo "index.html not found; skipping linkinator."
-          fi
+          linkinator $SITE --recurse --skip "mailto:,tel:"
 
       - name: Commit & push changes
-        if: contains(steps.parsed.outputs.ops, 'commit')
+        if: contains(env.ops, 'commit')
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if ! git diff --quiet || ! git diff --staged --quiet; then
-            git add -A
-            git commit -m "chore(batch-ops): automated formatting, sitemap & checks"
-            git push
-          else
-            echo "No changes to commit."
-          fi
+          git add .
+          git commit -m "chore(batch-ops): automated ops run [skip ci]" || echo "No changes to commit"
+          git push || echo "Nothing to push"
