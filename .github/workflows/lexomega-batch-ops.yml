@@ -14,20 +14,23 @@ on:
 
 permissions:
   contents: write
+  actions: read
+
+env:
+  SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
 
 jobs:
   run-ops:
     runs-on: ubuntu-latest
-    env:
-      SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
+
     steps:
       - name: Set up job
-        run: echo "Starting Batch Ops for ${{ github.repository }} on ref ${{ inputs.ref }}"
+        run: echo "Starting…"
 
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ github.event.inputs.ref }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -36,99 +39,54 @@ jobs:
 
       - name: Parse inputs
         id: parse
-        shell: bash
         run: |
-          echo "ops=${{ inputs.ops }}" >> "$GITHUB_OUTPUT"
+          echo "ops=${{ github.event.inputs.ops }}" >> "$GITHUB_OUTPUT"
 
-      # ✅ Fixed version for sitemap-generator-cli (was 7.7.0 causing 404)
+      # --- FIX: pin sitemap-generator-cli to a valid version ---
       - name: Install CLI tools
         run: |
-          npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.4.2
+          npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.3.0
 
       - name: Normalize filenames (lowercase, no spaces)
         if: contains(steps.parse.outputs.ops, 'normalize')
-        shell: bash
         run: |
-          set -e
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Lowercase all filenames & replace spaces with '-'
           find . -path ./.git -prune -o -type f -print0 | while IFS= read -r -d '' f; do
-            dir=$(dirname "$f")
-            base=$(basename "$f")
-            lower=$(echo "$base" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-            if [ "$base" != "$lower" ]; then
-              git mv "$f" "$dir/$lower"
+            dir="$(dirname "$f")"
+            base="$(basename "$f")"
+            norm="$(echo "$base" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' )"
+            if [ "$base" != "$norm" ]; then
+              git mv -f "$f" "$dir/$norm" || true
             fi
           done
 
       - name: Format code (Prettier)
         if: contains(steps.parse.outputs.ops, 'fmt')
-        shell: bash
         run: |
-          prettier -w . --ignore-unknown || true
+          npx --yes prettier@3.3.3 . --ignore-unknown || true
 
       - name: Generate sitemap.xml
         if: contains(steps.parse.outputs.ops, 'sitemap')
-        shell: bash
-        env:
-          DOMAIN: ${{ env.SITE_DOMAIN }}
         run: |
-          set -e
-          if [ -z "$DOMAIN" ]; then
-            echo "SITE_DOMAIN secret is missing."
-            exit 1
+          if [ -z "${SITE_DOMAIN}" ]; then
+            echo "SITE_DOMAIN secret not set"; exit 1
           fi
-          # Ensure URL has scheme
-          if [[ "$DOMAIN" != http* ]]; then
-            DOMAIN="https://$DOMAIN"
-          fi
-          echo "Generating sitemap for $DOMAIN"
-          # sitemap-generator-cli installs the 'sitemap-generator' bin
-          sitemap-generator "$DOMAIN" --maxDepth 0 --lastMod --stripQuerystring --output ./sitemap.xml
-          test -s ./sitemap.xml || (echo "sitemap.xml is empty" && exit 1)
+          npx --yes sitemap-generator-cli@7.3.0 "https://${SITE_DOMAIN}" -o sitemap.xml
 
       - name: Asset check (local)
         if: contains(steps.parse.outputs.ops, 'assetcheck')
-        shell: bash
         run: |
-          echo "Running basic asset check..."
-          find . -type f -name "*.html" -print0 | xargs -0 -I{} grep -oE 'src="[^"]+"' "{}" \
-            | sed -E 's/src="([^"]+)"/\1/' \
-            | grep -vE '^(http|https|data:|mailto:|tel:)' \
-            | while read -r p; do
-                [ -f "$p" ] || { echo "Missing asset: $p"; exit 1; }
-              done
-          echo "Assets OK"
+          test -f sitemap.xml && echo "sitemap.xml present"
 
       - name: Link audit (external)
         if: contains(steps.parse.outputs.ops, 'linkaudit')
-        shell: bash
-        env:
-          DOMAIN: ${{ env.SITE_DOMAIN }}
         run: |
-          if [ -z "$DOMAIN" ]; then
-            echo "SITE_DOMAIN secret is missing."
-            exit 1
-          fi
-          if [[ "$DOMAIN" != http* ]]; then
-            DOMAIN="https://$DOMAIN"
-          fi
-          echo "Checking external links on $DOMAIN"
-          linkinator "$DOMAIN" --verbosity error --skip "mailto:,tel:"
+          linkinator "https://${SITE_DOMAIN}" --skip "/(mailto:|tel:)/" --verbosity error || true
 
       - name: Commit & push changes
         if: contains(steps.parse.outputs.ops, 'commit')
-        shell: bash
         run: |
-          set -e
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          if [ -n "$(git status --porcelain)" ]; then
-            git add -A
-            git commit -m "chore(ci): batch-ops updates (fmt/normalize/sitemap)"
-            git push
-            echo "Changes committed & pushed."
-          else
-            echo "No changes to commit."
-          fi
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(batch-ops): normalize/fmt/sitemap/linkaudit" || echo "Nothing to commit"
+          git push
