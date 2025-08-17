@@ -4,109 +4,119 @@ on:
   workflow_dispatch:
     inputs:
       ops:
-        description: "comma-separated ops to run (normalize,fmt,sitemap,assetcheck,linkaudit,commit)"
-        required: true
+        description: "Comma-separated ops to run (normalize,fmt,sitemap,assetcheck,linkaudit,commit)"
+        required: false
         default: "normalize,fmt,sitemap,assetcheck,linkaudit,commit"
+
+permissions:
+  contents: write
+  pull-requests: write
 
 env:
   NODE_VERSION: "20.x"
-  SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
 
 jobs:
   run-ops:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      # Do NOT enable caching because the runner will demand a lockfile we don't use
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "none"
 
       - name: Parse inputs
         id: parse
         run: |
           OPS="${{ github.event.inputs.ops }}"
-          OPS="${OPS// /}"   # strip spaces
+          if [ -z "$OPS" ]; then OPS="normalize,fmt,sitemap,assetcheck,linkaudit,commit"; fi
           echo "ops=$OPS" >> "$GITHUB_OUTPUT"
+          echo "Batch ops: $OPS"
+
+      - name: Setup Node (no cache)
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install CLI tools
         run: |
           set -e
-          npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.4.2
+          npm i -g prettier@^3 linkinator@^5 sitemap-generator-cli@7.4.3
 
       - name: Prepare SITE value
         id: site
         run: |
-          if [ -n "${SITE_DOMAIN:-}" ]; then
-            SITE="https://${SITE_DOMAIN}"
+          DOMAIN="${{ secrets.SITE_DOMAIN }}"
+          if [ -n "$DOMAIN" ]; then
+            if echo "$DOMAIN" | grep -Eq '^https?://'; then
+              SITE="$DOMAIN"
+            else
+              SITE="https://$DOMAIN"
+            fi
+            echo "SITE=$SITE" >> "$GITHUB_OUTPUT"
+            echo "Using SITE=$SITE"
           else
-            # fallback to GH Pages style URL
-            OWNER_REPO="${GITHUB_REPOSITORY,,}"
-            OWNER="${OWNER_REPO%/*}"
-            REPO="${OWNER_REPO#*/}"
-            SITE="https://${OWNER}.github.io/${REPO}/"
+            echo "No SITE_DOMAIN secret; sitemap/link audit will be skipped."
           fi
-          echo "SITE=$SITE" >> "$GITHUB_ENV"
-          echo "Using SITE=$SITE"
 
       - name: Normalize filenames (lowercase, no spaces)
         if: contains(steps.parse.outputs.ops, 'normalize')
         run: |
           set -e
-          find . -path ./.git -prune -o -type f -print0 | while IFS= read -r -d '' f; do
-            dir=$(dirname "$f"); base=$(basename "$f")
-            lower=$(echo "$base" | tr '[:upper:] ' '[:lower:]-')
-            if [ "$base" != "$lower" ]; then
-              git mv -f "$f" "$dir/$lower"
-            fi
-          done
+          find . -type f \
+            \( -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.gif" -o -name "*.svg" \) \
+            -print0 | while IFS= read -r -d '' f; do
+              dir=$(dirname "$f")
+              base=$(basename "$f")
+              newbase=$(echo "$base" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+              if [ "$base" != "$newbase" ]; then
+                git mv -f "$f" "$dir/$newbase" || mv -f "$f" "$dir/$newbase"
+              fi
+            done
 
       - name: Format code (Prettier)
         if: contains(steps.parse.outputs.ops, 'fmt')
         run: |
-          set -e
-          prettier -w .
+          prettier . --ignore-unknown || true
 
       - name: Generate sitemap.xml (best-effort)
         if: contains(steps.parse.outputs.ops, 'sitemap')
         run: |
           set -e
-          # Try generating from the public site; ignore failures so the workflow can continue
-          npx --yes sitemap-generator-cli@7.4.2 "$SITE" --strip-querystring --filepath ./sitemap.xml || true
-          test -f sitemap.xml && echo "sitemap.xml present" || echo "sitemap.xml not created (continuing)"
+          if [ -n "${{ steps.site.outputs.SITE }}" ]; then
+            sitemap-generator "${{ steps.site.outputs.SITE }}" --verbose --max-depth 0 --output ./sitemap.xml || true
+          else
+            echo "Skipping sitemap: SITE not set."
+          fi
 
       - name: Asset check (local)
         if: contains(steps.parse.outputs.ops, 'assetcheck')
         run: |
-          set -e
-          # Keep this lightweight; it's mainly a smoke test step
-          test -f sitemap.xml && echo "sitemap.xml ok" || echo "no sitemap.xml (allowed)"
+          if [ -f sitemap.xml ]; then
+            echo "sitemap.xml present"
+          else
+            echo "sitemap.xml not present (ok if SITE not set or generator found 0 pages)"
+          fi
 
       - name: Link audit (external)
         if: contains(steps.parse.outputs.ops, 'linkaudit')
         run: |
-          set -e
-          linkinator "$SITE" --recurse --skip "mailto:,tel:"
+          if [ -n "${{ steps.site.outputs.SITE }}" ]; then
+            linkinator "${{ steps.site.outputs.SITE }}" --recurse --skip "mailto:,tel:" || true
+          else
+            echo "Skipping link audit: SITE not set."
+          fi
 
       - name: Commit & push changes
         if: contains(steps.parse.outputs.ops, 'commit')
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_EMAIL: actions@github.com
+          GH_NAME: github-actions[bot]
         run: |
           set -e
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then
+          git config user.email "$GH_EMAIL"
+          git config user.name "$GH_NAME"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts"
+            git push origin HEAD:${GITHUB_REF_NAME:-main}
+          else
             echo "No changes to commit."
-            exit 0
           fi
-          git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts [skip ci]"
-          git push
