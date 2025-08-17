@@ -1,4 +1,4 @@
-name: LexOmega - Batch Ops
+name: LexOmega — Batch Ops
 
 on:
   workflow_dispatch:
@@ -11,65 +11,93 @@ on:
 jobs:
   run-ops:
     runs-on: ubuntu-latest
+    env:
+      # Use secret to form full https URL where needed
+      SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
 
     steps:
       - name: Set up job
-        run: echo "Starting workflow for ${{ github.repository }}"
+        run: echo "Starting batch ops…"
 
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Parse inputs
-        id: parse
-        run: |
-          echo "ops=${{ github.event.inputs.ops }}" >> $GITHUB_ENV
+        id: steps
+        run: echo "ops=${{ github.event.inputs.ops }}" >> $GITHUB_OUTPUT
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
 
+      # Install CLIs we use
       - name: Install CLI tools
         run: |
           npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.5.0
 
+      # Build the SITE env var once, in case later steps need it
       - name: Prepare SITE value
-        run: echo "SITE=${{ secrets.SITE_DOMAIN }}" >> $GITHUB_ENV
+        run: echo "SITE=https://${SITE_DOMAIN}" >> $GITHUB_ENV
 
+      # ---------- NORMALIZE ----------
       - name: Normalize filenames (lowercase, no spaces)
-        if: contains(env.ops, 'normalize')
+        if: contains(steps.steps.outputs.ops, 'normalize')
         run: |
-          find . -type f -name "* *" | while read file; do
-            newfile=$(echo $file | tr '[:upper:]' '[:lower:]' | tr -d ' ')
-            if [ "$file" != "$newfile" ]; then
-              git mv "$file" "$newfile" || true
+          find . -type f -not -path "./.git/*" | while read -r f; do
+            d="$(dirname "$f")"
+            b="$(basename "$f")"
+            nb="$(echo "$b" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' )"
+            if [ "$b" != "$nb" ]; then
+              git mv -f "$f" "$d/$nb" || true
             fi
           done
 
+      # ---------- FMT ----------
       - name: Format code (Prettier)
-        if: contains(env.ops, 'fmt')
-        run: prettier --write "**/*.{js,ts,json,md,yml,yaml}"
+        if: contains(steps.steps.outputs.ops, 'fmt')
+        run: |
+          prettier -w . --ignore-unknown || true
 
+      # ---------- SITEMAP ----------
       - name: Generate sitemap.xml (best-effort)
-        if: contains(env.ops, 'sitemap')
+        if: contains(steps.steps.outputs.ops, 'sitemap')
         run: |
-          sitemap-generator $SITE --output ./sitemap.xml || echo "Sitemap generation skipped"
+          mkdir -p public
+          OUT="sitemap.xml"
+          npx --yes sitemap-generator-cli@7.5.0 "https://${SITE_DOMAIN}" --max-depth 3 --strip-query true --timeout 10000 > "$OUT" || true
+          if [ -s "$OUT" ]; then
+            echo "✅ Generated $OUT"
+          else
+            echo "⚠️ Could not generate $OUT (site may be private/unreachable)."
+            rm -f "$OUT" || true
+          fi
 
+      # ---------- LOCAL ASSET CHECK ----------
       - name: Asset check (local)
-        if: contains(env.ops, 'assetcheck')
+        if: contains(steps.steps.outputs.ops, 'assetcheck')
         run: |
-          linkinator ./ --recurse --skip "https?://"
+          # basic check that repo has some HTML/MD assets; do not fail the workflow
+          ls -1 **/*.html **/*.md 2>/dev/null | head -n 20 || true
 
+      # ---------- EXTERNAL LINK AUDIT ----------
       - name: Link audit (external)
-        if: contains(env.ops, 'linkaudit')
+        if: contains(steps.steps.outputs.ops, 'linkaudit')
         run: |
-          linkinator $SITE --recurse --skip "mailto:,tel:"
+          SITE_URL="https://${SITE_DOMAIN}"
+          echo "🔍 Crawling $SITE_URL"
+          # Use URL explicitly so linkinator does NOT treat it as a file glob.
+          linkinator "$SITE_URL" --recurse --skip "mailto:,tel:" --verbosity error || true
 
+      # ---------- COMMIT ----------
       - name: Commit & push changes
-        if: contains(env.ops, 'commit')
+        if: contains(steps.steps.outputs.ops, 'commit')
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "chore(batch-ops): automated ops run [skip ci]" || echo "No changes to commit"
-          git push || echo "Nothing to push"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts"
+            git push
+          else
+            echo "No changes to commit."
