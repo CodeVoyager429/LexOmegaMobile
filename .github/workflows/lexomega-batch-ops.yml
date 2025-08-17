@@ -5,19 +5,21 @@ on:
     inputs:
       ops:
         description: "Comma-separated ops to run (normalize,fmt,sitemap,assetcheck,linkaudit,commit)"
-        required: false
+        required: true
         default: "normalize,fmt,sitemap,assetcheck,linkaudit,commit"
 
 permissions:
   contents: write
   pull-requests: write
 
-env:
-  NODE_VERSION: "20.x"
+concurrency:
+  group: batch-ops-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   run-ops:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,98 +27,88 @@ jobs:
       - name: Parse inputs
         id: parse
         run: |
-          OPS="${{ github.event.inputs.ops }}"
-          if [ -z "$OPS" ]; then OPS="normalize,fmt,sitemap,assetcheck,linkaudit,commit"; fi
-          echo "ops=$OPS" >> "$GITHUB_OUTPUT"
-          echo "Batch ops: $OPS"
+          INPUT="${{ github.event.inputs.ops }}"
+          INPUT="${INPUT// /}"        # strip spaces
+          echo "ops=$INPUT" >> "$GITHUB_OUTPUT"
 
-      - name: Setup Node (no cache)
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: "20.x"
+          cache: "none"               # no lockfile in this repo
 
+      # ---- CLI tooling (no sitemap here) ----
       - name: Install CLI tools
         run: |
           set -e
-          npm i -g prettier@^3 linkinator@^5 sitemap-generator-cli@7.4.3
+          npm i -g prettier@3.3.3 linkinator@5.0.1
 
+      # ---- SITE (domain) from secret ----
       - name: Prepare SITE value
         id: site
         run: |
-          DOMAIN="${{ secrets.SITE_DOMAIN }}"
-          if [ -n "$DOMAIN" ]; then
-            if echo "$DOMAIN" | grep -Eq '^https?://'; then
-              SITE="$DOMAIN"
-            else
-              SITE="https://$DOMAIN"
-            fi
-            echo "SITE=$SITE" >> "$GITHUB_OUTPUT"
-            echo "Using SITE=$SITE"
+          if [ -n "${{ secrets.SITE_DOMAIN }}" ]; then
+            echo "SITE=${{ secrets.SITE_DOMAIN }}" >> "$GITHUB_ENV"
           else
-            echo "No SITE_DOMAIN secret; sitemap/link audit will be skipped."
+            echo "SITE=localhost" >> "$GITHUB_ENV"
           fi
 
+      # ---- normalize file names ----
       - name: Normalize filenames (lowercase, no spaces)
         if: contains(steps.parse.outputs.ops, 'normalize')
         run: |
           set -e
-          find . -type f \
-            \( -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.gif" -o -name "*.svg" \) \
-            -print0 | while IFS= read -r -d '' f; do
-              dir=$(dirname "$f")
-              base=$(basename "$f")
-              newbase=$(echo "$base" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-              if [ "$base" != "$newbase" ]; then
-                git mv -f "$f" "$dir/$newbase" || mv -f "$f" "$dir/$newbase"
-              fi
-            done
+          git ls-files -z | while IFS= read -r -d '' f; do
+            lc="$(echo "$f" | tr '[:upper:]' '[:lower:]' | tr ' ' '_' )"
+            [ "$f" = "$lc" ] || { git mv -f "$f" "$lc"; }
+          done || true
 
+      # ---- code format ----
       - name: Format code (Prettier)
         if: contains(steps.parse.outputs.ops, 'fmt')
         run: |
-          prettier . --ignore-unknown || true
+          set -e
+          prettier --version
+          prettier -w .
 
+      # ---- sitemap (run via npx pinned to 7.0.5) ----
       - name: Generate sitemap.xml (best-effort)
         if: contains(steps.parse.outputs.ops, 'sitemap')
         run: |
           set -e
-          if [ -n "${{ steps.site.outputs.SITE }}" ]; then
-            sitemap-generator "${{ steps.site.outputs.SITE }}" --verbose --max-depth 0 --output ./sitemap.xml || true
-          else
-            echo "Skipping sitemap: SITE not set."
-          fi
+          URL="https://${SITE}"
+          echo "Generating sitemap for $URL"
+          npx --yes sitemap-generator-cli@7.0.5 -u "$URL" -o sitemap.xml || true
+          test -f sitemap.xml && echo "sitemap.xml written" || echo "sitemap step skipped (no output)"
 
+      # ---- local asset check (lightweight) ----
       - name: Asset check (local)
         if: contains(steps.parse.outputs.ops, 'assetcheck')
         run: |
-          if [ -f sitemap.xml ]; then
-            echo "sitemap.xml present"
-          else
-            echo "sitemap.xml not present (ok if SITE not set or generator found 0 pages)"
-          fi
+          set -e
+          test -f sitemap.xml && echo "sitemap present" || true
 
+      # ---- external link audit (crawl the site URL) ----
       - name: Link audit (external)
         if: contains(steps.parse.outputs.ops, 'linkaudit')
         run: |
-          if [ -n "${{ steps.site.outputs.SITE }}" ]; then
-            linkinator "${{ steps.site.outputs.SITE }}" --recurse --skip "mailto:,tel:" || true
-          else
-            echo "Skipping link audit: SITE not set."
-          fi
+          set -e
+          linkinator "https://${SITE}" --recurse --skip "mailto:,tel:" || true
 
+      # ---- commit + push any changes ----
       - name: Commit & push changes
         if: contains(steps.parse.outputs.ops, 'commit')
         env:
-          GH_EMAIL: actions@github.com
-          GH_NAME: github-actions[bot]
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
-          git config user.email "$GH_EMAIL"
-          git config user.name "$GH_NAME"
+          git status --porcelain
           if [ -n "$(git status --porcelain)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add -A
             git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts"
-            git push origin HEAD:${GITHUB_REF_NAME:-main}
+            git push origin "${GITHUB_REF_NAME:-main}"
           else
-            echo "No changes to commit."
+            echo "Nothing to commit."
           fi
