@@ -6,12 +6,14 @@ on:
       ops:
         description: "Comma-separated ops to run (normalize,fmt,sitemap,assetcheck,linkaudit,commit)"
         required: false
-        default: "normalize,fmt,sitemap,assetcheck,commit"
+        default: "normalize,fmt,sitemap,assetcheck,linkaudit,commit"
 
-# Keep token perms simple & compatible; we won't touch .github/workflows in commits.
+# Let the job push changes and (if ever needed) touch workflow files.
 permissions:
   contents: write
   pull-requests: write
+  actions: read
+  workflows: write
 
 jobs:
   run-ops:
@@ -19,23 +21,28 @@ jobs:
     env:
       SITE: ${{ secrets.SITE_DOMAIN }}
       OPS: ${{ github.event.inputs.ops }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # IMPORTANT: no caching option here to avoid "Caching for 'none' is not supported"
+      # No caching option here (avoids “Caching for 'none' is not supported” and lockfile errors)
       - name: Setup Node
         uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Parse inputs
         id: steps
         shell: bash
         run: |
-          # Normalize comma/space list -> words
-          OPS_CLEAN="$(echo "${OPS:-normalize,fmt,sitemap,assetcheck,commit}" | tr "," " " | tr -s " ")"
+          set -e
+          OPS_CLEAN="$(echo "${OPS:-normalize,fmt,sitemap,assetcheck,linkaudit,commit}" \
+            | tr '[:upper:]' '[:lower:]' | tr -d ' ')"
           echo "ops=$OPS_CLEAN" >> "$GITHUB_OUTPUT"
 
       - name: Install CLI tools
+        if: contains(steps.steps.outputs.ops, 'fmt') || contains(steps.steps.outputs.ops, 'linkaudit') || contains(steps.steps.outputs.ops, 'sitemap')
         shell: bash
         run: |
           set -e
@@ -46,67 +53,78 @@ jobs:
         run: |
           set -e
           if [ -z "${SITE}" ]; then
-            echo "SITE secret not set; falling back to https://${GITHUB_REPOSITORY_OWNER}.github.io"
-            SITE="https://${GITHUB_REPOSITORY_OWNER}.github.io"
+            SITE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY##*/}"
           fi
           echo "Using SITE=${SITE}"
-          echo "SITE=${SITE}" >> "$GITHUB_ENV"
 
       - name: Normalize filenames (lowercase, no spaces)
         if: contains(steps.steps.outputs.ops, 'normalize')
         shell: bash
         run: |
           set -e
-          git ls-files -z | xargs -0 -I {} bash -c '
-            f="$1"
-            lf="$(echo "$f" | tr "[:upper:]" "[:lower:]" | tr " " "-")"
-            if [ "$f" != "$lf" ]; then
-              git mv -f "$f" "$lf"
+          shopt -s globstar nullglob
+          mapfile -t FILES < <(git ls-files)
+          for f in "${FILES[@]}"; do
+            base="$(basename "$f")"
+            dir="$(dirname "$f")"
+            newbase="$(echo "$base" | tr '[:upper:]' '[:lower:]' | sed -E 's/[[:space:]]+/-/g')"
+            if [[ "$base" != "$newbase" ]]; then
+              if [ -e "$dir/$newbase" ]; then
+                echo "Skip rename (target exists): $dir/$newbase"
+              else
+                git mv -f "$f" "$dir/$newbase"
+              fi
             fi
-          ' _ {}
+          done
 
       - name: Format code (Prettier)
         if: contains(steps.steps.outputs.ops, 'fmt')
         shell: bash
         run: |
           set -e
-          prettier -w . --ignore-unknown || true
+          prettier -w "**/*.{html,css,js,json,md,yml,yaml}"
 
       - name: Generate sitemap.xml (best-effort)
         if: contains(steps.steps.outputs.ops, 'sitemap')
         shell: bash
+        continue-on-error: true
         run: |
-          set +e
-          sitemap-generator-cli -u "$SITE" -o sitemap.xml
-          exit 0
+          set -e
+          sitemap-generator --strip-querystring "${SITE}" --max-depth 2 --output ./sitemap.xml
 
       - name: Asset check (local)
         if: contains(steps.steps.outputs.ops, 'assetcheck')
         shell: bash
         run: |
-          test -f sitemap.xml && echo "sitemap.xml present" || echo "sitemap.xml not generated (skipped/failed)"
+          set -e
+          if [ -f sitemap.xml ]; then
+            echo "sitemap.xml present"
+          else
+            echo "sitemap.xml missing (continuing)"
+          fi
 
       - name: Link audit (external)
         if: contains(steps.steps.outputs.ops, 'linkaudit')
         shell: bash
         run: |
-          # Make this non-fatal; you can enable strict later
-          set +e
-          linkinator "$SITE" --recurse --skip "mailto:,tel:" --timeout 30000
-          exit 0
+          set -e
+          linkinator "${SITE}" --recurse --skip "mailto:,tel:" --timeout 120000
 
       - name: Commit & push changes
         if: contains(steps.steps.outputs.ops, 'commit')
         shell: bash
+        env:
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
         run: |
           set -e
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Add everything EXCEPT workflow files to avoid 403/policy issues
-          git add -A . ':(exclude).github/workflows/**'
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          if ! git diff --quiet || ! git diff --cached --quiet; then
+            git add -A
             git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts"
-            git push origin "$GITHUB_REF_NAME"
+            git push
+          else
+            echo "No changes to commit."
           fi
