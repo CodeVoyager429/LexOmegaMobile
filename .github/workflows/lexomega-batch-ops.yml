@@ -12,7 +12,6 @@ jobs:
   run-ops:
     runs-on: ubuntu-latest
     env:
-      # Use secret to form full https URL where needed
       SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
 
     steps:
@@ -31,12 +30,10 @@ jobs:
         with:
           node-version: '20'
 
-      # Install CLIs we use
       - name: Install CLI tools
         run: |
           npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.5.0
 
-      # Build the SITE env var once, in case later steps need it
       - name: Prepare SITE value
         run: echo "SITE=https://${SITE_DOMAIN}" >> $GITHUB_ENV
 
@@ -77,7 +74,6 @@ jobs:
       - name: Asset check (local)
         if: contains(steps.steps.outputs.ops, 'assetcheck')
         run: |
-          # basic check that repo has some HTML/MD assets; do not fail the workflow
           ls -1 **/*.html **/*.md 2>/dev/null | head -n 20 || true
 
       # ---------- EXTERNAL LINK AUDIT ----------
@@ -86,7 +82,6 @@ jobs:
         run: |
           SITE_URL="https://${SITE_DOMAIN}"
           echo "🔍 Crawling $SITE_URL"
-          # Use URL explicitly so linkinator does NOT treat it as a file glob.
           linkinator "$SITE_URL" --recurse --skip "mailto:,tel:" --verbosity error || true
 
       # ---------- COMMIT ----------
@@ -101,3 +96,4 @@ jobs:
             git push
           else
             echo "No changes to commit."
+          fi
