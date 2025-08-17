@@ -1,4 +1,4 @@
-name: LexOmega – Batch Ops
+name: LexOmega — Batch Ops
 
 on:
   workflow_dispatch:
@@ -9,106 +9,116 @@ on:
         default: "normalize,fmt,sitemap,assetcheck,linkaudit,commit"
 
 permissions:
-  contents: write
+  contents: write          # needed so the actions/bot can push
   pull-requests: write
-
-concurrency:
-  group: batch-ops-${{ github.ref }}
-  cancel-in-progress: false
 
 jobs:
   run-ops:
     runs-on: ubuntu-latest
 
+    env:
+      SITE_SECRET: ${{ secrets.SITE_DOMAIN }}
+      OPS: ${{ github.event.inputs.ops }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Parse inputs
-        id: parse
-        run: |
-          INPUT="${{ github.event.inputs.ops }}"
-          INPUT="${INPUT// /}"        # strip spaces
-          echo "ops=$INPUT" >> "$GITHUB_OUTPUT"
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
-          cache: "none"               # no lockfile in this repo
+          node-version: "20"
+          # (no cache key at all, avoiding 'none' error and lockfile requirement)
 
-      # ---- CLI tooling (no sitemap here) ----
+      - name: Parse inputs
+        id: parse
+        run: |
+          IFS=',' read -ra ARR <<< "${OPS}"
+          for op in "${ARR[@]}"; do
+            op_trimmed="$(echo "$op" | xargs)"
+            echo "op_$op_trimmed=true" >> $GITHUB_OUTPUT
+          done
+
       - name: Install CLI tools
+        if: always()    # install once; later steps guard on flags
         run: |
           set -e
-          npm i -g prettier@3.3.3 linkinator@5.0.1
+          npm i -g prettier@3 linkinator@5 sitemap-generator-cli@7
 
-      # ---- SITE (domain) from secret ----
       - name: Prepare SITE value
-        id: site
+        shell: bash
         run: |
-          if [ -n "${{ secrets.SITE_DOMAIN }}" ]; then
-            echo "SITE=${{ secrets.SITE_DOMAIN }}" >> "$GITHUB_ENV"
-          else
-            echo "SITE=localhost" >> "$GITHUB_ENV"
+          if [[ -z "${SITE_SECRET}" ]]; then
+            echo "SITE is not set (Actions secret SITE_DOMAIN)."
+            exit 1
           fi
+          SITE="$SITE_SECRET"
+          if [[ "$SITE" != http* ]]; then
+            SITE="https://$SITE"
+          fi
+          echo "SITE=$SITE" >> $GITHUB_ENV
 
-      # ---- normalize file names ----
       - name: Normalize filenames (lowercase, no spaces)
-        if: contains(steps.parse.outputs.ops, 'normalize')
+        if: steps.parse.outputs.op_normalize == 'true'
+        shell: bash
         run: |
           set -e
-          git ls-files -z | while IFS= read -r -d '' f; do
-            lc="$(echo "$f" | tr '[:upper:]' '[:lower:]' | tr ' ' '_' )"
-            [ "$f" = "$lc" ] || { git mv -f "$f" "$lc"; }
+          git ls-files | while read -r f; do
+            d="$(dirname "$f")"
+            b="$(basename "$f")"
+            newb="$(echo "$b" | tr '[:upper:] ' '[:lower:]_')"
+            if [[ "$b" != "$newb" ]]; then
+              mkdir -p ".tmp/$d"
+              git mv -f "$f" "$d/$newb"
+            fi
           done || true
 
-      # ---- code format ----
       - name: Format code (Prettier)
-        if: contains(steps.parse.outputs.ops, 'fmt')
+        if: steps.parse.outputs.op_fmt == 'true'
         run: |
           set -e
-          prettier --version
           prettier -w .
 
-      # ---- sitemap (run via npx pinned to 7.0.5) ----
       - name: Generate sitemap.xml (best-effort)
-        if: contains(steps.parse.outputs.ops, 'sitemap')
+        if: steps.parse.outputs.op_sitemap == 'true'
+        shell: bash
         run: |
           set -e
-          URL="https://${SITE}"
-          echo "Generating sitemap for $URL"
-          npx --yes sitemap-generator-cli@7.0.5 -u "$URL" -o sitemap.xml || true
-          test -f sitemap.xml && echo "sitemap.xml written" || echo "sitemap step skipped (no output)"
+          # sitemap-generator-cli exposes 'sitemap-generator' binary
+          sitemap-generator "$SITE" -o sitemap.xml --max-depth 0 || true
+          test -f sitemap.xml && echo "sitemap.xml generated (or already existed)."
 
-      # ---- local asset check (lightweight) ----
       - name: Asset check (local)
-        if: contains(steps.parse.outputs.ops, 'assetcheck')
+        if: steps.parse.outputs.op_assetcheck == 'true'
+        shell: bash
         run: |
           set -e
-          test -f sitemap.xml && echo "sitemap present" || true
+          test -f sitemap.xml && echo "sitemap.xml present" || (echo "sitemap.xml missing"; exit 1)
 
-      # ---- external link audit (crawl the site URL) ----
       - name: Link audit (external)
-        if: contains(steps.parse.outputs.ops, 'linkaudit')
+        if: steps.parse.outputs.op_linkaudit == 'true'
+        shell: bash
         run: |
           set -e
-          linkinator "https://${SITE}" --recurse --skip "mailto:,tel:" || true
+          linkinator "$SITE" --recurse --skip "mailto:,tel:"
 
-      # ---- commit + push any changes ----
       - name: Commit & push changes
-        if: contains(steps.parse.outputs.ops, 'commit')
+        if: steps.parse.outputs.op_commit == 'true'
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
-          git status --porcelain
-          if [ -n "$(git status --porcelain)" ]; then
-            git config user.name  "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -A
-            git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts"
-            git push origin "${GITHUB_REF_NAME:-main}"
-          else
-            echo "Nothing to commit."
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
           fi
+
+          git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts"
+          # ensure remote uses token-based auth (required for Actions)
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push origin HEAD:${GITHUB_REF_NAME}
