@@ -9,8 +9,9 @@ on:
         default: "normalize,fmt,sitemap,assetcheck,linkaudit,commit"
 
 permissions:
-  contents: write          # needed so the actions/bot can push
+  contents: write
   pull-requests: write
+  workflows: write        # <-- lets the token update workflow files if ever needed
 
 jobs:
   run-ops:
@@ -28,7 +29,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          # (no cache key at all, avoiding 'none' error and lockfile requirement)
 
       - name: Parse inputs
         id: parse
@@ -40,27 +40,27 @@ jobs:
           done
 
       - name: Install CLI tools
-        if: always()    # install once; later steps guard on flags
         run: |
           set -e
           npm i -g prettier@3 linkinator@5 sitemap-generator-cli@7
 
       - name: Prepare SITE value
-        shell: bash
         run: |
           if [[ -z "${SITE_SECRET}" ]]; then
             echo "SITE is not set (Actions secret SITE_DOMAIN)."
             exit 1
           fi
           SITE="$SITE_SECRET"
-          if [[ "$SITE" != http* ]]; then
-            SITE="https://$SITE"
-          fi
+          [[ "$SITE" == http* ]] || SITE="https://$SITE"
           echo "SITE=$SITE" >> $GITHUB_ENV
+
+      # --- keep workflow files untouched by Prettier/normalizer ---
+      - name: Write Prettier ignore
+        run: |
+          printf ".github/workflows/\n" > .prettierignore
 
       - name: Normalize filenames (lowercase, no spaces)
         if: steps.parse.outputs.op_normalize == 'true'
-        shell: bash
         run: |
           set -e
           git ls-files | while read -r f; do
@@ -68,7 +68,6 @@ jobs:
             b="$(basename "$f")"
             newb="$(echo "$b" | tr '[:upper:] ' '[:lower:]_')"
             if [[ "$b" != "$newb" ]]; then
-              mkdir -p ".tmp/$d"
               git mv -f "$f" "$d/$newb"
             fi
           done || true
@@ -77,34 +76,29 @@ jobs:
         if: steps.parse.outputs.op_fmt == 'true'
         run: |
           set -e
-          prettier -w .
+          prettier -w . --ignore-path .prettierignore
 
       - name: Generate sitemap.xml (best-effort)
         if: steps.parse.outputs.op_sitemap == 'true'
-        shell: bash
         run: |
           set -e
-          # sitemap-generator-cli exposes 'sitemap-generator' binary
           sitemap-generator "$SITE" -o sitemap.xml --max-depth 0 || true
           test -f sitemap.xml && echo "sitemap.xml generated (or already existed)."
 
       - name: Asset check (local)
         if: steps.parse.outputs.op_assetcheck == 'true'
-        shell: bash
         run: |
           set -e
           test -f sitemap.xml && echo "sitemap.xml present" || (echo "sitemap.xml missing"; exit 1)
 
       - name: Link audit (external)
         if: steps.parse.outputs.op_linkaudit == 'true'
-        shell: bash
         run: |
           set -e
           linkinator "$SITE" --recurse --skip "mailto:,tel:"
 
       - name: Commit & push changes
         if: steps.parse.outputs.op_commit == 'true'
-        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -112,13 +106,15 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          # Stage EVERYTHING, then explicitly unstage workflow files so we never try to change them
           git add -A
+          git reset .github/workflows || true
+
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
 
-          git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts"
-          # ensure remote uses token-based auth (required for Actions)
+          git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts (exclude workflow files)"
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push origin HEAD:${GITHUB_REF_NAME}
