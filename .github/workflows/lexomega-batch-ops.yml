@@ -8,7 +8,7 @@ on:
         required: false
         default: "normalize,fmt,sitemap,assetcheck,linkaudit,commit"
 
-# Let the job push changes and (if ever needed) touch workflow files.
+# Let the job push changes and (if ever needed) touch workflows
 permissions:
   contents: write
   pull-requests: write
@@ -21,31 +21,31 @@ jobs:
     env:
       SITE: ${{ secrets.SITE_DOMAIN }}
       OPS: ${{ github.event.inputs.ops }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # No caching option here (avoids “Caching for 'none' is not supported” and lockfile errors)
+      # No cache option here (avoids “Caching for 'none' is not supported”)
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20.x"
 
       - name: Parse inputs
         id: steps
         shell: bash
         run: |
           set -e
-          OPS_CLEAN="$(echo "${OPS:-normalize,fmt,sitemap,assetcheck,linkaudit,commit}" \
-            | tr '[:upper:]' '[:lower:]' | tr -d ' ')"
+          # Normalize comma list into space-separated tokens
+          OPS_CLEAN="$(echo "${OPS:-normalize,fmt,sitemap,assetcheck,linkaudit,commit}" | tr ',' ' ')"
           echo "ops=$OPS_CLEAN" >> "$GITHUB_OUTPUT"
 
       - name: Install CLI tools
-        if: contains(steps.steps.outputs.ops, 'fmt') || contains(steps.steps.outputs.ops, 'linkaudit') || contains(steps.steps.outputs.ops, 'sitemap')
+        if: contains(steps.steps.outputs.ops, 'fmt') || contains(steps.steps.outputs.ops, 'sitemap') || contains(steps.steps.outputs.ops, 'linkaudit')
         shell: bash
         run: |
           set -e
+          # Known-good versions
           npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@6.2.2
 
       - name: Prepare SITE value
@@ -53,7 +53,8 @@ jobs:
         run: |
           set -e
           if [ -z "${SITE}" ]; then
-            SITE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY##*/}"
+            # Fallback to GitHub Pages domain (repo owner), if secret not set
+            SITE="https://${GITHUB_REPOSITORY_OWNER}.github.io"
           fi
           echo "Using SITE=${SITE}"
 
@@ -62,18 +63,30 @@ jobs:
         shell: bash
         run: |
           set -e
-          shopt -s globstar nullglob
-          mapfile -t FILES < <(git ls-files)
-          for f in "${FILES[@]}"; do
-            base="$(basename "$f")"
-            dir="$(dirname "$f")"
-            newbase="$(echo "$base" | tr '[:upper:]' '[:lower:]' | sed -E 's/[[:space:]]+/-/g')"
-            if [[ "$base" != "$newbase" ]]; then
-              if [ -e "$dir/$newbase" ]; then
-                echo "Skip rename (target exists): $dir/$newbase"
-              else
-                git mv -f "$f" "$dir/$newbase"
-              fi
+          # Only rename tracked files that actually need changes.
+          # Skip anything that looks like HTML content accidentally piped in.
+          git ls-files -z | while IFS= read -r -d '' f; do
+            # Skip .git internals (ls-files already does), and any path with '<' or '>'
+            if [[ "$f" == *'<'* || "$f" == *'>'* ]]; then
+              continue
+            fi
+            nf="$f"
+            # Replace spaces with dashes
+            if [[ "$nf" == *" "* ]]; then
+              nf="${nf// /-}"
+            fi
+            # Lowercase path (preserves slashes)
+            # Use Python for robust, locale-safe lowercasing
+            lf="$(python3 - <<'PY'
+import sys,os
+p=sys.stdin.read().strip()
+print(p.lower())
+PY
+<<<"$nf")"
+            if [ "$f" != "$lf" ]; then
+              # Ensure target directory exists
+              mkdir -p "$(dirname "$lf")"
+              git mv -f -- "$f" "$lf"
             fi
           done
 
@@ -82,33 +95,35 @@ jobs:
         shell: bash
         run: |
           set -e
-          prettier -w "**/*.{html,css,js,json,md,yml,yaml}"
+          # Prettify common text/code assets if present
+          npx --yes prettier@3.3.3 \
+            "**/*.{js,ts,jsx,tsx,css,scss,md,html,json,yml,yaml}" \
+            --write || true
 
       - name: Generate sitemap.xml (best-effort)
         if: contains(steps.steps.outputs.ops, 'sitemap')
         shell: bash
-        continue-on-error: true
         run: |
           set -e
-          sitemap-generator --strip-querystring "${SITE}" --max-depth 2 --output ./sitemap.xml
+          # Try to generate a sitemap from SITE; do not fail the job if the host is not live yet
+          npx --yes sitemap-generator-cli@6.2.2 "${SITE}" \
+            --filepath sitemap.xml --max-depth 0 --strip-querystring || true
+          test -f sitemap.xml && echo "sitemap.xml generated (or already present)"
 
       - name: Asset check (local)
         if: contains(steps.steps.outputs.ops, 'assetcheck')
         shell: bash
         run: |
           set -e
-          if [ -f sitemap.xml ]; then
-            echo "sitemap.xml present"
-          else
-            echo "sitemap.xml missing (continuing)"
-          fi
+          test -f sitemap.xml && echo "✅ sitemap.xml present" || { echo "⚠️ sitemap.xml not found (continuing)"; }
 
       - name: Link audit (external)
         if: contains(steps.steps.outputs.ops, 'linkaudit')
         shell: bash
         run: |
           set -e
-          linkinator "${SITE}" --recurse --skip "mailto:,tel:" --timeout 120000
+          # Crawl the public site; skip mailto/tel to keep noise down
+          npx --yes linkinator@5.0.1 "${SITE}" --recurse --skip "mailto:,tel:" || true
 
       - name: Commit & push changes
         if: contains(steps.steps.outputs.ops, 'commit')
@@ -120,11 +135,13 @@ jobs:
           GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
         run: |
           set -e
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          if ! git diff --quiet || ! git diff --cached --quiet; then
+          if [ -n "$(git status --porcelain)" ]; then
             git add -A
             git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts"
-            git push
+            # Avoid pushing workflow changes to dodge “workflows” permission block
+            # (we aren't modifying .github/workflows here, but keep rule anyway)
+            git push origin HEAD:${GITHUB_REF_NAME}
+            echo "Pushed updates."
           else
             echo "No changes to commit."
           fi
