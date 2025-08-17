@@ -5,9 +5,10 @@ on:
     inputs:
       ops:
         description: "Comma-separated ops to run (normalize,fmt,sitemap,assetcheck,linkaudit,commit)"
-        required: false
+        required: true
         default: "normalize,fmt,sitemap,assetcheck,linkaudit,commit"
 
+# Make sure the token can push back to the repo
 permissions:
   contents: write
   pull-requests: write
@@ -15,96 +16,106 @@ permissions:
 jobs:
   run-ops:
     runs-on: ubuntu-latest
-    env:
-      SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
 
     steps:
+      - name: Set up job
+        run: echo "Starting batch ops…"
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          persist-credentials: true
+          fetch-depth: 0
 
       - name: Parse inputs
         id: parse
         run: |
           OPS="${{ github.event.inputs.ops }}"
-          if [ -z "$OPS" ]; then OPS="normalize,fmt,sitemap,assetcheck,linkaudit,commit"; fi
-          OPS=$(echo "$OPS" | tr '[:upper:]' '[:lower:]' | sed 's/[[:space:]]//g')
-          echo "ops=$OPS" >> "$GITHUB_OUTPUT"
+          echo "ops=${OPS}" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
-          cache: 'npm'
+          node-version: 20
+          # Intentionally no 'cache' because this repo has no lockfile
 
       - name: Install CLI tools
-        run: npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.4.2
+        run: |
+          set -e
+          npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.7.0
 
       - name: Prepare SITE value
-        if: contains(steps.parse.outputs.ops, 'sitemap') || contains(steps.parse.outputs.ops, 'linkaudit')
         run: |
-          if [ -z "${SITE_DOMAIN}" ]; then
-            echo "SITE_DOMAIN secret not set"; exit 1
+          # Accept either domain-only or full URL in the secret
+          RAW="${{ secrets.SITE_DOMAIN }}"
+          if [[ "$RAW" =~ ^https?:// ]]; then
+            SITE="$RAW"
+          else
+            SITE="https://$RAW"
           fi
-          echo "SITE=https://${SITE_DOMAIN}" >> "$GITHUB_ENV"
+          echo "SITE=$SITE" >> "$GITHUB_ENV"
 
       - name: Normalize filenames (lowercase, no spaces)
         if: contains(steps.parse.outputs.ops, 'normalize')
         run: |
-          git ls-files -z | xargs -0 -I{} bash -c '
-            f="{}"
-            case "$f" in
-              .git/*|.github/*|node_modules/*|*.png|*.jpg|*.jpeg|*.gif|*.webp) exit 0;;
-            esac
-            nf=$(echo "$f" | sed -E "s/ /-/g" | tr "[:upper:]" "[:lower:]")
-            if [ "$f" != "$nf" ]; then
-              mkdir -p "$(dirname "$nf")"
-              git mv -f "$f" "$nf"
+          find . -type f -not -path "./.git/*" | while read -r f; do
+            dir="$(dirname "$f")"
+            base="$(basename "$f")"
+            lower="$(echo "$base" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')"
+            if [ "$base" != "$lower" ]; then
+              git mv -f "$f" "$dir/$lower" || true
             fi
-          '
+          done
 
       - name: Format code (Prettier)
         if: contains(steps.parse.outputs.ops, 'fmt')
         run: |
-          prettier --ignore-unknown --write "**/*.{js,jsx,ts,tsx,css,html,json,md,yml,yaml}" "!**/.github/**" || true
+          prettier -w . || true
 
       - name: Generate sitemap.xml (best-effort)
         if: contains(steps.parse.outputs.ops, 'sitemap')
+        env:
+          SITE: ${{ env.SITE }}
         run: |
-          npx --yes sitemap-generator-cli "$SITE" --max-depth 2 --changefreq weekly \
-            --priority-map '{"^/":1}' -o sitemap.xml || true
+          if [ -n "$SITE" ]; then
+            # v7 requires explicit -o for output file
+            sitemap-generator "$SITE" -o sitemap.xml || true
+          else
+            echo "SITE not set; skipping sitemap generation"
+          fi
 
       - name: Asset check (local)
         if: contains(steps.parse.outputs.ops, 'assetcheck')
-        run: test -f sitemap.xml && echo "sitemap.xml present" || echo "sitemap.xml missing (ok)"
+        run: |
+          test -f sitemap.xml && echo "sitemap.xml present" || echo "sitemap.xml not present (ok)"
 
       - name: Link audit (external)
         if: contains(steps.parse.outputs.ops, 'linkaudit')
+        env:
+          SITE: ${{ env.SITE }}
         run: |
-          linkinator "$SITE" --recurse --skip "mailto:,tel:" || true
+          if [ -n "$SITE" ]; then
+            # Crawl the actual site, skip mailto/tel; do not fail the job on link issues
+            linkinator "$SITE" --recurse --skip "mailto:,tel:" || true
+          else
+            echo "SITE not set; skipping link audit"
+          fi
 
       - name: Commit & push changes
         if: contains(steps.parse.outputs.ops, 'commit')
         env:
-          GIT_AUTHOR_NAME: github-actions[bot]
-          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
-          GIT_COMMITTER_NAME: github-actions[bot]
-          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
-          git config user.name "$GIT_AUTHOR_NAME"
-          git config user.email "$GIT_AUTHOR_EMAIL"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Stage everything, then explicitly unstage workflows (cannot be pushed by GITHUB_TOKEN)
+          # Stage anything that changed (prettier/normalize/sitemap)
           git add -A
-          git restore --staged .github/workflows || true
 
-          # Nothing to commit? exit cleanly
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
 
-          git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts [skip ci]"
+          git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts"
           git push origin "${GITHUB_REF_NAME:-main}"
