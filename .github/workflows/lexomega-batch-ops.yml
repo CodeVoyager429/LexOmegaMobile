@@ -23,7 +23,7 @@ jobs:
 
       - name: Parse inputs
         id: steps
-        run: echo "ops=${{ github.event.inputs.ops }}" >> $GITHUB_OUTPUT
+        run: echo "ops=${{ github.event.inputs.ops }}" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -35,7 +35,7 @@ jobs:
           npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@7.5.0
 
       - name: Prepare SITE value
-        run: echo "SITE=https://${SITE_DOMAIN}" >> $GITHUB_ENV
+        run: echo "SITE=https://${SITE_DOMAIN}" >> "$GITHUB_ENV"
 
       # ---------- NORMALIZE ----------
       - name: Normalize filenames (lowercase, no spaces)
@@ -44,7 +44,7 @@ jobs:
           find . -type f -not -path "./.git/*" | while read -r f; do
             d="$(dirname "$f")"
             b="$(basename "$f")"
-            nb="$(echo "$b" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' )"
+            nb="$(echo "$b" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')"
             if [ "$b" != "$nb" ]; then
               git mv -f "$f" "$d/$nb" || true
             fi
@@ -60,7 +60,6 @@ jobs:
       - name: Generate sitemap.xml (best-effort)
         if: contains(steps.steps.outputs.ops, 'sitemap')
         run: |
-          mkdir -p public
           OUT="sitemap.xml"
           npx --yes sitemap-generator-cli@7.5.0 "https://${SITE_DOMAIN}" --max-depth 3 --strip-query true --timeout 10000 > "$OUT" || true
           if [ -s "$OUT" ]; then
@@ -87,13 +86,11 @@ jobs:
       # ---------- COMMIT ----------
       - name: Commit & push changes
         if: contains(steps.steps.outputs.ops, 'commit')
+        shell: bash
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          set -e
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts"
-            git push
-          else
-            echo "No changes to commit."
-          fi
+          # If no staged changes, print message and stop; otherwise commit & push.
+          git diff --cached --quiet && echo "No changes to commit." || (git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts" && git push)
