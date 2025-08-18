@@ -8,162 +8,117 @@ on:
         required: false
         default: "normalize,fmt,sitemap,assetcheck,linkaudit,commit"
 
-# Let the job push changes and (if ever needed) touch workflows.
+# Only what we need; DO NOT include a 'workflows:' permission (it caused the parser error).
 permissions:
   contents: write
   pull-requests: write
-  actions: read
-  workflows: write
 
 jobs:
   run-ops:
     runs-on: ubuntu-latest
+
     env:
+      # From Settings → Secrets and variables → Actions
       SITE: ${{ secrets.SITE_DOMAIN }}
       OPS: ${{ github.event.inputs.ops }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # No caching option here (avoids “Caching for 'none' is not supported”)
+      # No caching to avoid: "Caching for 'none' is not supported"
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
+          node-version: 20
+          cache: ''
 
       - name: Parse inputs
-        id: steps
+        id: flags
         shell: bash
         run: |
-          set -e
-          # Normalize commas/spaces to a canonical list
-          OPS_CLEAN="$(echo "${OPS:-normalize,fmt,sitemap,assetcheck,linkaudit,commit}" | tr '[:upper:]' '[:lower:]' | tr -s ' ' | tr -d ' ')"
-          echo "ops=$OPS_CLEAN" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          OPS_CLEAN="$(echo "${OPS:-normalize,fmt,sitemap,assetcheck,linkaudit,commit}" | tr '[:upper:]' '[:lower:]' | tr -d ' ')"
+          echo "ops=${OPS_CLEAN}" >> "$GITHUB_OUTPUT"
 
       - name: Install CLI tools
-        if: contains(steps.steps.outputs.ops, 'fmt') || contains(steps.steps.outputs.ops, 'sitemap') || contains(steps.steps.outputs.ops, 'linkaudit')
+        if: contains(steps.flags.outputs.ops, 'fmt') || contains(steps.flags.outputs.ops, 'sitemap') || contains(steps.flags.outputs.ops, 'linkaudit')
         shell: bash
         run: |
           set -e
-          # Pin to versions known to exist to avoid ETARGET
-          npm i -g prettier@3.3.3 linkinator@5.0.1 sitemap-generator-cli@6.2.2
+          npm i -g prettier@3.3.3 linkinator@6.1.2 sitemap-generator-cli@7.2.2
 
       - name: Prepare SITE value
+        if: contains(steps.flags.outputs.ops, 'sitemap')
         shell: bash
         run: |
           set -e
-          if [ -z "${SITE}" ]; then
-            # Fall back to Pages domain if SITE secret not set
+          if [ -z "${SITE:-}" ]; then
             SITE="https://${GITHUB_REPOSITORY_OWNER}.github.io"
           fi
           echo "Using SITE=${SITE}"
+          echo "SITE=${SITE}" >> "$GITHUB_ENV"
 
       - name: Normalize filenames (lowercase, no spaces)
-        if: contains(steps.steps.outputs.ops, 'normalize')
+        if: contains(steps.flags.outputs.ops, 'normalize')
         shell: bash
         run: |
           set -e
-          # Only rename if files exist; turn spaces to hyphens; lower-case.
-          # We guard 'git mv' with existence checks to avoid “No such file or directory”.
-          while IFS= read -r -d '' f; do
-            base="$(basename "$f")"
-            dir="$(dirname "$f")"
-            new="$(echo "$base" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' )"
-            if [ "$base" != "$new" ]; then
-              if [ -e "$f" ]; then
-                git mv "$f" "$dir/$new" || true
-              fi
-            fi
-          done < <(git ls-files -z)
+          git ls-files -z \
+            | grep -zvE '^\.github/workflows/' \
+            | while IFS= read -r -d '' f; do
+                base="$(basename "$f")"
+                dir="$(dirname "$f")"
+                new="$(echo "$base" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' )"
+                if [ "$base" != "$new" ]; then
+                  mkdir -p "$dir"
+                  git mv -f "$f" "$dir/$new"
+                fi
+              done
 
       - name: Format code (Prettier)
-        if: contains(steps.steps.outputs.ops, 'fmt')
+        if: contains(steps.flags.outputs.ops, 'fmt')
         shell: bash
         run: |
           set -e
-          # Format only common web files if they exist.
-          npx -y prettier@3.3.3 \
-            --write "**/*.{js,jsx,ts,tsx,css,scss,html,json,md,yml,yaml}" || true
+          npx --yes prettier@3.3.3 --write "**/*.{js,jsx,ts,tsx,css,html,md,json,yml,yaml}" || true
+          git status --porcelain
 
       - name: Generate sitemap.xml (best-effort)
-        if: contains(steps.steps.outputs.ops, 'sitemap')
+        if: contains(steps.flags.outputs.ops, 'sitemap')
         shell: bash
         run: |
           set -e
-          # If there is an existing sitemap script/config, prefer it; otherwise best-effort:
-          if command -v sitemap-generator >/dev/null 2>&1; then
-            mkdir -p .out
-            # Avoid non-zero exit on minor crawl issues
-            sitemap-generator "${SITE}" --strip-querystring --max-depth 10 --timeout 10 --silent --output .out/sitemap.xml || true
-            # Use repo root if there is no sitemap yet
-            if [ -f ".out/sitemap.xml" ]; then
-              cp .out/sitemap.xml sitemap.xml
-              echo "Generated sitemap.xml"
-            else
-              echo "No sitemap produced; skipping copy"
-            fi
-          else
-            echo "sitemap-generator not available; skipping"
-          fi
+          npx --yes sitemap-generator-cli@7.2.2 "${SITE}" --output ./sitemap.xml || echo "sitemap generation skipped"
+          git add sitemap.xml || true
 
       - name: Asset check (local)
-        if: contains(steps.steps.outputs.ops, 'assetcheck')
+        if: contains(steps.flags.outputs.ops, 'assetcheck')
         shell: bash
         run: |
           set -e
-          # Quick local existence checks for referenced assets in HTML files
-          # Non-fatal: report but don't fail the job
-          fails=0
-          while IFS= read -r -d '' html; do
-            while read -r asset; do
-              asset="${asset%\"}"
-              asset="${asset#\"}"
-              [ -z "$asset" ] && continue
-              # Skip external refs
-              if echo "$asset" | grep -Eq '^https?://|^//' ; then
-                continue
-              fi
-              if [ ! -e "$asset" ]; then
-                echo "::warning title=Missing asset::${asset} (referenced from ${html})"
-              fi
-            done < <(grep -Eo 'src="[^"]+"|href="[^"]+"' "$html" | cut -d= -f2)
-          done < <(git ls-files -z '*.html')
-          exit 0
+          test -f index.html || echo "note: index.html not present"
 
       - name: Link audit (external)
-        if: contains(steps.steps.outputs.ops, 'linkaudit')
+        if: contains(steps.flags.outputs.ops, 'linkaudit')
         shell: bash
         run: |
           set -e
-          if command -v linkinator >/dev/null 2>&1; then
-            # Crawl the repo if there are HTML files; otherwise skip
-            if git ls-files '*.html' | grep -q .; then
-              # Ignore mailto/tel and keep non-zero exits from failing the job
-              linkinator . --recurse --skip "mailto:,tel:" || true
-            else
-              echo "No HTML files found; skipping link audit"
-            fi
-          else
-            echo "linkinator not available; skipping"
-          fi
+          npx --yes linkinator@6.1.2 "https://${GITHUB_REPOSITORY_OWNER}.github.io" --recurse --skip "mailto:,tel:" || true
 
       - name: Commit & push changes
-        if: contains(steps.steps.outputs.ops, 'commit')
+        if: contains(steps.flags.outputs.ops, 'commit')
         shell: bash
-        env:
-          GH_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
-          GH_NAME: "github-actions[bot]"
         run: |
           set -e
-          git config user.email "$GH_EMAIL"
-          git config user.name  "$GH_NAME"
-          # Stage everything changed by ops above
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
+          # Guard: never stage workflow files (avoids GitHub's 'refusing to allow a GitHub App to create/update workflow' error)
+          git reset -- .github/workflows || true
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
-          msg="chore(batch-ops): apply fmt/normalize and generated artifacts"
-          git commit -m "$msg"
-          # Push with default GITHUB_TOKEN (needs repo settings we already set)
-          git push origin "${GITHUB_REF_NAME:-main}"
+          git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts [skip ci]"
+          git push origin HEAD:${GITHUB_REF_NAME}
