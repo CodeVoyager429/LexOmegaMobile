@@ -1,0 +1,14 @@
+name: Health Check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run echo test
+        run: echo "✅ Health check workflow is running correctly"
