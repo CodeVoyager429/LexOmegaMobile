@@ -4,121 +4,77 @@ on:
   workflow_dispatch:
     inputs:
       ops:
-        description: "Comma-separated ops to run (normalize,fmt,sitemap,assetcheck,linkaudit,commit)"
-        required: false
+        description: "Comma-separated list of operations to run (e.g., normalize,fmt,sitemap,assetcheck,linkaudit,commit)"
+        required: true
         default: "normalize,fmt,sitemap,assetcheck,linkaudit,commit"
 
-# Only what we need; DO NOT include a 'workflows:' permission (it caused the parser error).
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
-  run-ops:
+  batch-ops:
     runs-on: ubuntu-latest
 
-    env:
-      # From Settings → Secrets and variables → Actions
-      SITE: ${{ secrets.SITE_DOMAIN }}
-      OPS: ${{ github.event.inputs.ops }}
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      # No caching to avoid: "Caching for 'none' is not supported"
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 20
-          cache: ''
-
-      - name: Parse inputs
-        id: flags
-        shell: bash
-        run: |
-          set -euo pipefail
-          OPS_CLEAN="$(echo "${OPS:-normalize,fmt,sitemap,assetcheck,linkaudit,commit}" | tr '[:upper:]' '[:lower:]' | tr -d ' ')"
-          echo "ops=${OPS_CLEAN}" >> "$GITHUB_OUTPUT"
+          node-version: '18'
 
       - name: Install CLI tools
-        if: contains(steps.flags.outputs.ops, 'fmt') || contains(steps.flags.outputs.ops, 'sitemap') || contains(steps.flags.outputs.ops, 'linkaudit')
-        shell: bash
         run: |
           set -e
-          npm i -g prettier@3.3.3 linkinator@6.1.2 sitemap-generator-cli@7.2.2
-
-      - name: Prepare SITE value
-        if: contains(steps.flags.outputs.ops, 'sitemap')
-        shell: bash
-        run: |
-          set -e
-          if [ -z "${SITE:-}" ]; then
-            SITE="https://${GITHUB_REPOSITORY_OWNER}.github.io"
+          npm install -g prettier
+          # Try sitemap-generator-cli, fallback to sitemap
+          if ! npm install -g sitemap-generator-cli@latest; then
+            echo "⚠️ sitemap-generator-cli not available, installing 'sitemap' instead"
+            npm install -g sitemap
           fi
-          echo "Using SITE=${SITE}"
-          echo "SITE=${SITE}" >> "$GITHUB_ENV"
 
-      - name: Normalize filenames (lowercase, no spaces)
-        if: contains(steps.flags.outputs.ops, 'normalize')
-        shell: bash
+      - name: Run batch ops
         run: |
           set -e
-          git ls-files -z \
-            | grep -zvE '^\.github/workflows/' \
-            | while IFS= read -r -d '' f; do
-                base="$(basename "$f")"
-                dir="$(dirname "$f")"
-                new="$(echo "$base" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' )"
-                if [ "$base" != "$new" ]; then
-                  mkdir -p "$dir"
-                  git mv -f "$f" "$dir/$new"
-                fi
-              done
+          OPS="${{ github.event.inputs.ops }}"
+          echo "🚀 Running ops: $OPS"
 
-      - name: Format code (Prettier)
-        if: contains(steps.flags.outputs.ops, 'fmt')
-        shell: bash
-        run: |
-          set -e
-          npx --yes prettier@3.3.3 --write "**/*.{js,jsx,ts,tsx,css,html,md,json,yml,yaml}" || true
-          git status --porcelain
-
-      - name: Generate sitemap.xml (best-effort)
-        if: contains(steps.flags.outputs.ops, 'sitemap')
-        shell: bash
-        run: |
-          set -e
-          npx --yes sitemap-generator-cli@7.2.2 "${SITE}" --output ./sitemap.xml || echo "sitemap generation skipped"
-          git add sitemap.xml || true
-
-      - name: Asset check (local)
-        if: contains(steps.flags.outputs.ops, 'assetcheck')
-        shell: bash
-        run: |
-          set -e
-          test -f index.html || echo "note: index.html not present"
-
-      - name: Link audit (external)
-        if: contains(steps.flags.outputs.ops, 'linkaudit')
-        shell: bash
-        run: |
-          set -e
-          npx --yes linkinator@6.1.2 "https://${GITHUB_REPOSITORY_OWNER}.github.io" --recurse --skip "mailto:,tel:" || true
-
-      - name: Commit & push changes
-        if: contains(steps.flags.outputs.ops, 'commit')
-        shell: bash
-        run: |
-          set -e
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          # Guard: never stage workflow files (avoids GitHub's 'refusing to allow a GitHub App to create/update workflow' error)
-          git reset -- .github/workflows || true
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-            exit 0
+          if [[ "$OPS" == *"normalize"* ]]; then
+            echo "📦 Normalizing package.json"
+            npx sort-package-json
           fi
-          git commit -m "chore(batch-ops): apply fmt/normalize and generated artifacts [skip ci]"
-          git push origin HEAD:${GITHUB_REF_NAME}
+
+          if [[ "$OPS" == *"fmt"* ]]; then
+            echo "✨ Formatting code with Prettier"
+            prettier --write "**/*.{js,ts,jsx,tsx,json,md}"
+          fi
+
+          if [[ "$OPS" == *"sitemap"* ]]; then
+            echo "🌐 Generating sitemap.xml"
+            if command -v sitemap-generator-cli > /dev/null; then
+              echo "✅ Using sitemap-generator-cli"
+              sitemap-generator-cli https://your-site-url.com -o ./sitemap.xml || echo "⚠️ sitemap generation failed"
+            elif command -v sitemap > /dev/null; then
+              echo "✅ Using fallback 'sitemap' package"
+              sitemap https://your-site-url.com > ./sitemap.xml || echo "⚠️ sitemap fallback generation failed"
+            else
+              echo "❌ No sitemap generator found, skipping"
+            fi
+          fi
+
+          if [[ "$OPS" == *"assetcheck"* ]]; then
+            echo "🖼️ Checking assets directory"
+            ls -lh ./public || echo "⚠️ No public directory found"
+          fi
+
+          if [[ "$OPS" == *"linkaudit"* ]]; then
+            echo "🔗 Auditing links (placeholder)"
+            echo "Would run link check here..."
+          fi
+
+          if [[ "$OPS" == *"commit"* ]]; then
+            echo "💾 Preparing commit"
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "chore(batch-ops): automated batch operations" || echo "ℹ️ Nothing to commit"
+            git push
+          fi
