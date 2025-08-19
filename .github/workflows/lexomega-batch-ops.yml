@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       ops:
-        description: "Comma-separated list of operations to run (e.g., normalize,fmt,sitemap,assetcheck,linkaudit,commit)"
+        description: "Comma-separated ops to run (normalize,fmt,sitemap,assetcheck,linkaudit,commit)"
         required: true
         default: "normalize,fmt,sitemap,assetcheck,linkaudit,commit"
 
@@ -14,21 +14,21 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
       - name: Install CLI tools
         run: |
           set -e
-          npm install -g prettier
-          # Try sitemap-generator-cli, fallback to sitemap
+          npm install -g prettier@3 sort-package-json@3
+          # Try sitemap-generator-cli, fall back to sitemap
           if ! npm install -g sitemap-generator-cli@latest; then
-            echo "⚠️ sitemap-generator-cli not available, installing 'sitemap' instead"
-            npm install -g sitemap
+            echo "⚠️ sitemap-generator-cli unavailable, installing 'sitemap' fallback"
+            npm install -g sitemap@latest
           fi
 
       - name: Run batch ops
@@ -37,44 +37,73 @@ jobs:
           OPS="${{ github.event.inputs.ops }}"
           echo "🚀 Running ops: $OPS"
 
+          # ---------- NORMALIZE ----------
           if [[ "$OPS" == *"normalize"* ]]; then
-            echo "📦 Normalizing package.json"
-            npx sort-package-json
-          fi
-
-          if [[ "$OPS" == *"fmt"* ]]; then
-            echo "✨ Formatting code with Prettier"
-            prettier --write "**/*.{js,ts,jsx,tsx,json,md}"
-          fi
-
-          if [[ "$OPS" == *"sitemap"* ]]; then
-            echo "🌐 Generating sitemap.xml"
-            if command -v sitemap-generator-cli > /dev/null; then
-              echo "✅ Using sitemap-generator-cli"
-              sitemap-generator-cli https://your-site-url.com -o ./sitemap.xml || echo "⚠️ sitemap generation failed"
-            elif command -v sitemap > /dev/null; then
-              echo "✅ Using fallback 'sitemap' package"
-              sitemap https://your-site-url.com > ./sitemap.xml || echo "⚠️ sitemap fallback generation failed"
+            echo "📦 Normalizing package.json files (monorepo-safe)"
+            mapfile -t PKGS < <(git ls-files -- '**/package.json' ':!:**/node_modules/**')
+            if (( ${#PKGS[@]} == 0 )); then
+              echo "ℹ️ No package.json files found. Skipping normalize."
             else
-              echo "❌ No sitemap generator found, skipping"
+              for f in "${PKGS[@]}"; do
+                echo "  • $f"
+                sort-package-json "$f"
+              done
             fi
           fi
 
+          # ---------- FORMAT ----------
+          if [[ "$OPS" == *"fmt"* ]]; then
+            echo "✨ Formatting with Prettier"
+            # Collect files tracked in git that Prettier can handle
+            mapfile -t FMT < <(git ls-files -- \
+              '*.js' '*.jsx' '*.ts' '*.tsx' '*.json' '*.md' '*.css' '*.scss' '*.html' '*.yml' '*.yaml')
+            if (( ${#FMT[@]} == 0 )); then
+              echo "ℹ️ No formattable files found. Skipping fmt."
+            else
+              # Use xargs safely; Prettier returns nonzero when nothing matches, so we bypass that
+              printf '%s\0' "${FMT[@]}" | xargs -0 prettier --write
+            fi
+          fi
+
+          # ---------- SITEMAP ----------
+          if [[ "$OPS" == *"sitemap"* ]]; then
+            echo "🌐 Generating sitemap.xml (best-effort)"
+            if command -v sitemap-generator-cli >/dev/null 2>&1; then
+              echo "✅ Using sitemap-generator-cli"
+              sitemap-generator-cli "https://your-site-url.com" -o ./sitemap.xml || echo "⚠️ Sitemap generation failed (cli)"
+            elif command -v sitemap >/dev/null 2>&1; then
+              echo "✅ Using fallback 'sitemap' package"
+              sitemap "https://your-site-url.com" > ./sitemap.xml || echo "⚠️ Sitemap generation failed (fallback)"
+            else
+              echo "❌ No sitemap tool installed; skipping"
+            fi
+          fi
+
+          # ---------- ASSET CHECK ----------
           if [[ "$OPS" == *"assetcheck"* ]]; then
-            echo "🖼️ Checking assets directory"
-            ls -lh ./public || echo "⚠️ No public directory found"
+            echo "🖼️ Asset check (best-effort)"
+            if [ -d "./public" ]; then
+              ls -lh ./public || true
+            else
+              echo "ℹ️ No ./public directory. Skipping assetcheck."
+            fi
           fi
 
+          # ---------- LINK AUDIT (placeholder) ----------
           if [[ "$OPS" == *"linkaudit"* ]]; then
-            echo "🔗 Auditing links (placeholder)"
-            echo "Would run link check here..."
+            echo "🔗 Link audit placeholder – add your link-check command here."
           fi
 
+          # ---------- COMMIT ----------
           if [[ "$OPS" == *"commit"* ]]; then
-            echo "💾 Preparing commit"
+            echo "💾 Commit & push changes (if any)"
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
-            git add .
-            git commit -m "chore(batch-ops): automated batch operations" || echo "ℹ️ Nothing to commit"
-            git push
+            git add -A
+            if git diff --cached --quiet; then
+              echo "ℹ️ No changes to commit."
+            else
+              git commit -m "chore(batch-ops): automated normalize/fmt/sitemap updates"
+              git push
+            fi
           fi
