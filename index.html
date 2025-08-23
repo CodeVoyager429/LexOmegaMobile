@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>LexOmega | Unified Legal Intelligence</title>
-  <meta name="description" content="LexOmega — analytics, case tracking, document generation, notary, billing, and real-time legal intelligence."/>
+  <meta name="description" content="LexOmega — analytics, case tracking, document generation, notary, and real-time legal intelligence."/>
   <link rel="icon" href="data:,"/>
   <style>
     /* ===================== DESIGN TOKENS ===================== */
@@ -97,12 +97,12 @@
       box-shadow:var(--shadow);padding:22px
     }
     .card h2{margin:0 0 6px;font-size:clamp(22px,3.2vw,32px)}
-    .cta-row{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+    .cta-row{display:flex;gap:16px;margin-top:18px;flex-wrap:wrap}
 
     /* Buttons & Inputs */
     .btn{
       appearance:none;border:0;cursor:pointer;user-select:none;background:var(--accent);color:#111;
-      font-weight:800;padding:12px 16px;border-radius:14px;box-shadow:0 10px 18px rgba(255,208,0,.15);
+      font-weight:800;padding:12px 20px;border-radius:14px;box-shadow:0 10px 18px rgba(255,208,0,.15);
       transition:transform .06s ease,box-shadow .12s ease,background .12s ease
     }
     .btn:hover{transform:translateY(-1px)}
@@ -128,11 +128,11 @@
     /* ===================== CHAT (Ask Lex) ===================== */
     .fab{
       position:fixed;right:18px;bottom:18px;background:var(--accent);color:#111;width:60px;height:60px;border-radius:999px;
-      display:grid;place-items:center;font-weight:900;box-shadow:0 18px 36px rgba(255,208,0,.25);z-index:65;border:0;cursor:pointer
+      display:grid;place-items:center;font-weight:900;box-shadow:0 18px 36px rgba(255,208,0,.25);z-index:55;border:0;cursor:pointer
     }
     .chat{
       position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:3px solid var(--accent);box-shadow:var(--shadow);
-      transform:translateY(100%);transition:transform .22s ease-out;z-index:64
+      transform:translateY(100%);transition:transform .22s ease-out;z-index:65
     }
     .chat.open{transform:translateY(0)}
     .chat-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
@@ -153,6 +153,7 @@
   </style>
 </head>
 <body>
+
   <!-- Drawer (mobile) -->
   <nav class="drawer" id="drawer">
     <div class="links">
@@ -161,6 +162,7 @@
       <a href="tools.html" data-nav="tools">Tools</a>
       <a href="documents.html" data-nav="documents">Documents</a>
       <a href="notary.html" data-nav="notary">Notary</a>
+      <a href="#" data-nav="billing" id="drawerBilling">Billing</a>
     </div>
   </nav>
 
@@ -177,6 +179,7 @@
         <a href="tools.html" data-nav="tools">Tools</a>
         <a href="documents.html" data-nav="documents">Documents</a>
         <a href="notary.html" data-nav="notary">Notary</a>
+        <a href="#" data-nav="billing" id="navBilling">Billing</a>
       </div>
       <button class="hamburger" id="hamburger" aria-label="Open menu"><span></span><span></span><span></span></button>
     </div>
@@ -206,9 +209,9 @@
           <button class="btn" id="btnLogin">Login</button>
           <button class="btn ghost" id="btnCreate">Create Account</button>
           <button class="btn ghost" id="btnLogout" style="display:none">Logout</button>
-          <!-- Stripe actions -->
-          <button class="btn" id="btnSubscribe" title="Start subscription">Subscribe</button>
-          <button class="btn ghost" id="btnBilling" title="Manage billing">Manage Billing</button>
+          <!-- NEW: Stripe actions on the card -->
+          <button class="btn" id="btnSubscribe">Subscribe</button>
+          <button class="btn ghost" id="btnManageBilling">Manage Billing</button>
         </div>
         <div class="spacer"></div>
         <span class="pill">Status: <span id="authState">Signed out</span></span>
@@ -294,6 +297,21 @@
     </div>
   </div>
 
+  <!-- Billing Modal -->
+  <div class="modal-backdrop" id="billingModal">
+    <div class="modal">
+      <h3 style="display:flex;justify-content:space-between;align-items:center;margin:0 0 12px">
+        Billing
+        <button class="btn ghost" style="padding:6px 10px" data-close="billingModal" aria-label="Close">✕</button>
+      </h3>
+      <p class="muted">Manage your subscription.</p>
+      <div class="actions" style="justify-content:flex-start">
+        <button class="btn" id="modalSubscribe">Subscribe</button>
+        <button class="btn ghost" id="modalPortal">Manage Billing</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Ask Lex FAB -->
   <button class="fab" id="fab" aria-label="Ask Lex">?</button>
 
@@ -303,12 +321,11 @@
       <strong>Ask Lex</strong>
       <div style="display:flex;gap:8px;align-items:center">
         <button class="mic" id="voiceToggle" title="Voice input">🎤</button>
-        <button class="btn ghost" id="btnPlan" title="Autonomous plan from input">Auto-Plan</button>
         <button class="btn ghost" id="chatClose">Close</button>
       </div>
     </div>
     <div class="chat-body" id="chatBody">
-      <div class="chat-item bot">Hi! Ask anything like “Go to Tools”, “Search: Miranda rights”, “Draft an affidavit”, or click <em>Auto-Plan</em> to get a step-by-step plan.</div>
+      <div class="chat-item bot">Hi! Ask anything like “Go to Tools”, “Search: Miranda rights”, or “Draft an affidavit”.</div>
     </div>
     <div class="chat-input">
       <input id="chatInput" type="text" placeholder='Ask anything. Try: "Go to Tools" or "Search Fourth Amendment".'/>
@@ -321,38 +338,34 @@
 
   <script>
     /* =========================================================
-       FRONT-END CONTROLLER (wired to unified backend)
+       FRONT-END CONTROLLER (wired to backend base URL)
        ========================================================= */
 
-    // ---- Backend auto-detect / override ------------------------------------
+    // CHANGE THIS if your backend domain is different:
     const DEFAULT_BACKEND = 'https://lex-omega-backend.vercel.app';
-    const SAME_ORIGIN_BACKEND = (()=>{ try{
-      const host = location.origin;
-      return /lex-omega-backend\.vercel\.app$/.test(new URL(host).host) ? host : null;
-    }catch{ return null; }})();
+
+    // Auto-detect: if this page is served from the backend domain, use same-origin.
+    const SAME_ORIGIN_BACKEND = (()=>{
+      try{
+        const host = location.origin;
+        return /lex-omega-backend\.vercel\.app$/.test(new URL(host).host) ? host : null;
+      }catch{ return null; }
+    })();
+
+    // Allow manual override via ?backend=... for quick testing
     const urlBackend = new URLSearchParams(location.search).get('backend');
     const BACKEND = urlBackend || SAME_ORIGIN_BACKEND || DEFAULT_BACKEND;
 
     const API = {
-      health: `${BACKEND}/api/health`,
-      status: `${BACKEND}/api/status`,
-      // Auth
       login: `${BACKEND}/api/auth/login`,
       register: `${BACKEND}/api/auth/register`,
       me: `${BACKEND}/api/auth/me`,
-      logout: `${BACKEND}/api/auth/logout`,
-      // Dashboard + Docs
       stats: `${BACKEND}/api/dashboard/stats`,
       documentsList: `${BACKEND}/api/documents/list`,
-      documentsGet: `${BACKEND}/api/documents/get`,
-      documentsSave: `${BACKEND}/api/documents/save`,
-      documentsDelete: `${BACKEND}/api/documents/delete`,
       documentsGenerate: `${BACKEND}/api/documents/generate`,
-      // Search & Assistant
       searchCases: `${BACKEND}/api/cases/search`,
       chat: `${BACKEND}/api/assistant/chat`,
-      autoPlan: `${BACKEND}/api/bot/autonomous`,
-      // Billing
+      status: `${BACKEND}/api/status`,
       billingCheckout: `${BACKEND}/api/billing/checkout`,
       billingPortal: `${BACKEND}/api/billing/portal`
     };
@@ -363,47 +376,62 @@
     const drawer = qs('#drawer');
     const toast = qs('#toast');
 
-    // ====== Storage (session) ======
-    const authKey = 'lexomega.auth';
-    const storage = {
-      set(k,v){localStorage.setItem(k, JSON.stringify(v));},
-      get(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}},
-      del(k){localStorage.removeItem(k)}
-    };
-    function currentUser(){ return storage.get(authKey); }
-    function saveSession(payload){
-      storage.set(authKey, payload);
-      setAuthState(payload?.user);
-      qs('#btnLogout').style.display = payload?.user ? 'inline-block' : 'none';
+    // ====== Cookies / CSRF ======
+    function getCookie(name){
+      const m = document.cookie.match('(?:^|; )' + name.replace(/([.$?*|{}()\\[\\]\\\\/+^])/g,'\\\\$1') + '=([^;]*)');
+      return m ? decodeURIComponent(m[1]) : '';
     }
-    function signOut(){
-      storage.del(authKey);
+    async function ensureCsrf(){
+      if(!getCookie('lo_csrf')){
+        try{ await fetch(API.status, { method:'GET', credentials:'include' }); }catch{}
+      }
+    }
+
+    // ====== Storage (session display; server keeps the real session) ======
+    const storeKey = 'lexomega.user';
+    const storage = {
+      set(k,v){ localStorage.setItem(k, JSON.stringify(v)); },
+      get(k){ try{return JSON.parse(localStorage.getItem(k))}catch{return null} },
+      del(k){ localStorage.removeItem(k); }
+    };
+    function currentUser(){ return storage.get(storeKey); }
+    function saveUser(u){
+      storage.set(storeKey, u || null);
+      setAuthState(u);
+      qs('#btnLogout').style.display = u ? 'inline-block' : 'none';
+    }
+    function signOutUI(){
+      storage.del(storeKey);
       setAuthState(null);
       qs('#btnLogout').style.display = 'none';
     }
     function setAuthState(user){
       const state = qs('#authState');
-      state.textContent = user ? 'Signed in as ' + (user.username || user.email || 'user') : 'Signed out';
+      state.textContent = user ? 'Signed in as ' + (user.name || user.email || 'user') : 'Signed out';
     }
 
-    // ====== Cookies / CSRF ======
-    function readCookie(name){
-      return (document.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(name+'='))?.split('=').slice(1).join('=') || '';
-    }
-    function csrf(){ return readCookie('lo_csrf'); }
-
-    // ====== Global fetch wrapper (credentials + CSRF) ======
+    // ====== Global fetch wrapper with credentials + CSRF ======
     async function apiFetch(url, opts={}){
       const method = (opts.method||'GET').toUpperCase();
-      const headers = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
-      // attach CSRF to mutating methods
-      if (!['GET','HEAD','OPTIONS'].includes(method)) headers['X-CSRF-Token'] = csrf();
+      const headers = Object.assign({'Content-Type':'application/json'}, opts.headers || {});
+      // Attach CSRF on state-changing requests
+      if(!['GET','HEAD','OPTIONS'].includes(method)){
+        await ensureCsrf();
+        const token = getCookie('lo_csrf');
+        if(token) headers['X-CSRF-Token'] = token;
+      }
       const res = await fetch(url, Object.assign({}, opts, { headers, credentials:'include' }));
-      if(res.status === 401){ signOut(); throw new Error('Not authenticated'); }
+      if(res.status === 401){
+        signOutUI();
+        throw new Error('Session expired. Please sign in again.');
+      }
+      if(res.status === 405){
+        throw new Error('Method not allowed (405) — check backend route + method.');
+      }
       if(!res.ok){
-        let msg = '';
-        try{ msg = (await res.json()).error || '' }catch{}
-        throw new Error(msg || ('Request failed: '+res.status));
+        let msg = 'Request failed: '+res.status;
+        try{ const t = await res.text(); if(t) msg = t; }catch{}
+        throw new Error(msg);
       }
       const ct = res.headers.get('content-type')||'';
       return ct.includes('application/json') ? res.json() : res.text();
@@ -414,15 +442,13 @@
     drawer.addEventListener('click', e=>{ if(e.target.matches('a')) drawer.classList.remove('open'); });
 
     // ====== Modals ======
-    function openModal(id){ qs('#'+id).style.display='grid'; }
-    function closeModal(id){ qs('#'+id).style.display='none'; }
-    qsa('[data-close]').forEach(btn=>btn.addEventListener('click', e=>{
-      closeModal(e.target.getAttribute('data-close'));
-    }));
+    function openModal(id){ const m=qs('#'+id); if(m) m.style.display='grid'; }
+    function closeModal(id){ const m=qs('#'+id); if(m) m.style.display='none'; }
+    qsa('[data-close]').forEach(btn=>btn.addEventListener('click', e=> closeModal(e.target.getAttribute('data-close')) ));
     qsa('.modal-backdrop').forEach(backdrop=>{
       backdrop.addEventListener('click',(e)=>{ if(e.target===backdrop) backdrop.style.display='none'; });
     });
-    document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ closeModal('loginModal'); closeModal('registerModal'); } });
+    document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ ['loginModal','registerModal','billingModal'].forEach(closeModal); } });
 
     // ====== Toasts ======
     let toastTimer;
@@ -438,14 +464,17 @@
     qs('#btnLogin').addEventListener('click', ()=> openModal('loginModal'));
     qs('#btnCreate').addEventListener('click', ()=> openModal('registerModal'));
     qs('#btnLogout').addEventListener('click', async ()=>{
-      try{ await apiFetch(API.logout, { method:'POST' }); }catch{}
-      signOut(); showToast('Signed out');
+      try{
+        await apiFetch(`${BACKEND}/api/auth/logout`, { method:'POST', body:JSON.stringify({}) });
+      }catch{}
+      signOutUI();
+      showToast('Signed out');
     });
 
     qs('#guestContinue').addEventListener('click',(e)=>{
       e.preventDefault();
       closeModal('registerModal');
-      saveSession({ token:null, user:{ id:'guest', email:'guest@lexomega.ai', username:'Guest', role:'guest'} });
+      saveUser({ id:'guest', email:'guest', name:'Guest', role:'guest' });
       showToast('Continuing as guest');
     });
 
@@ -455,7 +484,7 @@
       try{
         if(!email || password.length<3) throw new Error('Enter email and password (≥ 3 chars)');
         const data = await apiFetch(API.login, { method:'POST', body:JSON.stringify({email, password}) });
-        saveSession(data);
+        saveUser(data?.user);
         closeModal('loginModal');
         showToast('Welcome back!');
         refreshAll();
@@ -469,40 +498,68 @@
       try{
         if(!name || !email || password.length<8) throw new Error('Please fill all fields (password ≥ 8)');
         const data = await apiFetch(API.register, { method:'POST', body:JSON.stringify({name,email,password}) });
-        saveSession(data);
+        saveUser(data?.user);
         closeModal('registerModal');
         showToast('Account created!');
         refreshAll();
       }catch(err){ showToast(err.message||'Registration error','error'); }
     });
 
-    // ====== Billing actions ======
-    qs('#btnSubscribe').addEventListener('click', async ()=>{
+    // ====== Billing (Stripe) ======
+    function requireUserOrPrompt(){
+      const u = currentUser();
+      if(!u || u.id==='guest'){
+        openModal('loginModal');
+        showToast('Please sign in to continue', 'warn');
+        return null;
+      }
+      return u;
+    }
+    async function doSubscribe(){
+      if(!requireUserOrPrompt()) return;
       try{
-        const { url } = await apiFetch(API.billingCheckout, { method:'POST' });
-        location.href = url;
-      }catch(err){ showToast(err.message||'Billing error','error'); }
-    });
-    qs('#btnBilling').addEventListener('click', async ()=>{
+        const r = await apiFetch(API.billingCheckout, { method:'POST', body:JSON.stringify({}) });
+        if(r?.url) location.href = r.url;
+        else throw new Error('No checkout URL returned.');
+      }catch(err){ showToast(err.message||'Checkout failed','error'); }
+    }
+    async function openPortal(){
+      if(!requireUserOrPrompt()) return;
       try{
-        const { url } = await apiFetch(API.billingPortal, { method:'POST' });
-        location.href = url;
-      }catch(err){ showToast(err.message||'Portal error','error'); }
-    });
+        const r = await apiFetch(API.billingPortal, { method:'POST', body:JSON.stringify({}) });
+        if(r?.url) location.href = r.url;
+        else throw new Error('No portal URL returned.');
+      }catch(err){ showToast(err.message||'Portal failed','error'); }
+    }
+
+    // Buttons on card
+    qs('#btnSubscribe').addEventListener('click', doSubscribe);
+    qs('#btnManageBilling').addEventListener('click', openPortal);
+    // Nav + Drawer open billing modal
+    qs('#navBilling').addEventListener('click', (e)=>{ e.preventDefault(); openModal('billingModal'); });
+    qs('#drawerBilling').addEventListener('click', (e)=>{ e.preventDefault(); openModal('billingModal'); });
+    // Modal buttons
+    qs('#modalSubscribe').addEventListener('click', doSubscribe);
+    qs('#modalPortal').addEventListener('click', openPortal);
+
+    // Handle Stripe return params
+    (function handleStripeReturns(){
+      const p = new URLSearchParams(location.search);
+      if(p.get('sub')==='success') showToast('Subscription activated. Welcome!', 'info');
+      if(p.get('sub')==='cancel') showToast('Checkout canceled.', 'warn');
+      if(p.get('portal')==='return') showToast('Returned from billing portal.', 'info');
+    })();
 
     // ====== Data blocks ======
     async function loadStats(){
       try{
         const data = await apiFetch(API.stats, { method:'GET' });
-        const cases = data.cases||0;
-        const documents = data.documents||0;
-        const alerts = data.alerts||0;
         qs('#statsBlock').innerHTML = `
-          <div class="pill">Cases: <strong>${cases}</strong></div>
+          <div class="pill">Cases: <strong>${data.cases||0}</strong></div>
           <div class="spacer"></div>
-          <div class="pill">Documents: <strong>${documents}</strong></div>
+          <div class="pill">Documents: <strong>${data.documents||0}</strong></div>
           <div class="spacer"></div>
-          <div class="pill">Alerts: <strong>${alerts}</strong></div>
+          <div class="pill">Alerts: <strong>${data.alerts||0}</strong></div>
         `;
       }catch(err){
         qs('#statsBlock').textContent = 'Unable to load stats.';
@@ -511,10 +568,10 @@
 
     async function loadRecentDocs(){
       try{
-        const list = await apiFetch(API.documentsList, { method:'GET' });
-        const items = Array.isArray(list) ? list : (list.items||[]);
-        if(!items.length){ qs('#recentDocs').textContent='No recent documents.'; return; }
-        qs('#recentDocs').innerHTML = items.slice(0,6).map(d=>`• ${d.title} <span class="muted">(${new Date(d.created_at||d.createdAt||Date.now()).toLocaleDateString()})</span>`).join('<br/>');
+        const res = await apiFetch(API.documentsList, { method:'GET' });
+        const list = res?.items || res || [];
+        if(!list.length){ qs('#recentDocs').textContent='No recent documents.'; return; }
+        qs('#recentDocs').innerHTML = list.slice(0,6).map(d=>`• ${d.title} <span class="muted">(${new Date(d.created_at||d.createdAt||Date.now()).toLocaleDateString()})</span>`).join('<br/>');
       }catch(err){
         qs('#recentDocs').textContent = 'Unable to fetch documents.';
       }
@@ -545,7 +602,6 @@
       try{
         const res = await apiFetch(API.documentsGenerate, { method:'POST', body:JSON.stringify({ type:'sample' }) });
         alert('Sample generated: '+ (res.title||'Document'));
-        refreshAll();
       }catch(err){ showToast(err.message,'error'); }
     });
 
@@ -568,8 +624,9 @@
       const el = document.createElement('div');
       el.className = 'chat-item ' + who;
       el.textContent = text;
-      qs('#chatBody').appendChild(el);
-      qs('#chatBody').scrollTop = qs('#chatBody').scrollHeight;
+      const body = qs('#chatBody');
+      body.appendChild(el);
+      body.scrollTop = body.scrollHeight;
     }
     qs('#chatSend').addEventListener('click', ()=>{
       const val = qs('#chatInput').value.trim();
@@ -579,19 +636,6 @@
     });
     qs('#chatInput').addEventListener('keydown', (e)=>{
       if(e.key==='Enter'){ e.preventDefault(); qs('#chatSend').click(); }
-    });
-
-    // ====== Autonomous Plan (Bot Mode) ======
-    qs('#btnPlan').addEventListener('click', async ()=>{
-      const instruction = (qs('#chatInput').value||'').trim();
-      if(!instruction){ showToast('Type an instruction first (e.g., "Audit my docs and suggest next actions").'); return; }
-      addChat('me', '[Auto-Plan] ' + instruction);
-      try{
-        const res = await apiFetch(API.autoPlan, { method:'POST', body:JSON.stringify({ instruction }) });
-        addChat('bot', (res.plan || res.reply || 'No plan returned').toString());
-      }catch(err){
-        addChat('bot', 'Auto-Plan error: '+(err.message||'request failed'));
-      }
     });
 
     // ====== Voice input + voice navigation ======
@@ -618,29 +662,34 @@
       else { rec.stop(); }
     });
 
-    // Simple voice/navigation
+    // Simple voice navigation
     function handleVoiceCommand(text){
       const t = (text||'').toLowerCase();
       if(t.includes('go to tools') || t.includes('open tools')) location.href='tools.html';
       if(t.includes('go to documents') || t.includes('open documents')) location.href='documents.html';
       if(t.includes('go to dashboard') || t.includes('open dashboard')) location.href='dashboard.html';
       if(t.includes('open notary') || t.includes('go to notary')) location.href='notary.html';
+      if(t.includes('open billing') || t.includes('go to billing')) openModal('billingModal');
     }
 
     // ====== Init ======
     (async function init(){
+      // Ensure CSRF cookie exists early
+      await ensureCsrf();
+
+      // Restore UI identity if we have one
       const params = new URLSearchParams(location.search);
       if(params.get('dev')==='1'){
-        saveSession({token:'demo.auto', user:{id:'u_demo', email:'demo@lexomega.ai', username:'demo', role:'user'}});
+        saveUser({id:'u_demo', email:'demo@lexomega.ai', name:'demo', role:'user'});
       }else{
         const existing = currentUser();
-        if(existing) saveSession(existing);
+        if(existing) saveUser(existing);
         else setAuthState(null);
       }
 
-      // backend reachability health ping
+      // quick backend health ping (sets CSRF cookie too)
       try{
-        await apiFetch(API.health, { method:'GET' });
+        await apiFetch(API.status, { method:'GET' });
       }catch{
         showToast('Backend not reachable. Check deployment / CORS.', 'warn');
       }
