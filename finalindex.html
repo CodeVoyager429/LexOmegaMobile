@@ -1,437 +1,307 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>LexOmega — The First AI Law Firm</title>
-<meta name="theme-color" content="#0b0b0b" />
-<!-- Optional: set a default backend here; otherwise use same-origin /api or ?backend= -->
-<meta name="lex-backend" content="">
-<style>
-  :root{
-    --bg:#0b0b0b; --panel:#141414; --panel2:#1a1a1a; --text:#e9e9e9; --muted:#b8b8b8;
-    --teal:#07d1d1; --gold:#ffd54a; --gold2:#ffc400; --danger:#ff5a5a; --ok:#39d98a;
-    --divider:#252525; --shadow:0 12px 36px rgba(0,0,0,.35);
-  }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Inter,Segoe UI,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-  a{color:#42e2ff;text-decoration:none} a:hover{text-decoration:underline}
-  /* nav */
-  .nav{position:sticky;top:0;z-index:30;background:var(--panel);border-bottom:2px solid var(--gold);
-       display:flex;gap:16px;align-items:center;justify-content:space-between;padding:10px 14px}
-  .brand{display:flex;align-items:center;gap:10px;color:var(--teal);font-weight:900;font-size:20px}
-  .navlinks{display:flex;flex-wrap:wrap;gap:16px}
-  .navlinks a{color:var(--text);font-weight:800} .navlinks a.active{color:var(--gold)}
-  .nav-right{display:flex;gap:10px;align-items:center}
-  .banner{background:#0a7b7b;color:#fff;padding:10px 14px;text-align:center;font-weight:800}
-  /* layout */
-  .wrap{max-width:1100px;margin:22px auto 80px;padding:0 14px}
-  h1,h2,h3{margin:0 0 8px} .muted{color:var(--muted)}
-  .card{background:var(--panel);border:1px solid var(--divider);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
-  .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  .grid{display:grid;grid-template-columns:1fr;gap:16px} @media(min-width:900px){.grid{grid-template-columns:1.2fr .8fr}}
-  .list{display:flex;flex-direction:column;gap:12px} .item{background:var(--panel2);border:1px solid var(--divider);border-radius:12px;padding:12px}
-  .divider{height:2px;background:var(--gold);margin:26px 0}
-  .btn{background:var(--gold);color:#111;font-weight:900;border:0;border-radius:12px;padding:12px 16px;cursor:pointer}
-  .btn:hover{background:var(--gold2)} .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--divider)}
-  .btn.teal{background:var(--teal);color:#062b2b} .btn.red{background:var(--danger);color:#fff}
-  input,select,textarea{background:#101010;border:1px solid var(--divider);color:var(--text);border-radius:10px;padding:10px 12px;width:100%}
-  /* chat */
-  .fab{position:fixed;right:18px;bottom:18px;z-index:40;display:inline-flex;align-items:center;gap:10px;
-       background:var(--gold);color:#141414;border:0;border-radius:999px;font-weight:900;padding:14px 18px;box-shadow:0 12px 34px rgba(0,0,0,.45)}
-  .fab:hover{background:var(--gold2)}
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:50}
-  .modal.open{display:flex}
-  .sheet{width:min(940px,94vw);max-height:86vh;overflow:auto;background:var(--panel);border:1px solid var(--divider);border-radius:16px;box-shadow:var(--shadow)}
-  .sheet header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--divider)}
-  .sheet .body{padding:16px}
-  .x{background:transparent;border:0;color:var(--text);font-size:20px;cursor:pointer}
-  .chatbox{display:flex;flex-direction:column;gap:10px} .bubble{padding:10px 12px;border-radius:12px;max-width:90%}
-  .bubble.user{background:#223;color:#cfe} .bubble.ai{background:#1c1c1c;border:1px solid var(--divider)}
-  .chat-input{display:flex;gap:10px}
-  footer{text-align:center;margin:34px 0 100px;color:var(--muted)}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LexOmega — The First AI Law Firm</title>
+
+  <!-- Set to your backend (e.g., https://lexomega-executor.vercel.app).
+       You can also override via ?backend=https://… in the URL. -->
+  <meta name="lex-backend" content="">
+
+  <meta name="theme-color" content="#0ea5b1" />
+  <style>
+    :root{
+      --bg:#0b0b0c; --panel:#121315; --muted:#cbd5e1; --text:#e5e7eb;
+      --brand:#14b8a6; --brand-2:#06b6d4; --accent:#facc15; --line:#f2c200;
+      --shadow:0 10px 30px rgba(0,0,0,.35)
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
+      color:var(--text); background:var(--bg)
+    }
+    a{color:#7dd3fc; text-decoration:none} a:hover{text-decoration:underline}
+    .wrap{max-width:1100px; margin:0 auto; padding:18px}
+    header{
+      position:sticky; top:0; z-index:50; background:rgba(11,11,12,.92);
+      border-bottom:2px solid var(--line); backdrop-filter:saturate(140%) blur(6px)
+    }
+    .nav{display:flex; align-items:center; justify-content:space-between; gap:12px}
+    .brand{display:flex; align-items:center; gap:12px}
+    .badge{background:#0ea5b1; color:#001014; font-weight:700; padding:6px 10px; border-radius:999px}
+    .menu{display:flex; flex-wrap:wrap; gap:18px}
+    .menu a{padding:8px 2px; border-bottom:2px solid transparent}
+    .menu a:hover,.menu a.active{border-color:var(--line)}
+    .btn{
+      appearance:none; border:0; border-radius:14px; padding:12px 18px; font-weight:700;
+      background:var(--accent); color:#14120a; box-shadow:var(--shadow); cursor:pointer
+    }
+    .btn.secondary{background:#0ea5b1; color:#081a1a}
+    .btn.ghost{background:#1f2937; color:#e5e7eb}
+    .hero{padding:28px 0 18px}
+    h1{font-size:40px; margin:12px 0 6px; color:#67e8f9}
+    h2{font-size:28px; margin:26px 0 14px}
+    p.lede{color:#b6c2d1; font-size:18px}
+    .row{display:grid; grid-template-columns:1fr; gap:24px}
+    .card{
+      background:var(--panel); border:1px solid #22252a; border-radius:18px; padding:18px; box-shadow:var(--shadow)
+    }
+    .grid-2{display:grid; grid-template-columns:1fr; gap:18px}
+    @media(min-width:880px){ .grid-2{grid-template-columns:1.2fr .8fr} .row{grid-template-columns:1fr 1fr}}
+    .docPreview{background:#0f1114; border:1px solid #1e2630; border-radius:16px; overflow:hidden}
+    .docBar{display:flex; gap:22px; padding:10px 14px; border-bottom:2px solid var(--line); background:#0c0e11}
+    .docPane{padding:20px}
+    .ribbon{margin:10px 0 0; background:#0e9fad; color:#021416; padding:8px 12px; border-radius:10px; font-weight:700}
+    .footer{border-top:2px solid var(--line); margin-top:36px; padding:18px 0 120px; color:#cbd5e1}
+    .floatChat{
+      position:fixed; right:18px; bottom:18px; z-index:60;
+      display:flex; align-items:center; gap:8px; padding:12px 16px; border-radius:999px;
+      background:var(--accent); color:#111; box-shadow:var(--shadow); cursor:pointer
+    }
+    .toast{
+      position:fixed; left:50%; transform:translateX(-50%);
+      bottom:92px; background:#111827; color:#e5e7eb; padding:10px 14px;
+      border:1px solid #263041; border-radius:10px; display:none; z-index:70
+    }
+    dialog{
+      width:min(860px,95vw); border:1px solid #2a3342; border-radius:14px; padding:0; background:#0f1216; color:#e5e7eb;
+      box-shadow:var(--shadow)
+    }
+    dialog::backdrop{background:rgba(0,0,0,.6)}
+    .chatHdr{display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid #222b39}
+    .chatBody{display:grid; grid-template-rows:1fr auto; height:70vh}
+    .msgs{padding:14px; overflow:auto}
+    .msg{padding:10px 12px; border-radius:12px; margin:8px 0; max-width:80%}
+    .me{background:#0ea5b1; color:#052427; margin-left:auto}
+    .bot{background:#1f2937}
+    .composer{display:flex; gap:8px; padding:12px; border-top:1px solid #222b39}
+    .composer input{flex:1; border:1px solid #2a3342; border-radius:12px; padding:12px; background:#0b0e12; color:#e5e7eb}
+    .mic{border-radius:12px; padding:0 12px}
+    .kbd{font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace; color:#cbd5e1; opacity:.8}
+  </style>
 </head>
 <body>
-  <!-- NAV -->
-  <nav class="nav">
-    <div class="brand"><span>⚖️</span><span>LexOmega</span></div>
-    <div class="navlinks">
-      <a href="#home" class="active">Home</a>
-      <a href="#dashboard">Dashboard</a>
-      <a href="#tools">Tools</a>
-      <a href="#documents">Documents</a>
-      <a href="#casebuilder">Case&nbsp;Builder</a>
-      <a href="#notary">Notary</a>
-      <a href="#secretary">Secretary</a>
-      <a href="#billing">Billing</a>
-    </div>
-    <div class="nav-right">
-      <button id="btn-login" class="btn ghost">Login</button>
-      <button id="btn-register" class="btn teal">Create Account</button>
-      <button id="btn-logout" class="btn red" style="display:none">Logout</button>
-    </div>
-  </nav>
-
-  <!-- BANNER -->
-  <div class="banner">📢 LexOmega Launch Offer: 30-day free trial. No credit card required.</div>
-
-  <!-- MAIN -->
-  <main class="wrap" id="home">
-    <h1 style="color:var(--teal);font-size:44px;font-weight:900;margin:8px 2px">Welcome to LexOmega</h1>
-    <p class="muted" style="font-size:20px;margin-bottom:18px">The Future of Legal Intelligence</p>
-
-    <!-- HERO -->
-    <div class="card" style="margin-bottom:18px">
-      <h2>Live Dashboard Preview</h2>
-      <p class="muted">Analytics, case tracking, document generation, notary, and real-time alerts.</p>
-      <div class="row" style="margin:12px 0 6px">
-        <button id="cta-login" class="btn">Login</button>
-        <button id="cta-register" class="btn">Create Account</button>
-        <button id="cta-subscribe" class="btn">Subscribe</button>
-        <button id="cta-portal" class="btn ghost">Manage Billing</button>
+  <header>
+    <div class="wrap nav">
+      <div class="brand">
+        <span class="badge">LexOmega</span>
+        <span class="kbd">Launch Offer: 30-day free trial</span>
       </div>
-      <p class="muted" style="margin:4px 0 0">Ask questions via the floating <b>💬 Chat</b> button (voice supported).</p>
-    </div>
-
-    <!-- TWO COLUMN OVERVIEW -->
-    <div class="grid">
-      <!-- LEFT: DOCUMENTS & CASE SEARCH -->
-      <section class="card" id="documents">
-        <h2>Documents</h2>
-        <div class="row" style="margin:8px 0 10px">
-          <input id="doc-q" placeholder="Search your documents… (Enter)"/>
-          <button id="btn-docs-refresh" class="btn ghost">Refresh</button>
-          <button id="btn-docs-sample" class="btn teal">Generate Sample</button>
-        </div>
-        <div id="docs-list" class="list" aria-live="polite">
-          <div class="item"><span class="muted">Sign in to see your documents.</span></div>
-        </div>
-        <div class="divider" style="background:var(--divider)"></div>
-        <h3>Quick Case Search</h3>
-        <p class="muted">Short, plain-English summaries. Great for first-pass scoping.</p>
-        <textarea id="case-q" rows="3" placeholder="e.g., California small claims deadline"></textarea>
-        <div class="row" style="margin-top:8px">
-          <button id="btn-case" class="btn">Search</button>
-          <span id="case-status" class="muted"></span>
-        </div>
-        <div id="case-results" class="list" style="margin-top:10px"></div>
-      </section>
-
-      <!-- RIGHT: DASHBOARD + BILLING -->
-      <aside class="card" id="dashboard">
-        <h2>Dashboard</h2>
-        <p class="muted" id="stats-line">Cases: — • Documents: — • Alerts: —</p>
-        <div class="divider" style="background:var(--divider)"></div>
-        <h3 id="billing">Billing</h3>
-        <p class="muted">Choose a plan — upgrade/downgrade anytime.</p>
-        <div class="list">
-          <div class="item">
-            <div class="row" style="justify-content:space-between">
-              <div><b>Starter</b><div class="muted">Personal use</div></div>
-              <button class="btn" onclick="toCheckout()">Subscribe</button>
-            </div>
-          </div>
-          <div class="item">
-            <div class="row" style="justify-content:space-between">
-              <div><b>Professional</b><div class="muted">Firms & teams</div></div>
-              <button class="btn" onclick="toCheckout()">Subscribe</button>
-            </div>
-          </div>
-          <div class="item">
-            <div class="row" style="justify-content:space-between">
-              <div><b>Enterprise</b><div class="muted">Advanced support</div></div>
-              <button class="btn" onclick="toCheckout()">Subscribe</button>
-            </div>
-          </div>
-        </div>
-        <div class="row" style="margin-top:10px">
-          <button id="btn-portal" class="btn ghost">Manage Billing</button>
-        </div>
-      </aside>
-    </div>
-
-    <!-- CASE BUILDER -->
-    <div id="casebuilder" class="card" style="margin-top:16px">
-      <h2>Case Builder</h2>
-      <p class="muted">Turn facts into a draft document you can refine.</p>
-      <div class="grid" style="grid-template-columns:1fr 1fr">
-        <div>
-          <label>Case Type</label>
-          <select id="cb-type">
-            <option value="affidavit">Affidavit</option>
-            <option value="demand">Demand Letter</option>
-            <option value="motion">Motion</option>
-          </select>
-        </div>
-        <div>
-          <label>Jurisdiction</label>
-          <input id="cb-juris" placeholder="e.g., CA Superior Court"/>
-        </div>
-        <div style="grid-column:1/-1">
-          <label>Key Facts</label>
-          <textarea id="cb-facts" rows="4" placeholder="Bullet the relevant facts…"></textarea>
-        </div>
-        <div style="grid-column:1/-1" class="row">
-          <button id="cb-generate" class="btn teal">Build Draft</button>
-          <span id="cb-status" class="muted"></span>
-        </div>
+      <nav class="menu">
+        <a href="#home" class="active">Home</a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#tools">Tools</a>
+        <a href="#documents">Documents</a>
+        <a href="#notary">Notary</a>
+        <a href="#secretary">Secretary</a>
+        <a href="#case-builder">Case Builder</a>
+        <a href="#billing">Billing</a>
+      </nav>
+      <div class="menu">
+        <button class="btn ghost" id="btn-login">Login</button>
+        <button class="btn secondary" id="btn-register">Create Account</button>
+        <button class="btn" id="btn-subscribe">Subscribe</button>
       </div>
     </div>
+  </header>
 
-    <!-- NOTARY -->
-    <div id="notary" class="card" style="margin-top:16px">
-      <h2>Digital Notary</h2>
-      <p class="muted">Create a notary request ticket for a specific document.</p>
-      <div class="grid" style="grid-template-columns:1fr 1fr">
-        <div>
-          <label>Document ID</label>
-          <input id="notary-doc" placeholder="e.g., doc_abc123"/>
+  <main class="wrap">
+    <section class="hero grid-2" id="home">
+      <div class="card">
+        <h1>Welcome to LexOmega</h1>
+        <p class="lede">The Future of Legal Intelligence — analytics, case tracking, document generation, and real-time alerts.</p>
+        <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap">
+          <button class="btn ghost" id="btn-login-2">Login</button>
+          <button class="btn secondary" id="btn-register-2">Create Account</button>
+          <button class="btn" id="btn-subscribe-2">Subscribe</button>
+          <button class="btn ghost" id="btn-portal">Manage Billing</button>
         </div>
-        <div>
-          <label>Your Legal Name</label>
-          <input id="notary-name" placeholder="Full legal name"/>
-        </div>
-        <div style="grid-column:1/-1">
-          <label>Email</label>
-          <input id="notary-email" placeholder="you@example.com"/>
-        </div>
-        <div style="grid-column:1/-1" class="row">
-          <button id="notary-send" class="btn">Request Notary</button>
-          <span id="notary-status" class="muted"></span>
+        <div class="ribbon">Tip: Click “Chat” (bottom-right) to Ask-Lex with voice.</div>
+      </div>
+      <div class="card">
+        <h2>Live Dashboard Preview</h2>
+        <p>Shows usage, recent documents, and alerts once you’re signed in.</p>
+        <div class="docPreview" aria-label="preview">
+          <div class="docBar"><strong>LexOmega — The First AI Law Firm</strong></div>
+          <div class="docPane">
+            <p style="margin:0 0 8px">Home • Dashboard • Tools • Documents</p>
+            <p class="lede">Your workspace at a glance. AI summaries and quick actions appear here.</p>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- SECRETARY -->
-    <div id="secretary" class="card" style="margin-top:16px">
-      <h2>Lex Secretary</h2>
-      <p class="muted">Dictate tasks/notes and ask for summaries. Your quick in-house helper.</p>
-      <div class="grid" style="grid-template-columns:1fr 1fr">
-        <div>
-          <label>New Task / Note</label>
-          <div class="row">
-            <input id="sec-input" placeholder="e.g., Call client about discovery responses"/>
-            <button id="sec-add" class="btn">Add</button>
-          </div>
-          <div class="list" id="sec-list" style="margin-top:10px"></div>
-        </div>
-        <div>
-          <label>Ask Secretary</label>
-          <textarea id="sec-ask" rows="4" placeholder="Summarize today’s tasks; draft an email…"></textarea>
-          <div class="row" style="margin-top:8px">
-            <button id="sec-ask-btn" class="btn teal">Ask</button>
-            <span id="sec-status" class="muted"></span>
-          </div>
-          <div id="sec-answer" class="item" style="margin-top:10px;display:none"></div>
+    <section class="row" id="documents">
+      <div class="card">
+        <h2>Embedded Legal Document Preview</h2>
+        <p><a href="#" id="sampleDocLink">LexOmega — Document Sample</a></p>
+        <p>This is a preview of a legal document.</p>
+      </div>
+      <div class="card" id="billing">
+        <h2>Billing</h2>
+        <p>Start your subscription or manage your existing plan.</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap">
+          <button class="btn" id="btn-subscribe-3">Subscribe</button>
+          <button class="btn ghost" id="btn-portal-2">Manage Billing</button>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="divider"></div>
-    <footer>
-      <div id="verse" class="muted" style="max-width:900px;margin:0 auto 10px"></div>
-      <div>© <span id="year"></span> LexOmega. All rights reserved.</div>
-    </footer>
+    <section class="footer">
+      <div id="dailyVerse" style="text-align:center; font-size:15px; margin-bottom:8px">Loading daily verse…</div>
+      <div style="text-align:center; opacity:.85">© 2025 LexOmega. All rights reserved.</div>
+    </section>
   </main>
 
   <!-- Floating Chat -->
-  <button class="fab" id="chat-open">💬 Chat</button>
+  <button class="floatChat" id="openChat"><span>💬</span> <strong>Chat</strong></button>
+  <div class="toast" id="toast"></div>
 
-  <!-- Chat Modal -->
-  <div class="modal" id="chat-modal" role="dialog" aria-modal="true" aria-labelledby="chat-title">
-    <div class="sheet">
-      <header>
-        <h3 id="chat-title" style="color:var(--teal);margin:0">Ask Lex</h3>
-        <div class="row">
-          <label class="muted" style="font-size:14px">Mode:</label>
-          <select id="chat-mode">
-            <option value="lex">Ask Lex (default)</option>
-            <option value="counsel">In-House Counsel</option>
-          </select>
-          <button class="x" id="chat-close" aria-label="Close">✕</button>
-        </div>
-      </header>
-      <div class="body">
-        <div id="chat-log" class="chatbox" style="min-height:240px">
-          <div class="bubble ai">Hi! I’m <b>Lex</b>. Ask a concise legal question. Tap 🎤 to dictate.</div>
-        </div>
-        <div class="chat-input" style="margin-top:10px">
-          <input id="chat-input" placeholder="Type your question…" />
-          <button id="chat-mic" class="btn ghost" title="Voice input">🎤</button>
-          <button id="chat-send" class="btn">Send</button>
-        </div>
+  <dialog id="chatDlg">
+    <div class="chatHdr">
+      <strong>Ask-Lex</strong>
+      <button class="btn ghost" id="closeChat">Close</button>
+    </div>
+    <div class="chatBody">
+      <div class="msgs" id="msgs" aria-live="polite"></div>
+      <div class="composer">
+        <input id="chatInput" placeholder="Ask Lex anything…" />
+        <button class="btn mic" id="micBtn" title="Voice input">🎙️</button>
+        <button class="btn secondary" id="sendBtn">Send</button>
       </div>
     </div>
-  </div>
+  </dialog>
 
 <script>
-/* ===== Backend autodetect & helpers =================================== */
 (function(){
-  const u = new URL(location.href);
-  const hint = u.searchParams.get('backend') || window.LexBackend || document.querySelector('meta[name="lex-backend"]')?.content || '';
-  const norm = (v)=>{ if(!v) return ''; try{ return new URL(v).origin }catch{ return 'https://'+String(v).replace(/^https?:\/\//,'') } };
-  window.BACKEND = norm(hint);
-  window.API = (p)=> (window.BACKEND?window.BACKEND:'') + p;
+  // ---------- Backend origin resolution (query param > meta > same-origin) ----------
+  const params = new URLSearchParams(location.search);
+  const qpBackend = params.get('backend')?.trim() || "";
+  const meta = document.querySelector('meta[name="lex-backend"]');
+  const metaBackend = (meta && meta.content.trim()) || "";
+  const BACKEND = qpBackend || metaBackend || ""; // empty => same-origin
+  const API = (path) => (BACKEND ? BACKEND : "") + path;
+
+  // ---------- Small helpers ----------
+  const $ = (sel) => document.querySelector(sel);
+  const toast = (msg, ms=2800) => {
+    const t = $('#toast'); t.textContent = msg; t.style.display='block';
+    clearTimeout(toast._t); toast._t=setTimeout(()=>t.style.display='none', ms);
+  };
+  function readCookie(name){
+    return document.cookie.split(';').map(s=>s.trim()).find(s=>s.startsWith(name+'='))?.split('=')[1] || '';
+  }
+  function csrf(){
+    // Accept several names to align with whatever backend sets
+    const c = readCookie('lo_csrf') || readCookie('csrf') || readCookie('XSRF-TOKEN');
+    return decodeURIComponent(c || '');
+  }
+  async function fetchJSON(url, opts={}){
+    const init = Object.assign({ credentials:'include', headers: { 'Content-Type':'application/json' }}, opts);
+    if (opts && opts.method && opts.method !== 'GET'){
+      init.headers['X-CSRF-Token'] = csrf();
+    }
+    const r = await fetch(url, init);
+    const text = await r.text();
+    let j; try { j = JSON.parse(text); } catch { j = { ok:r.ok, raw:text }; }
+    if(!r.ok || j.ok === false){ throw new Error(j.error || ('HTTP '+r.status)); }
+    return j;
+  }
+
+  // ---------- CSRF priming: GET /api/health to set cookie ----------
+  (async () => {
+    try { await fetchJSON(API('/api/health'), { method:'GET' }); }
+    catch { /* fine: some backends may not expose health publicly */ }
+  })();
+
+  // ---------- Auth placeholders (wire to your existing /api/auth/* if needed) ----------
+  const goLogin = () => toast('Login: /api/auth/login (UI stub)');
+  $('#btn-login')?.addEventListener('click', goLogin);
+  $('#btn-login-2')?.addEventListener('click', goLogin);
+  $('#btn-register')?.addEventListener('click', ()=>toast('Register: /api/auth/register (UI stub)'));
+  $('#btn-register-2')?.addEventListener('click', ()=>toast('Register: /api/auth/register (UI stub)'));
+
+  // ---------- Billing ----------
+  async function startCheckout(){
+    try {
+      const j = await fetchJSON(API('/api/billing/checkout'), { method:'POST', body: JSON.stringify({}) });
+      if (j.url) location.href = j.url; else toast('No checkout URL returned');
+    } catch(e){ toast('Checkout error: '+e.message); }
+  }
+  async function openPortal(){
+    try {
+      const j = await fetchJSON(API('/api/billing/portal'), { method:'POST', body: JSON.stringify({}) });
+      if (j.url) location.href = j.url; else toast('No portal URL returned');
+    } catch(e){ toast('Portal error: '+e.message); }
+  }
+  ['#btn-subscribe','#btn-subscribe-2','#btn-subscribe-3'].forEach(id=>$(id)?.addEventListener('click', startCheckout));
+  ['#btn-portal','#btn-portal-2'].forEach(id=>$(id)?.addEventListener('click', openPortal));
+
+  // ---------- Sample doc ----------
+  $('#sampleDocLink')?.addEventListener('click', async (e)=>{
+    e.preventDefault();
+    try {
+      const j = await fetchJSON(API('/api/documents/generate'), { method:'POST', body: JSON.stringify({}) });
+      toast('Sample created: '+(j.title || j.id || 'OK'));
+    } catch(e){ toast('Sample error: '+e.message); }
+  });
+
+  // ---------- Ask-Lex Chat + Voice ----------
+  const dlg = $('#chatDlg'), openBtn = $('#openChat'), closeBtn = $('#closeChat');
+  const msgs = $('#msgs'), input = $('#chatInput'), sendBtn = $('#sendBtn'), micBtn = $('#micBtn');
+  openBtn?.addEventListener('click', ()=>dlg.showModal());
+  closeBtn?.addEventListener('click', ()=>dlg.close());
+  function push(role, text){
+    const div = document.createElement('div');
+    div.className='msg '+(role==='user'?'me':'bot');
+    div.textContent=text; msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+  }
+  async function send(){
+    const text = input.value.trim(); if(!text) return;
+    input.value=''; push('user', text);
+    try{
+      const j = await fetchJSON(API('/api/assistant/chat'), { method:'POST', body: JSON.stringify({ message:text }) });
+      push('assistant', j.reply || '(no reply)');
+    }catch(e){ push('assistant','Error: '+e.message); }
+  }
+  sendBtn?.addEventListener('click', send);
+  input?.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }});
+
+  // Voice (Web Speech API)
+  let rec, listening=false;
+  function ensureRec(){
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR){ toast('Voice not supported on this browser'); return null; }
+    if(!rec){ rec = new SR(); rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=1;
+      rec.onresult = (e)=>{ const t=e.results[0][0].transcript; input.value=t; send(); };
+      rec.onerror = ()=>{ listening=false; micBtn.textContent='🎙️'; };
+      rec.onend = ()=>{ listening=false; micBtn.textContent='🎙️'; };
+    }
+    return rec;
+  }
+  micBtn?.addEventListener('click', ()=>{
+    const r = ensureRec(); if(!r) return;
+    if(!listening){ listening=true; micBtn.textContent='⏹️'; r.start(); } else { r.stop(); }
+  });
+
+  // ---------- Daily Bible verse (local rotation; can swap to API) ----------
+  const verses = [
+    `"Jesus said to him, 'I am the way, the truth, and the life. No one comes to the Father except through Me.'" — John 14:6`,
+    `"Trust in the LORD with all your heart and lean not on your own understanding." — Proverbs 3:5`,
+    `"The LORD is my shepherd; I shall not want." — Psalm 23:1`,
+    `"Blessed are the peacemakers, for they shall be called sons of God." — Matthew 5:9`,
+    `"Be strong and courageous... for the LORD your God is with you wherever you go." — Joshua 1:9`,
+    `"If God is for us, who can be against us?" — Romans 8:31`,
+    `"Let justice roll down like waters, and righteousness like an ever-flowing stream." — Amos 5:24`,
+    `"Whatever you do, work heartily, as for the Lord and not for men." — Colossians 3:23`,
+    `"The steadfast love of the LORD never ceases; his mercies never come to an end." — Lamentations 3:22-23`,
+    `"Ask, and it will be given to you; seek, and you will find." — Matthew 7:7`
+  ];
+  const idx = new Date().getDate() % verses.length;
+  $('#dailyVerse').textContent = verses[idx];
 })();
-const $ = (s)=>document.querySelector(s);
-const $$ = (s)=>Array.from(document.querySelectorAll(s));
-function getCookie(name){ return document.cookie.split(';').map(s=>s.trim()).find(s=>s.startsWith(name+'='))?.split('=').slice(1).join('=')||''; }
-function csrf(){ return getCookie('lo_csrf') || ''; }
-async function jfetch(path, opts={}){
-  const method=(opts.method||'GET').toUpperCase();
-  const headers=Object.assign({"Content-Type":"application/json"}, opts.headers||{});
-  if(['POST','PATCH','DELETE'].includes(method)){ headers['X-CSRF-Token']=csrf(); headers['Cache-Control']='no-store'; }
-  const body = opts.body && typeof opts.body!=='string' ? JSON.stringify(opts.body) : opts.body;
-  const res = await fetch(API(path), {method, headers, body, credentials:'include'});
-  const text = await res.text(); let json; try{ json=JSON.parse(text) }catch{ json={ok:false,error:text} }
-  if(!res.ok || json.ok===false) throw new Error(json.error || res.statusText || 'Request failed');
-  return json;
-}
-function toast(msg, good=false){
-  const n=document.createElement('div'); n.textContent=msg;
-  n.style.position='fixed';n.style.left='50%';n.style.top='18px';n.style.transform='translateX(-50%)';
-  n.style.background=good?'linear-gradient(90deg,#1b522f,#1d7144)':'linear-gradient(90deg,#5c2a2a,#863434)';
-  n.style.color='#fff';n.style.padding='10px 14px';n.style.borderRadius='10px';n.style.zIndex=60;n.style.boxShadow='0 8px 24px rgba(0,0,0,.35)';
-  document.body.appendChild(n); setTimeout(()=>n.remove(),2400);
-}
-
-/* ===== Auth ============================================================ */
-let USER=null;
-function setAuthed(u){
-  USER=u;
-  $('#btn-login').style.display = u?'none':'inline-flex';
-  $('#btn-register').style.display = u?'none':'inline-flex';
-  $('#btn-logout').style.display = u?'inline-flex':'none';
-  if(u){ loadStats(); loadDocs(); } else { $('#docs-list').innerHTML='<div class="item"><span class="muted">Sign in to see your documents.</span></div>'; $('#stats-line').textContent='Cases: — • Documents: — • Alerts: —'; }
-}
-async function reg(){ const name=prompt('Full name'); if(!name) return; const email=prompt('Email'); if(!email) return; const pw=prompt('Password (min 8)'); if(!pw) return;
-  try{ const r=await jfetch('/api/auth/register',{method:'POST',body:{name,email,password:pw}}); setAuthed(r.user); toast('Registered & signed in',true);}catch(e){toast(e.message)} }
-async function login(){ const email=prompt('Email'); if(!email) return; const pw=prompt('Password'); if(!pw) return;
-  try{ const r=await jfetch('/api/auth/login',{method:'POST',body:{email,password:pw}}); setAuthed(r.user); toast('Signed in',true);}catch(e){toast(e.message)} }
-async function logout(){ try{ await jfetch('/api/auth/logout',{method:'POST'}); setAuthed(null); toast('Signed out',true);}catch(e){toast(e.message)} }
-$('#btn-register').onclick=reg; $('#cta-register').onclick=reg; $('#btn-login').onclick=login; $('#cta-login').onclick=login; $('#btn-logout').onclick=logout;
-
-/* ===== Dashboard & Billing ============================================ */
-async function loadStats(){ try{ const r=await jfetch('/api/dashboard/stats'); $('#stats-line').textContent=`Cases: ${r.cases} • Documents: ${r.documents} • Alerts: ${r.alerts}` }catch{} }
-async function toCheckout(){ try{ const r=await jfetch('/api/billing/checkout',{method:'POST'}); location.href=r.url }catch(e){toast(e.message)} }
-async function toPortal(){ try{ const r=await jfetch('/api/billing/portal',{method:'POST'}); location.href=r.url }catch(e){toast(e.message)} }
-$('#btn-portal').onclick=toPortal; $('#cta-subscribe').onclick=toCheckout; $('#cta-portal').onclick=toPortal;
-
-/* ===== Documents ======================================================= */
-async function loadDocs(page=1,size=10){
-  try{
-    const q=$('#doc-q').value.trim(); const sp=new URLSearchParams({page:String(page),size:String(size)}); if(q) sp.set('q',q);
-    const r=await jfetch(`/api/documents/list?${sp.toString()}`);
-    const html=(r.items||[]).map(d=>`
-      <div class="item">
-        <div class="row" style="justify-content:space-between">
-          <div><div style="font-weight:800">${d.title}</div><div class="muted" style="max-width:680px">${(d.preview||'').replace(/\n/g,' ')}</div></div>
-          <div class="row"><button class="btn ghost" data-open="${d.id}">Open</button><button class="btn red" data-del="${d.id}">Delete</button></div>
-        </div>
-      </div>`).join('') || '<div class="item"><span class="muted">No documents yet.</span></div>';
-    $('#docs-list').innerHTML=html;
-    $$('#docs-list [data-open]').forEach(b=>b.onclick=()=>openDoc(b.dataset.open));
-    $$('#docs-list [data-del]').forEach(b=>b.onclick=()=>delDoc(b.dataset.del));
-  }catch(e){ $('#docs-list').innerHTML=`<div class="item"><span class="muted">${e.message}</span></div>` }
-}
-async function openDoc(id){ try{ const r=await jfetch(`/api/documents/get?id=${encodeURIComponent(id)}`); alert(`Title: ${r.title}\n\n${r.body.slice(0,600)}${r.body.length>600?'…':''}`) }catch(e){toast(e.message)} }
-async function delDoc(id){ if(!confirm('Delete this document?')) return; try{ await jfetch('/api/documents/delete',{method:'POST',body:{id}}); toast('Deleted',true); loadDocs(); }catch(e){toast(e.message)} }
-$('#btn-docs-refresh').onclick=()=>loadDocs(); $('#doc-q').addEventListener('keydown',e=>{if(e.key==='Enter')loadDocs()});
-$('#btn-docs-sample').onclick=async()=>{ try{ await jfetch('/api/documents/generate',{method:'POST'}); toast('Sample created',true); loadDocs(); }catch(e){toast(e.message)} };
-
-/* ===== Case Search ===================================================== */
-$('#btn-case').onclick=async()=>{ const q=$('#case-q').value.trim(); if(!q) return toast('Enter a query'); $('#case-status').textContent='Searching…'; $('#case-results').innerHTML='';
-  try{ const r=await jfetch('/api/cases/search',{method:'POST',body:{q}}); const out=(r.results||[]).map(x=>`<div class="item"><b>${x.citation}</b><div class="muted">${x.summary}</div></div>`).join('')||'<div class="item"><span class="muted">No results.</span></div>'; $('#case-results').innerHTML=out; }
-  catch(e){ toast(e.message) } finally{ $('#case-status').textContent='' } };
-
-/* ===== Case Builder ==================================================== */
-$('#cb-generate').onclick=async()=>{
-  if(!USER) return toast('Sign in first');
-  const type=$('#cb-type').value, juris=$('#cb-juris').value.trim(), facts=$('#cb-facts').value.trim();
-  if(!facts) return toast('Enter key facts');
-  const title=`${type[0].toUpperCase()+type.slice(1)} Draft — ${new Date().toLocaleDateString()}`;
-  const body=`Case Type: ${type}\nJurisdiction: ${juris||'—'}\n\nFacts:\n${facts}\n\nDraft:\n[Provide a structured ${type} draft…]`;
-  try{ await jfetch('/api/documents/save',{method:'POST',body:{title,body}}); toast('Draft created',true); loadDocs(); }catch(e){toast(e.message)}
-};
-
-/* ===== Notary ========================================================== */
-$('#notary-send').onclick=async()=>{
-  if(!USER) return toast('Sign in first');
-  const docId=$('#notary-doc').value.trim(), legalName=$('#notary-name').value.trim(), email=$('#notary-email').value.trim();
-  if(!docId||!legalName||!email) return toast('Complete all fields');
-  $('#notary-status').textContent='Submitting…';
-  try{ const r=await jfetch('/api/notary/request',{method:'POST',body:{docId,legalName,email}}); $('#notary-status').textContent=`Ticket ${r.ticket.id} — ${r.ticket.status}`; toast('Notary request submitted',true); }
-  catch(e){ $('#notary-status').textContent=''; toast(e.message) }
-};
-
-/* ===== Secretary (local tasks + Ask) ================================== */
-const SEC_KEY='lexomega.tasks';
-function loadTasks(){ try{ return JSON.parse(localStorage.getItem(SEC_KEY)||'[]') }catch{ return [] } }
-function saveTasks(t){ localStorage.setItem(SEC_KEY, JSON.stringify(t)); }
-function renderTasks(){ const t=loadTasks(); const html=t.length?t.map((x,i)=>`<div class="item row" style="justify-content:space-between"><div>${x}</div><button class="btn red" data-del="${i}">✕</button></div>`).join(''):'<div class="item"><span class="muted">No tasks yet.</span></div>'; $('#sec-list').innerHTML=html; $$('#sec-list [data-del]').forEach(b=>b.onclick=()=>{ const t=loadTasks(); t.splice(+b.dataset.del,1); saveTasks(t); renderTasks(); }); }
-renderTasks();
-$('#sec-add').onclick=()=>{ const v=$('#sec-input').value.trim(); if(!v) return; const t=loadTasks(); t.unshift(v); saveTasks(t); $('#sec-input').value=''; renderTasks(); };
-$('#sec-ask-btn').onclick=async()=>{
-  const q=$('#sec-ask').value.trim(); if(!q) return;
-  $('#sec-status').textContent='Working…'; $('#sec-answer').style.display='none';
-  try{
-    const msg=`[SECRETARY MODE] Tasks today: ${loadTasks().map((x,i)=>`${i+1}. ${x}`).join(' ')}. User asks: ${q}`;
-    const r=await jfetch('/api/assistant/chat',{method:'POST',body:{message:msg}});
-    $('#sec-answer').style.display='block'; $('#sec-answer').textContent=r.reply||'(no reply)';
-  }catch(e){ toast(e.message) } finally{ $('#sec-status').textContent='' }
-};
-
-/* ===== Ask Lex (chat + voice) ========================================= */
-const chatModal=$('#chat-modal'); $('#chat-open').onclick=()=>chatModal.classList.add('open'); $('#chat-close').onclick=()=>chatModal.classList.remove('open');
-async function askLex(text, mode){
-  const log=$('#chat-log');
-  const you=document.createElement('div'); you.className='bubble user'; you.textContent=text; log.appendChild(you);
-  const ai=document.createElement('div'); ai.className='bubble ai'; ai.textContent='Thinking…'; log.appendChild(ai); log.scrollTop=log.scrollHeight;
-  try{
-    const prefix= mode==='counsel' ? '[IN-HOUSE COUNSEL] Please respond as internal counsel: concise risk/issues, next steps.' : '';
-    const r=await jfetch('/api/assistant/chat',{method:'POST',body:{message:`${prefix} ${text}`}});
-    ai.textContent=r.reply||'(no reply)';
-  }catch(e){ ai.textContent='Error: '+e.message; }
-}
-$('#chat-send').onclick=()=>{ const t=$('#chat-input').value.trim(); if(!t) return; $('#chat-input').value=''; askLex(t, $('#chat-mode').value); };
-$('#chat-input').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('#chat-send').click(); }});
-/* voice input */
-(function(){
-  const Mic = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!Mic){ $('#chat-mic').disabled=true; $('#chat-mic').title='Voice not supported on this device'; return; }
-  const rec=new Mic(); rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=1;
-  $('#chat-mic').onclick=()=>{ try{ rec.start(); $('#chat-mic').textContent='🎙️'; $('#chat-mic').disabled=true; }catch{} };
-  rec.onresult=(e)=>{ const t=e.results[0][0].transcript||''; $('#chat-input').value=t; $('#chat-mic').textContent='🎤'; $('#chat-mic').disabled=false; };
-  rec.onend=()=>{ $('#chat-mic').textContent='🎤'; $('#chat-mic').disabled=false; };
-  rec.onerror=()=>{ $('#chat-mic').textContent='🎤'; $('#chat-mic').disabled=false; toast('Mic error'); };
-})();
-
-/* ===== Daily Verse (rotates by date) ================================== */
-const VERSES = [
-  'John 14:6 — "I am the way, the truth, and the life. No one comes to the Father except through Me."',
-  'Psalm 23:1 — "The Lord is my shepherd; I shall not want."',
-  'Proverbs 3:5 — "Trust in the Lord with all your heart, and do not lean on your own understanding."',
-  'Isaiah 41:10 — "Fear not, for I am with you; be not dismayed, for I am your God."',
-  'Romans 8:28 — "All things work together for good for those who love God."',
-  'Philippians 4:6 — "Do not be anxious about anything, but in everything by prayer…"',
-  'Matthew 6:33 — "Seek first the kingdom of God and His righteousness…"',
-  'Joshua 1:9 — "Be strong and courageous… for the Lord your God is with you."',
-  'Psalm 46:1 — "God is our refuge and strength, a very present help in trouble."',
-  '1 Peter 5:7 — "Cast all your anxiety on Him because He cares for you."'
-];
-function setVerse(){ const dayIndex=Math.floor((Date.now()/86400000))%VERSES.length; $('#verse').textContent=VERSES[dayIndex]; }
-setVerse();
-
-/* ===== Startup & watchdog ============================================= */
-async function startup(){
-  try{ await fetch(API('/api/health'),{credentials:'include'}) }catch{}
-  try{ const r=await jfetch('/api/auth/me'); setAuthed(r.user) }catch{ setAuthed(null) }
-  try{ const s=await jfetch('/api/status'); console.log('[LexOmega status]', s) }catch{}
-  setInterval(()=>{ fetch(API('/api/health'),{credentials:'include'}).catch(()=>{}) }, 10*60*1000);
-  $('#year').textContent=new Date().getFullYear();
-}
-startup();
 </script>
 </body>
 </html>
