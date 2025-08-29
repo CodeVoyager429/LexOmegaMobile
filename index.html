@@ -2,170 +2,179 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LexOmega — The Law, Alive</title>
-  <meta name="description" content="LexOmega: AI-powered law firm platform — Ask Lex, draft documents, and navigate federal, state, and local laws in real time." />
-  <link rel="stylesheet" href="styles.css" />
+  <title>LexOmega | Unified Legal Intelligence</title>
+  <meta name="description" content="LexOmega — The Future of Legal Intelligence. Ask Lex, draft documents, track cases, and search law across jurisdictions." />
   <link rel="icon" href="/favicon.ico" />
-  <!-- i18n libs -->
-  <script src="https://unpkg.com/i18next@23.7.11/dist/umd/i18next.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+
   <style>
-    /* Minimal safety styling in case styles.css is not loaded */
-    :root { --bg:#0b0f14; --card:#0f1620; --muted:#8aa0b2; --accent:#ffd54a; --line:#1e2a38; }
-    html,body { margin:0; padding:0; background:linear-gradient(180deg,#0b0f14 0%,#0e1420 100%); color:#e9f0f6; font-family:system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif; }
-    a { color:#cfe6ff; text-decoration:none; }
-    header { position:sticky; top:0; z-index:100; backdrop-filter:blur(10px); background:rgba(11,15,20,.7); border-bottom:1px solid var(--line); }
-    .nav { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:12px 16px; }
-    .logo { font-weight:800; letter-spacing:.3px; }
-    .nav-links a { margin:0 10px; padding:8px 10px; border-radius:8px; }
-    .nav-links a:hover { background:rgba(255,255,255,.06); }
-    .tools { display:flex; align-items:center; gap:10px; }
-    .select { background:#0f1620; color:#e9f0f6; border:1px solid var(--line); border-radius:8px; padding:6px 8px; }
-    .hero { max-width:1200px; margin:40px auto 24px; padding:24px 16px; display:grid; grid-template-columns:1.2fr .8fr; gap:20px; }
-    .card { background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:16px; padding:24px; box-shadow:0 10px 30px rgba(0,0,0,.25); }
-    .badge { display:inline-block; padding:6px 10px; border-radius:999px; background:rgba(255,213,74,.15); color:#ffde73; border:1px solid rgba(255,213,74,.4); font-weight:600; font-size:12px; letter-spacing:.3px; }
-    .cta { display:flex; gap:10px; margin-top:14px; }
-    .btn { background:var(--accent); color:#161a20; border:0; border-radius:10px; padding:12px 16px; font-weight:700; cursor:pointer; }
-    .btn.secondary { background:transparent; color:#e9f0f6; border:1px solid var(--line); }
-    .grid { max-width:1200px; margin:8px auto 80px; padding:0 16px; display:grid; gap:16px; grid-template-columns:repeat(3,1fr); }
-    .grid .card h3 { margin-top:0; }
-    footer { border-top:1px solid var(--line); color:#9db2c4; padding:20px 16px 100px; text-align:center; }
-    /* Floating chat button */
-    #chat-fab { position:fixed; right:20px; bottom:20px; z-index:200; background:var(--accent); border:none; border-radius:999px; padding:14px 16px; font-weight:800; box-shadow:0 10px 24px rgba(0,0,0,.35); cursor:pointer; }
-    #chat-fab:hover { transform:translateY(-1px); }
-    /* Chat panel */
-    #chat-panel { position:fixed; right:20px; bottom:90px; width:360px; max-width:90vw; max-height:70vh; display:none; flex-direction:column; background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden; z-index:210; }
-    #chat-head { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid var(--line); }
-    #chat-body { padding:14px 12px; overflow:auto; display:flex; flex-direction:column; gap:10px; }
-    .msg { padding:10px 12px; border-radius:12px; line-height:1.35; }
-    .user { background:#16324a; align-self:flex-end; }
-    .bot { background:#122032; border:1px solid #233449; }
-    #chat-foot { display:flex; gap:8px; padding:10px; border-top:1px solid var(--line); }
-    #ask-input { flex:1; background:#0e1622; color:#e9f0f6; padding:10px; border:1px solid var(--line); border-radius:10px; }
-    #send-btn { padding:10px 14px; border-radius:10px; border:1px solid var(--line); background:#1a2432; color:#e9f0f6; cursor:pointer; }
-    .muted { color:var(--muted); font-size:12px; }
-    @media (max-width: 980px) {
-      .hero { grid-template-columns:1fr; }
-      .grid { grid-template-columns:1fr; }
-    }
+    /* screenshot-accurate tweaks layered over styles.css */
+    .topbar { background:#12a3a0; color:#061014; border-bottom:3px solid #ffd54a; }
+    .topbar .inner { max-width:1200px; margin:0 auto; padding:10px 16px; font-weight:700; display:flex; gap:8px; align-items:center; }
+    .topbar .megaphone { filter: drop-shadow(0 2px 0 rgba(0,0,0,.15)); }
+
+    .brandbar { background:rgba(0,0,0,.55); border-bottom:1px solid var(--line); }
+    .brand { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:12px 16px; }
+    .brand-left { display:flex; align-items:center; gap:10px; }
+    .brand-logo { width:34px; height:34px; border-radius:50%; background:#ffd54a; color:#111; display:grid; place-items:center; font-weight:900; }
+    .hamburger { width:44px; height:44px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.04); display:grid; place-items:center; cursor:pointer; }
+    .hamburger span { width:18px; height:2px; background:#e9f0f6; display:block; position:relative; }
+    .hamburger span::before,.hamburger span::after { content:""; position:absolute; left:0; width:18px; height:2px; background:#e9f0f6; }
+    .hamburger span::before { top:-6px; } .hamburger span::after { top:6px; }
+
+    /* drawer */
+    #drawer { position:fixed; inset:0 0 0 40%; max-width:420px; left:auto; background:#0b0f14f5; backdrop-filter:blur(10px); border-left:1px solid var(--line); transform:translateX(100%); transition:.18s ease; z-index:300; }
+    #drawer.open { transform:translateX(0); }
+    #drawer .menu { padding:18px 16px; }
+    #drawer a { display:block; padding:14px 8px; border-bottom:1px solid #132031; color:#e9f0f6; font-weight:600; }
+    #drawer .tools-row { display:flex; align-items:center; justify-content:space-between; padding:14px 8px; }
+    #drawer .select { min-width:160px; }
+    #drawer .close { position:absolute; top:12px; right:12px; }
+
+    .section { max-width:1200px; margin:20px auto; padding:0 16px; }
+    .hero-title { font-size:34px; margin:18px 0 6px; color:#2fd2ff; }
+    .subtitle { color:#9db2c4; margin:0 0 12px; }
+
+    .stat { border-top:1px dashed var(--line); margin-top:12px; padding-top:10px; color:var(--muted); font-size:12px; }
+
+    /* cards themed like screenshots */
+    .card.headered { border:1px solid #222f44; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+    .card .title { font-size:22px; font-weight:800; margin:0 0 10px; }
+
+    /* case search */
+    .case-search { display:flex; gap:8px; }
+    .case-search input { flex:1; background:#0e1622; color:#e9f0f6; border:1px solid var(--line); padding:12px 12px; border-radius:10px; }
+    .case-search button { padding:12px 16px; border-radius:10px; border:1px solid var(--line); background:#ffd54a; color:#161a20; font-weight:800; cursor:pointer; }
+
+    /* bottom sheet feel for chat header stripe */
+    #chat-panel { border:1px solid #3a464f; box-shadow: 0 16px 40px rgba(0,0,0,.45); }
+    #chat-head { border-bottom:2px solid #ffd54a; }
+
+    .toast { position:fixed; left:50%; transform:translateX(-50%); bottom:84px; background:#122032; color:#e9f0f6; padding:10px 14px; border:1px solid #233449; border-radius:999px; font-size:12px; box-shadow:0 8px 20px rgba(0,0,0,.35); display:none; z-index:280; }
+    .toast.show { display:block; }
   </style>
+
+  <!-- i18n (inline resources used by chatbot.js as before) -->
+  <script src="https://unpkg.com/i18next@23.7.11/dist/umd/i18next.min.js"></script>
 </head>
 <body>
-  <!-- Header / Nav -->
-  <header>
-    <nav class="nav" aria-label="Primary">
-      <div class="logo">
-        <span class="badge" data-i18n="ui.badge">LIVE</span>
-        <span style="margin-left:8px;" data-i18n="ui.brand">LexOmega</span>
+
+  <!-- Top promo bar (teal) -->
+  <div class="topbar">
+    <div class="inner">
+      <span class="megaphone">📣</span>
+      <span data-i18n="promo.text">LexOmega Launch Offer: 30-day free trial. No credit card required.</span>
+    </div>
+  </div>
+
+  <!-- Brand bar -->
+  <div class="brandbar">
+    <div class="brand">
+      <div class="brand-left">
+        <div class="brand-logo" aria-label="LexOmega">L</div>
+        <strong>LexOmega</strong>
       </div>
-      <div class="nav-links" role="navigation">
-        <a href="/" data-i18n="ui.home">Home</a>
-        <a href="/new-dashboard.html" data-i18n="ui.dashboard">Dashboard</a>
-        <a href="/legal-tools.html" data-i18n="ui.tools">Legal Tools</a>
-        <a href="/support.html" data-i18n="ui.support">Support</a>
-        <a href="/contact.html" data-i18n="ui.contact">Contact</a>
-        <a href="/login.html" data-i18n="ui.login">Login</a>
-      </div>
-      <div class="tools">
-        <!-- Language Select inside Tools (no API calls; i18n local) -->
-        <label for="lang-select" class="sr-only" aria-hidden="true">Language</label>
+      <button class="hamburger" id="btn-drawer" aria-label="Menu"><span></span></button>
+    </div>
+  </div>
+
+  <!-- Drawer menu -->
+  <aside id="drawer" aria-label="Main Menu">
+    <button class="btn secondary close" id="drawer-close">✕</button>
+    <div class="menu">
+      <a href="/" data-i18n="ui.home">Home</a>
+      <a href="/new-dashboard.html" data-i18n="ui.dashboard">Dashboard</a>
+      <a href="/legal-tools.html" data-i18n="ui.tools">Tools</a>
+      <a href="/documents.html" data-i18n="ui.documents">Documents</a>
+      <a href="/notary.html" data-i18n="ui.notary">Notary</a>
+      <div class="tools-row">
+        <span data-i18n="ui.language">Language</span>
         <select id="lang-select" class="select" aria-label="Language">
           <option value="en" selected>English</option>
           <option value="es">Español</option>
+          <option value="ar">العربية</option>
           <option value="zh-CN">中文（简体）</option>
           <option value="hi">हिन्दी</option>
-          <option value="ar">العربية</option>
           <option value="fr">Français</option>
-          <option value="bn">বাংলা</option>
           <option value="pt">Português</option>
+          <option value="de">Deutsch</option>
+          <option value="ja">日本語</option>
           <option value="ru">Русский</option>
           <option value="ur">اُردُو</option>
           <option value="id">Bahasa Indonesia</option>
-          <option value="de">Deutsch</option>
-          <option value="ja">日本語</option>
+          <option value="bn">বাংলা</option>
           <option value="sw">Kiswahili</option>
         </select>
       </div>
-    </nav>
-  </header>
-
-  <!-- Hero -->
-  <section class="hero">
-    <div class="card">
-      <h1 style="margin:0 0 8px 0; font-size:36px; line-height:1.1;" data-i18n="hero.title">
-        The Law, Alive — Ask Lex. Draft. Decide.
-      </h1>
-      <p class="muted" data-i18n="hero.tagline">
-        An AI-powered law firm platform covering federal, state, and local law across the U.S. — with multilingual support.
-      </p>
-      <div class="cta">
-        <button class="btn" id="open-ask" data-i18n="hero.askLex">Ask Lex</button>
-        <a class="btn secondary" href="/legal-tools.html" data-i18n="hero.viewTools">View Legal Tools</a>
-      </div>
-      <div style="margin-top:16px;">
-        <span class="muted" data-i18n="hero.coverage">
-          Coverage: Federal • 50 States • ~3,000 Counties • ~19,000 Cities • 10+ legal domains
-        </span>
-      </div>
     </div>
-    <div class="card">
-      <h3 style="margin-top:0;" data-i18n="hero.quickCompare">Modular vs. Mobile Homes (Quick Legal Facts)</h3>
-      <ul style="margin-top:8px; line-height:1.45;">
-        <li data-i18n="housing.point1">Modular = local/state building codes; permanent foundation; real property; mortgage-eligible.</li>
-        <li data-i18n="housing.point2">Mobile/Manufactured = HUD code; may remain personal property unless converted; zoning limits may apply.</li>
-        <li class="muted" data-i18n="housing.point3">Ask Lex for jurisdiction-specific rules before purchasing or placing on land.</li>
-      </ul>
+  </aside>
+
+  <!-- Welcome hero -->
+  <section class="section">
+    <h1 class="hero-title" data-i18n="hero.title">Welcome to LexOmega</h1>
+    <p class="subtitle" data-i18n="hero.subtitle">The Future of Legal Intelligence</p>
+
+    <div class="card headered" style="margin-top:12px;">
+      <div class="title" data-i18n="dash.title">Live Dashboard Preview</div>
+      <p class="muted" data-i18n="dash.copy">Analytics, case tracking, document generation and real-time alerts.</p>
+
+      <div class="cta" style="margin-top:12px;">
+        <a class="btn" href="/login.html" data-i18n="dash.login">Login</a>
+        <a class="btn secondary" href="/signup.html" data-i18n="dash.create">Create Account</a>
+        <a class="btn secondary" href="/logout" data-i18n="dash.logout">Logout</a>
+      </div>
+
+      <div class="stat">
+        <strong data-i18n="dash.statusPrefix">Status:</strong>
+        <span id="status" data-i18n="dash.statusGuest">Signed in as Guest</span>
+      </div>
+      <div class="muted" style="margin-top:10px;" id="stat-fallback" data-i18n="dash.unable">Unable to load stats.</div>
     </div>
   </section>
 
-  <!-- Features -->
-  <section class="grid" aria-label="Features">
-    <div class="card">
-      <h3 data-i18n="feat.aiAssistant">AI Legal Assistant</h3>
-      <p class="muted" data-i18n="feat.aiAssistantDesc">24/7 answers in plain language; citations preserved in original text with translated summaries.</p>
-    </div>
-    <div class="card">
-      <h3 data-i18n="feat.docs">Document Generation</h3>
-      <p class="muted" data-i18n="feat.docsDesc">Contracts, filings, compliance — formatted and ready to use.</p>
-    </div>
-    <div class="card">
-      <h3 data-i18n="feat.sim">Case Simulation</h3>
-      <p class="muted" data-i18n="feat.simDesc">Outcome modeling based on statutes and precedents.</p>
-    </div>
-    <div class="card">
-      <h3 data-i18n="feat.jxn">Jurisdictional Reach</h3>
-      <p class="muted" data-i18n="feat.jxnDesc">Federal • 50 States • Counties • Cities — unified into one interface.</p>
-    </div>
-    <div class="card">
-      <h3 data-i18n="feat.pay">Payments</h3>
-      <p class="muted" data-i18n="feat.payDesc">Stripe & PayPal integrated for subscriptions or one-time services.</p>
-    </div>
-    <div class="card">
-      <h3 data-i18n="feat.security">Security</h3>
-      <p class="muted" data-i18n="feat.securityDesc">Environment-backed secrets; auth; rate-limit aware to protect API capacity.</p>
+  <!-- Embedded legal document preview -->
+  <section class="section">
+    <div class="card headered">
+      <div class="title" data-i18n="doc.title">Embedded Legal Document Preview</div>
+      <p><strong>LexOmega — <span data-i18n="doc.sample">Document Sample</span></strong></p>
+      <div class="card" style="background:#0c121b; border:1px dashed var(--line); text-align:center; color:#8aa0b2;">
+        <div style="padding:30px 10px;" data-i18n="doc.placeholder">Document preview placeholder</div>
+      </div>
+      <div class="muted" style="margin-top:10px;" id="doc-fallback" data-i18n="doc.unable">Unable to fetch documents.</div>
     </div>
   </section>
 
-  <!-- Footer -->
+  <!-- Case search -->
+  <section class="section">
+    <div class="card headered">
+      <div class="title" data-i18n="case.title">Case Search</div>
+      <p class="muted" data-i18n="case.hint">Try: “Fourth Amendment traffic stop”</p>
+      <div class="case-search" style="margin-top:8px;">
+        <input id="case-q" placeholder="Search cases..." />
+        <button id="case-go" aria-label="Search">Search</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer verse (as per your preference) -->
   <footer>
-    <div class="muted" data-i18n="footer.note">
-      Legal summaries may be translated for clarity; statutes/quotes remain in original language for accuracy.
-    </div>
+    “Jesus said to him, 'I am the way, the truth, and the life. No one comes to the Father except through Me.' — John 14:6
   </footer>
 
-  <!-- Floating chat button (only one) -->
-  <button id="chat-fab" aria-label="Open Ask Lex" title="Ask Lex">Ask&nbsp;Lex</button>
+  <!-- Floating Chat Button -->
+  <button id="chat-fab" title="Chat">?</button>
 
-  <!-- Chat panel -->
+  <!-- Ask Lex Panel (same engine as before) -->
   <aside id="chat-panel" aria-live="polite" aria-label="Ask Lex">
     <div id="chat-head">
       <strong data-i18n="chat.title">Ask Lex</strong>
-      <button id="close-chat" class="btn secondary" style="padding:6px 10px;" aria-label="Close">✕</button>
+      <button id="close-chat" class="btn secondary" style="padding:6px 10px;">Close</button>
     </div>
     <div id="chat-body">
       <div class="msg bot">
-        <div class="muted" data-i18n="chat.welcome">Ask a legal question. I’ll answer in your selected language. Citations stay original; I’ll add a translated summary.</div>
+        <div class="muted" data-i18n="chat.welcome">Hi! Ask anything like “Go to Tools”, “Search: Miranda rights”, or “Draft an affidavit”.</div>
+        <p><a href="#" class="muted" id="voice-demo" data-i18n="chat.voice">I can voice search as well</a></p>
       </div>
     </div>
     <div id="chat-foot">
@@ -175,244 +184,80 @@
     <div class="muted" style="padding:0 10px 10px 10px;" id="limit-note"></div>
   </aside>
 
+  <!-- Toast like “Continuing as guest” -->
+  <div class="toast" id="toast">Continuing as guest</div>
+
+  <!-- Logic: drawer, toast, minimal demo for search, i18n init, chat (delegated to chatbot.js) -->
   <script>
-    // =========================
-    // Minimal i18n (inline resources to avoid extra files)
-    // =========================
-    const RTL = new Set(["ar","ur"]);
-    const RES = {
-      en: {
-        ui: { badge:"LIVE", brand:"LexOmega", home:"Home", dashboard:"Dashboard", tools:"Legal Tools", support:"Support", contact:"Contact", login:"Login" },
-        hero: {
-          title:"The Law, Alive — Ask Lex. Draft. Decide.",
-          tagline:"An AI-powered law firm platform covering federal, state, and local law across the U.S. — with multilingual support.",
-          askLex:"Ask Lex",
-          viewTools:"View Legal Tools",
-          coverage:"Coverage: Federal • 50 States • ~3,000 Counties • ~19,000 Cities • 10+ legal domains",
-          quickCompare:"Modular vs. Mobile Homes (Quick Legal Facts)"
-        },
-        housing: {
-          point1:"Modular = local/state building codes; permanent foundation; real property; mortgage-eligible.",
-          point2:"Mobile/Manufactured = HUD code; may remain personal property unless converted; zoning limits may apply.",
-          point3:"Ask Lex for jurisdiction-specific rules before purchasing or placing on land."
-        },
-        feat: {
-          aiAssistant:"AI Legal Assistant",
-          aiAssistantDesc:"24/7 answers in plain language; citations preserved in original text with translated summaries.",
-          docs:"Document Generation",
-          docsDesc:"Contracts, filings, compliance — formatted and ready to use.",
-          sim:"Case Simulation",
-          simDesc:"Outcome modeling based on statutes and precedents.",
-          jxn:"Jurisdictional Reach",
-          jxnDesc:"Federal • 50 States • Counties • Cities — unified into one interface.",
-          pay:"Payments",
-          payDesc:"Stripe & PayPal integrated for subscriptions or one-time services.",
-          security:"Security",
-          securityDesc:"Environment-backed secrets; auth; rate-limit aware to protect API capacity."
-        },
-        footer: { note:"Legal summaries may be translated for clarity; statutes/quotes remain in original language for accuracy." },
-        chat: {
-          title:"Ask Lex",
-          welcome:"Ask a legal question. I’ll answer in your selected language. Citations stay original; I’ll add a translated summary.",
-          send:"Send",
-          limit:"LexOmega has reached today’s API capacity. Please retry later."
-        }
-      },
-      es: {
-        ui:{ badge:"EN LÍNEA", brand:"LexOmega", home:"Inicio", dashboard:"Panel", tools:"Herramientas Legales", support:"Soporte", contact:"Contacto", login:"Acceder" },
-        hero:{
-          title:"La ley, viva — Pregunta a Lex. Redacta. Decide.",
-          tagline:"Plataforma jurídica con IA que cubre leyes federales, estatales y locales en EE. UU., con soporte multilingüe.",
-          askLex:"Preguntar a Lex",
-          viewTools:"Ver Herramientas",
-          coverage:"Cobertura: Federal • 50 estados • ~3.000 condados • ~19.000 ciudades • 10+ áreas legales",
-          quickCompare:"Casas modulares vs. móviles (datos legales rápidos)"
-        },
-        housing:{
-          point1:"Modular = códigos locales/estatales; cimentación permanente; bien inmueble; apta para hipoteca.",
-          point2:"Móvil/Fabricada = código HUD; puede seguir como bien mueble salvo conversión; posibles límites de zonificación.",
-          point3:"Pregunta a Lex por reglas específicas de tu jurisdicción antes de comprar o instalar en un terreno."
-        },
-        feat:{
-          aiAssistant:"Asistente Legal IA",
-          aiAssistantDesc:"Respuestas 24/7 en lenguaje claro; citas en texto original con resúmenes traducidos.",
-          docs:"Generación de Documentos",
-          docsDesc:"Contratos, escritos, cumplimiento — formateados y listos.",
-          sim:"Simulación de Casos",
-          simDesc:"Modelado de resultados según leyes y precedentes.",
-          jxn:"Cobertura Jurisdiccional",
-          jxnDesc:"Federal • 50 estados • condados • ciudades — en una sola interfaz.",
-          pay:"Pagos",
-          payDesc:"Stripe y PayPal para suscripciones o servicios puntuales.",
-          security:"Seguridad",
-          securityDesc:"Secretos en entorno; autenticación; conciencia de límites de API."
-        },
-        footer:{ note:"Los resúmenes legales pueden traducirse para claridad; las citas/leyes permanecen en su idioma original." },
-        chat:{ title:"Preguntar a Lex", welcome:"Haz una pregunta legal. Responderé en tu idioma seleccionado. Las citas quedan en su idioma original; agregaré un resumen traducido.", send:"Enviar", limit:"Se alcanzó la capacidad de la API hoy. Inténtalo más tarde." }
-      },
-      ar: {
-        ui:{ badge:"مباشر", brand:"ليكس أوميغا", home:"الرئيسية", dashboard:"لوحة التحكم", tools:"الأدوات القانونية", support:"الدعم", contact:"اتصل", login:"تسجيل الدخول" },
-        hero:{
-          title:"القانون حي — اسأل ليكس. أنشئ. قرّر.",
-          tagline:"منصة قانونية مدعومة بالذكاء الاصطناعي تغطي القوانين الفدرالية والولائية والمحلية في الولايات المتحدة، مع دعم متعدد اللغات.",
-          askLex:"اسأل ليكس",
-          viewTools:"عرض الأدوات",
-          coverage:"التغطية: فدرالي • 50 ولاية • ~3000 مقاطعة • ~19000 مدينة • أكثر من 10 مجالات قانونية",
-          quickCompare:"منازل تركيبية مقابل متنقلة (حقائق قانونية سريعة)"
-        },
-        housing:{
-          point1:"التركيبي = أكواد محلية/ولائية؛ أساس دائم؛ عقار؛ مؤهل للرهن.",
-          point2:"المتنقل/المصنّع = كود HUD؛ قد يبقى منقولاً ما لم يُحوّل؛ قد توجد قيود تنظيمية.",
-          point3:"اسأل ليكس عن قواعد الاختصاص قبل الشراء أو التثبيت على أرض."
-        },
-        feat:{
-          aiAssistant:"مساعد قانوني بالذكاء الاصطناعي",
-          aiAssistantDesc:"إجابات على مدار الساعة بلغة واضحة؛ تبقى الاقتباسات بلغتها الأصلية مع ملخصات مترجمة.",
-          docs:"إنشاء المستندات",
-          docsDesc:"عقود ومرافعات وامتثال — مُهيّأة وجاهزة.",
-          sim:"محاكاة القضايا",
-          simDesc:"نمذجة النتائج بناءً على القوانين والسوابق.",
-          jxn:"نطاق الاختصاص",
-          jxnDesc:"فدرالي • 50 ولاية • مقاطعات • مدن — ضمن واجهة واحدة.",
-          pay:"المدفوعات",
-          payDesc:"Stripe وPayPal للاشتراكات أو الخدمات لمرة واحدة.",
-          security:"الأمان",
-          securityDesc:"أسرار عبر البيئة؛ مصادقة؛ وعي بحدود واجهات البرمجة."
-        },
-        footer:{ note:"قد تُترجم الملخصات للتوضيح؛ تبقى الاقتباسات/النصوص القانونية بلغتها الأصلية." },
-        chat:{ title:"اسأل ليكس", welcome:"اطرح سؤالاً قانونياً. سأجيب بلغتك المختارة. تظل الاقتباسات بلغتها الأصلية؛ سأضيف ملخصاً مترجماً.", send:"إرسال", limit:"تم بلوغ سعة واجهة البرمجة لليوم. حاول لاحقاً." }
-      }
-      // Add more languages later using the same keys
+    // Drawer controls
+    const drawer = document.getElementById('drawer');
+    const btnDrawer = document.getElementById('btn-drawer');
+    const drawerClose = document.getElementById('drawer-close');
+    btnDrawer.addEventListener('click', () => drawer.classList.add('open'));
+    drawerClose.addEventListener('click', () => drawer.classList.remove('open'));
+    drawer.addEventListener('click', (e)=>{ if(e.target.id==='drawer') drawer.classList.remove('open'); });
+
+    // Simple guest toast (mimics your screenshot)
+    const toast = document.getElementById('toast');
+    function showToast(msg){ toast.textContent = msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 2400); }
+    showToast('Continuing as guest');
+
+    // Fake “failed to fetch” preview if API not wired yet (for parity with screenshot)
+    const demoFail = () => {
+      const bot = document.createElement('div');
+      bot.className = 'msg bot';
+      bot.innerHTML = '<span class="muted">Error: Failed to fetch</span>';
+      document.getElementById('chat-body').appendChild(bot);
     };
 
+    // Minimal i18n resources to seed page keys (more in chatbot.js if you wish)
+    const RES = {
+      en:{ ui:{home:"Home",dashboard:"Dashboard",tools:"Tools",documents:"Documents",notary:"Notary",language:"Language"},
+           promo:{text:"LexOmega Launch Offer: 30-day free trial. No credit card required."},
+           hero:{title:"Welcome to LexOmega",subtitle:"The Future of Legal Intelligence"},
+           dash:{title:"Live Dashboard Preview",copy:"Analytics, case tracking, document generation and real-time alerts.",login:"Login",create:"Create Account",logout:"Logout",statusPrefix:"Status:",statusGuest:"Signed in as Guest",unable:"Unable to load stats."},
+           doc:{title:"Embedded Legal Document Preview",sample:"Document Sample",placeholder:"Document preview placeholder",unable:"Unable to fetch documents."},
+           case:{title:"Case Search",hint:"Try: “Fourth Amendment traffic stop”"},
+           chat:{title:"Ask Lex",welcome:"Hi! Ask anything like “Go to Tools”, “Search: Miranda rights”, or “Draft an affidavit”.",send:"Send",voice:"I can voice search as well",limit:"LexOmega has reached today’s API capacity. Please retry later."}
+      },
+      es:{ ui:{home:"Inicio",dashboard:"Panel",tools:"Herramientas",documents:"Documentos",notary:"Notaría",language:"Idioma"},
+           promo:{text:"Oferta de lanzamiento: prueba gratis de 30 días. No se requiere tarjeta."},
+           hero:{title:"Bienvenido a LexOmega",subtitle:"El Futuro de la Inteligencia Legal"},
+           dash:{title:"Vista previa del panel en vivo",copy:"Analítica, seguimiento de casos, generación de documentos y alertas en tiempo real.",login:"Acceder",create:"Crear cuenta",logout:"Salir",statusPrefix:"Estado:",statusGuest:"Conectado como invitado",unable:"No se pueden cargar estadísticas."},
+           doc:{title:"Vista previa de documento legal incrustado",sample:"Documento de ejemplo",placeholder:"Marcador de vista previa de documento",unable:"No se pueden obtener documentos."},
+           case:{title:"Búsqueda de casos",hint:"Prueba: “Detención de tráfico Cuarta Enmienda”"},
+           chat:{title:"Preguntar a Lex",welcome:"¡Hola! Pregunta algo como “Ir a Herramientas”, “Buscar: derechos Miranda” o “Redactar una declaración jurada”.",send:"Enviar",voice:"También puedo buscar por voz",limit:"Se alcanzó la capacidad de la API. Inténtalo luego."}
+      },
+      ar:{ ui:{home:"الرئيسية",dashboard:"لوحة التحكم",tools:"الأدوات",documents:"المستندات",notary:"التوثيق",language:"اللغة"},
+           promo:{text:"عرض الإطلاق: تجربة مجانية لمدة 30 يوماً. لا حاجة لبطاقة."},
+           hero:{title:"مرحباً بك في ليكس أوميغا",subtitle:"مستقبل الذكاء القانوني"},
+           dash:{title:"معاينة لوحة المعلومات الحية",copy:"تحليلات، تتبع القضايا، إنشاء المستندات، وتنبيهات فورية.",login:"تسجيل الدخول",create:"إنشاء حساب",logout:"تسجيل الخروج",statusPrefix:"الحالة:",statusGuest:"متصل كضيف",unable:"يتعذر تحميل الإحصاءات."},
+           doc:{title:"معاينة مستند قانوني مضمن",sample:"نموذج مستند",placeholder:"عنصر نائب لمعاينة المستند",unable:"تعذر جلب المستندات."},
+           case:{title:"بحث القضايا",hint:"جرّب: «توقيف مروري والتعديل الرابع»"},
+           chat:{title:"اسأل ليكس",welcome:"اسأل أي شيء مثل «اذهب إلى الأدوات»، «ابحث: حقوق ميراندا»، أو «صِغ إفادة»",send:"إرسال",voice:"يمكنني البحث صوتياً أيضاً",limit:"تم بلوغ سعة واجهة البرمجة لليوم. حاول لاحقاً."}
+      }
+    };
+    const RTL = new Set(["ar","ur"]);
     const LANG_KEY = "lexomega.lang";
-
-    function setDir(lng) {
-      const rtl = RTL.has(lng);
-      document.documentElement.setAttribute("lang", lng);
-      document.documentElement.setAttribute("dir", rtl ? "rtl" : "ltr");
-    }
-
-    i18next.init({
-      lng: localStorage.getItem(LANG_KEY) || "en",
-      fallbackLng: "en",
-      resources: RES,
-      interpolation: { escapeValue: false }
-    }, applyI18n);
-
-    function applyI18n() {
-      const t = i18next.t.bind(i18next);
-      document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.getAttribute("data-i18n");
-        el.innerHTML = t(key);
-      });
-      setDir(i18next.language || "en");
-      const sel = document.getElementById("lang-select");
-      if (sel) sel.value = i18next.language || "en";
-    }
-
-    const sel = document.getElementById("lang-select");
-    sel.addEventListener("change", async (e) => {
-      const lng = e.target.value;
-      localStorage.setItem(LANG_KEY, lng);
-      await i18next.changeLanguage(lng);
-      applyI18n();
+    i18next.init({ resources: RES, lng: localStorage.getItem(LANG_KEY)||"en", fallbackLng:"en", interpolation:{escapeValue:false}}, ()=>{
+      // simple binder
+      document.querySelectorAll("[data-i18n]").forEach(el=>{ el.innerHTML = i18next.t(el.getAttribute("data-i18n")); });
+      const lng = i18next.language; document.documentElement.setAttribute("lang", lng); document.documentElement.setAttribute("dir", RTL.has(lng)?"rtl":"ltr");
+      const sel = document.getElementById("lang-select"); if (sel) sel.value = lng;
     });
 
-    // =========================
-    // Ask Lex — locale-aware, cached, rate-limit friendly
-    // =========================
-    const chatFab = document.getElementById("chat-fab");
-    const chatPanel = document.getElementById("chat-panel");
-    const chatBody = document.getElementById("chat-body");
-    const closeChat = document.getElementById("close-chat");
-    const sendBtn = document.getElementById("send-btn");
-    const askInput = document.getElementById("ask-input");
-    const limitNote = document.getElementById("limit-note");
-    const openAsk = document.getElementById("open-ask");
-
-    const cacheKey = "lexomega.answer.cache";
-    let cache = {};
-    try { cache = JSON.parse(localStorage.getItem(cacheKey) || "{}"); } catch{}
-
-    function showPanel() { chatPanel.style.display = "flex"; askInput.focus(); }
-    function hidePanel() { chatPanel.style.display = "none"; }
-
-    chatFab.addEventListener("click", showPanel);
-    openAsk.addEventListener("click", showPanel);
-    closeChat.addEventListener("click", hidePanel);
-
-    function bubble(text, role="bot") {
-      const div = document.createElement("div");
-      div.className = `msg ${role === "user" ? "user" : "bot"}`;
-      div.innerHTML = text;
-      chatBody.appendChild(div);
-      chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    let sending = false;
-    async function askLex() {
-      const q = askInput.value.trim();
-      if (!q || sending) return;
-      sending = true;
-      sendBtn.disabled = true;
-      limitNote.textContent = "";
-      bubble(q, "user");
-      askInput.value = "";
-
-      const lng = i18next.language || "en";
-      const key = `${lng}|${q}`;
-      if (cache[key]) {
-        bubble(cache[key], "bot");
-        sending = false;
-        sendBtn.disabled = false;
-        return;
-      }
-
-      // Gentle throttle to avoid rapid-fire API hits
-      await new Promise(r => setTimeout(r, 600));
-
-      try {
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-lex-locale": lng,
-            "Accept-Language": lng
-          },
-          body: JSON.stringify({ query: q, locale: lng })
-        });
-
-        if (res.status === 429) {
-          limitNote.textContent = i18next.t("chat.limit");
-          sending = false; sendBtn.disabled = false; return;
-        }
-
-        if (!res.ok) {
-          bubble(`<span class="muted">(${res.status}) Something went wrong. Please try again.</span>`, "bot");
-          sending = false; sendBtn.disabled = false; return;
-        }
-
-        const data = await res.json();
-        const answer = (data && (data.answer || data.text)) || "—";
-        cache[key] = answer;
-        localStorage.setItem(cacheKey, JSON.stringify(cache));
-        bubble(answer, "bot");
-      } catch (e) {
-        bubble(`<span class="muted">Network error. Please try again.</span>`, "bot");
-      } finally {
-        sending = false;
-        sendBtn.disabled = false;
-      }
-    }
-
-    sendBtn.addEventListener("click", askLex);
-    askInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        askLex();
-      }
+    document.getElementById("lang-select")?.addEventListener("change", async (e)=>{
+      const lng = e.target.value; localStorage.setItem(LANG_KEY, lng); await i18next.changeLanguage(lng);
+      document.querySelectorAll("[data-i18n]").forEach(el=>{ el.innerHTML = i18next.t(el.getAttribute("data-i18n")); });
+      document.documentElement.setAttribute("dir", RTL.has(lng)?"rtl":"ltr"); document.documentElement.setAttribute("lang", lng);
     });
+
+    // Case search demo (wire to your backend when ready)
+    document.getElementById("case-go").addEventListener("click", ()=> demoFail());
+
   </script>
+
+  <!-- Centralized chat + locale logic -->
+  <script src="chatbot.js"></script>
 </body>
 </html>
