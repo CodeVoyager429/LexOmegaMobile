@@ -1,96 +1,140 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>LexOmega | Unified Legal Intelligence</title>
-  <meta name="description" content="LexOmega — The Future of Legal Intelligence. Ask Lex, draft documents, track cases, and search law across jurisdictions." />
+  <meta name="description" content="LexOmega — AI-powered legal intelligence. Ask Lex, draft documents, track cases, and search law across jurisdictions." />
+  <meta name="theme-color" content="#0b0f14" />
   <link rel="icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="color-scheme" content="dark light" />
 
   <style>
-    /* screenshot-accurate tweaks layered over styles.css */
-    .topbar { background:#12a3a0; color:#061014; border-bottom:3px solid #ffd54a; }
-    .topbar .inner { max-width:1200px; margin:0 auto; padding:10px 16px; font-weight:700; display:flex; gap:8px; align-items:center; }
-    .topbar .megaphone { filter: drop-shadow(0 2px 0 rgba(0,0,0,.15)); }
+    :root{
+      --bg:#0b0f14; --bg2:#0e1420; --surface:#0f1620; --line:#1e2a38;
+      --text:#e9f0f6; --muted:#8aa0b2;
+      --accent:#ffd54a; --accentText:#161a20;
+      --teal:#12a3a0; --teal-700:#0d7c7a;
+      --shadow:0 10px 30px rgba(0,0,0,.28);
+      --radius:16px; --focus:#2fd2ff;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      min-height:100vh;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+      color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+    }
+    a{color:#cfe6ff;text-decoration:none}
+    a:hover{filter:brightness(1.05)}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+    :focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:8px}
 
-    .brandbar { background:rgba(0,0,0,.55); border-bottom:1px solid var(--line); }
-    .brand { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:12px 16px; }
-    .brand-left { display:flex; align-items:center; gap:10px; }
-    .brand-logo { width:34px; height:34px; border-radius:50%; background:#ffd54a; color:#111; display:grid; place-items:center; font-weight:900; }
-    .hamburger { width:44px; height:44px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.04); display:grid; place-items:center; cursor:pointer; }
-    .hamburger span { width:18px; height:2px; background:#e9f0f6; display:block; position:relative; }
-    .hamburger span::before,.hamburger span::after { content:""; position:absolute; left:0; width:18px; height:2px; background:#e9f0f6; }
-    .hamburger span::before { top:-6px; } .hamburger span::after { top:6px; }
+    /* Promo bar */
+    .promo{position:sticky;top:0;z-index:120;background:var(--teal);color:#041014;border-bottom:3px solid var(--accent)}
+    .promo__inner{max-width:1200px;margin:0 auto;padding:10px 16px;font-weight:800;display:flex;gap:10px;align-items:center}
 
-    /* drawer */
-    #drawer { position:fixed; inset:0 0 0 40%; max-width:420px; left:auto; background:#0b0f14f5; backdrop-filter:blur(10px); border-left:1px solid var(--line); transform:translateX(100%); transition:.18s ease; z-index:300; }
-    #drawer.open { transform:translateX(0); }
-    #drawer .menu { padding:18px 16px; }
-    #drawer a { display:block; padding:14px 8px; border-bottom:1px solid #132031; color:#e9f0f6; font-weight:600; }
-    #drawer .tools-row { display:flex; align-items:center; justify-content:space-between; padding:14px 8px; }
-    #drawer .select { min-width:160px; }
-    #drawer .close { position:absolute; top:12px; right:12px; }
+    /* Brand */
+    .brandbar{background:rgba(0,0,0,.55);border-bottom:1px solid var(--line)}
+    .brand{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+    .brand__left{display:flex;gap:10px;align-items:center}
+    .brand__logo{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#111;display:grid;place-items:center;font-weight:900}
+    .brand__menu{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.06);display:grid;place-items:center;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)}
+    .brand__menu span{width:18px;height:2px;background:var(--text);display:block;position:relative;border-radius:2px}
+    .brand__menu span::before,.brand__menu span::after{content:"";position:absolute;left:0;width:18px;height:2px;background:var(--text);border-radius:2px}
+    .brand__menu span::before{top:-6px}.brand__menu span::after{top:6px}
 
-    .section { max-width:1200px; margin:20px auto; padding:0 16px; }
-    .hero-title { font-size:34px; margin:18px 0 6px; color:#2fd2ff; }
-    .subtitle { color:#9db2c4; margin:0 0 12px; }
+    /* Drawer */
+    .drawer{position:fixed;inset:0 0 0 40%;max-width:420px;left:auto;background:#0b0f14f5;backdrop-filter:blur(10px);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .18s ease;z-index:140}
+    .drawer--open{transform:translateX(0)}
+    .drawer__panel{padding:18px 16px}
+    .drawer__link{display:block;padding:14px 8px;border-bottom:1px solid #132031;color:var(--text);font-weight:700;border-radius:10px}
+    .drawer__link:hover{background:rgba(255,255,255,.04)}
+    .drawer__row{display:flex;align-items:center;justify-content:space-between;padding:14px 8px}
+    .select{background:#0f1620;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:170px}
+    .drawer__close{position:absolute;top:12px;right:12px}
 
-    .stat { border-top:1px dashed var(--line); margin-top:12px; padding-top:10px; color:var(--muted); font-size:12px; }
+    /* Layout & cards */
+    .wrap{max-width:1200px;margin:20px auto;padding:0 16px}
+    .h1{font-size:34px;margin:18px 0 6px;color:#2fd2ff}
+    .sub{color:#9db2c4;margin:0 0 12px}
+    .card{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
+    .card--emph{border:1px solid #222f44}
+    .card__title{font-size:22px;font-weight:900;margin:0 0 10px}
+    .muted{color:var(--muted);font-size:12px}
 
-    /* cards themed like screenshots */
-    .card.headered { border:1px solid #222f44; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
-    .card .title { font-size:22px; font-weight:800; margin:0 0 10px; }
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{background:var(--accent);color:var(--accentText);border:0;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer;transition:transform .08s ease, filter .12s ease}
+    .btn:hover{transform:translateY(-1px);filter:brightness(1.02)}
+    .btn--ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
 
-    /* case search */
-    .case-search { display:flex; gap:8px; }
-    .case-search input { flex:1; background:#0e1622; color:#e9f0f6; border:1px solid var(--line); padding:12px 12px; border-radius:10px; }
-    .case-search button { padding:12px 16px; border-radius:10px; border:1px solid var(--line); background:#ffd54a; color:#161a20; font-weight:800; cursor:pointer; }
+    input[type="text"],input[type="search"]{background:#0e1622;color:var(--text);border:1px solid var(--line);padding:12px;border-radius:12px}
+    .case{display:flex;gap:8px}
+    .case button{padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--accent);color:var(--accentText);font-weight:900;cursor:pointer}
 
-    /* bottom sheet feel for chat header stripe */
-    #chat-panel { border:1px solid #3a464f; box-shadow: 0 16px 40px rgba(0,0,0,.45); }
-    #chat-head { border-bottom:2px solid #ffd54a; }
+    /* Toast */
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:84px;background:#122032;color:var(--text);padding:10px 14px;border:1px solid #233449;border-radius:999px;font-size:12px;box-shadow:0 8px 20px rgba(0,0,0,.35);display:none;z-index:135}
+    .toast--show{display:block}
 
-    .toast { position:fixed; left:50%; transform:translateX(-50%); bottom:84px; background:#122032; color:#e9f0f6; padding:10px 14px; border:1px solid #233449; border-radius:999px; font-size:12px; box-shadow:0 8px 20px rgba(0,0,0,.35); display:none; z-index:280; }
-    .toast.show { display:block; }
+    /* Chat */
+    .fab{position:fixed;right:20px;bottom:20px;z-index:130;background:var(--accent);border:none;border-radius:999px;padding:14px 16px;font-weight:900;box-shadow:0 10px 24px rgba(0,0,0,.35);cursor:pointer}
+    .fab:hover{transform:translateY(-1px)}
+    .sheet{position:fixed;right:20px;bottom:90px;width:380px;max-width:92vw;max-height:70vh;display:none;flex-direction:column;background:var(--surface);border:1px solid #3a464f;border-radius:16px;overflow:hidden;z-index:131;box-shadow:0 16px 40px rgba(0,0,0,.45)}
+    .sheet__head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:2px solid var(--accent)}
+    .sheet__body{padding:14px 12px;overflow:auto;display:flex;flex-direction:column;gap:10px}
+    .msg{padding:10px 12px;border-radius:12px;line-height:1.4}
+    .msg--me{background:#16324a;align-self:flex-end}
+    .msg--bot{background:#122032;border:1px solid #233449}
+    .sheet__foot{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+    .send{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:#1a2432;color:var(--text);cursor:pointer}
+
+    /* Footer */
+    .footer{border-top:1px solid var(--line);color:#9db2c4;padding:20px 16px 100px;text-align:center}
+
+    @media (max-width:980px){ .wrap{margin:16px auto} }
+    html[dir="rtl"] .brand{direction:rtl}
+    html[dir="rtl"] .fab{left:20px;right:auto}
+    html[dir="rtl"] .sheet{left:20px;right:auto}
   </style>
-
-  <!-- i18n (inline resources used by chatbot.js as before) -->
-  <script src="https://unpkg.com/i18next@23.7.11/dist/umd/i18next.min.js"></script>
 </head>
 <body>
+  <a href="#main" class="sr-only">Skip to content</a>
 
-  <!-- Top promo bar (teal) -->
-  <div class="topbar">
-    <div class="inner">
-      <span class="megaphone">📣</span>
+  <!-- Promo -->
+  <div class="promo" role="region" aria-label="Promotion">
+    <div class="promo__inner">
+      <span aria-hidden="true">📣</span>
       <span data-i18n="promo.text">LexOmega Launch Offer: 30-day free trial. No credit card required.</span>
     </div>
   </div>
 
-  <!-- Brand bar -->
-  <div class="brandbar">
+  <!-- Brand -->
+  <header class="brandbar">
     <div class="brand">
-      <div class="brand-left">
-        <div class="brand-logo" aria-label="LexOmega">L</div>
+      <div class="brand__left">
+        <div class="brand__logo" aria-label="LexOmega">L</div>
         <strong>LexOmega</strong>
       </div>
-      <button class="hamburger" id="btn-drawer" aria-label="Menu"><span></span></button>
+      <button class="brand__menu" id="menuBtn" aria-controls="drawer" aria-expanded="false" aria-label="Open menu">
+        <span></span>
+      </button>
     </div>
-  </div>
+  </header>
 
-  <!-- Drawer menu -->
-  <aside id="drawer" aria-label="Main Menu">
-    <button class="btn secondary close" id="drawer-close">✕</button>
-    <div class="menu">
-      <a href="/" data-i18n="ui.home">Home</a>
-      <a href="/new-dashboard.html" data-i18n="ui.dashboard">Dashboard</a>
-      <a href="/legal-tools.html" data-i18n="ui.tools">Tools</a>
-      <a href="/documents.html" data-i18n="ui.documents">Documents</a>
-      <a href="/notary.html" data-i18n="ui.notary">Notary</a>
-      <div class="tools-row">
-        <span data-i18n="ui.language">Language</span>
-        <select id="lang-select" class="select" aria-label="Language">
+  <!-- Drawer -->
+  <aside class="drawer" id="drawer" aria-label="Main menu" aria-hidden="true" role="dialog">
+    <button class="btn btn--ghost drawer__close" id="drawerClose" aria-label="Close menu">✕</button>
+    <nav class="drawer__panel">
+      <a class="drawer__link" href="/" data-i18n="ui.home">Home</a>
+      <a class="drawer__link" href="/new-dashboard.html" data-i18n="ui.dashboard">Dashboard</a>
+      <a class="drawer__link" href="/legal-tools.html" data-i18n="ui.tools">Tools</a>
+      <a class="drawer__link" href="/documents.html" data-i18n="ui.documents">Documents</a>
+      <a class="drawer__link" href="/notary.html" data-i18n="ui.notary">Notary</a>
+      <div class="drawer__row">
+        <label for="lang" data-i18n="ui.language">Language</label>
+        <select id="lang" class="select" aria-label="Language">
           <option value="en" selected>English</option>
           <option value="es">Español</option>
           <option value="ar">العربية</option>
@@ -107,157 +151,198 @@
           <option value="sw">Kiswahili</option>
         </select>
       </div>
-    </div>
+    </nav>
   </aside>
 
-  <!-- Welcome hero -->
-  <section class="section">
-    <h1 class="hero-title" data-i18n="hero.title">Welcome to LexOmega</h1>
-    <p class="subtitle" data-i18n="hero.subtitle">The Future of Legal Intelligence</p>
+  <main id="main" class="wrap" tabindex="-1">
+    <!-- Hero / Dashboard preview -->
+    <section aria-labelledby="welcome">
+      <h1 id="welcome" class="h1" data-i18n="hero.title">Welcome to LexOmega</h1>
+      <p class="sub" data-i18n="hero.subtitle">The Future of Legal Intelligence</p>
 
-    <div class="card headered" style="margin-top:12px;">
-      <div class="title" data-i18n="dash.title">Live Dashboard Preview</div>
-      <p class="muted" data-i18n="dash.copy">Analytics, case tracking, document generation and real-time alerts.</p>
+      <article class="card card--emph" aria-labelledby="dashTitle">
+        <h2 id="dashTitle" class="card__title" data-i18n="dash.title">Live Dashboard Preview</h2>
+        <p class="muted" data-i18n="dash.copy">Analytics, case tracking, document generation and real-time alerts.</p>
+        <div class="row" style="margin-top:10px">
+          <a class="btn" href="/login.html" data-i18n="dash.login">Login</a>
+          <a class="btn btn--ghost" href="/signup.html" data-i18n="dash.create">Create Account</a>
+          <a class="btn btn--ghost" href="/logout" data-i18n="dash.logout">Logout</a>
+        </div>
+        <p class="muted" style="margin-top:12px">
+          <strong data-i18n="dash.statusPrefix">Status:</strong>
+          <span id="status" data-i18n="dash.statusGuest">Signed in as Guest</span>
+        </p>
+        <p id="statFail" class="muted" data-i18n="dash.unable">Unable to load stats.</p>
+      </article>
+    </section>
 
-      <div class="cta" style="margin-top:12px;">
-        <a class="btn" href="/login.html" data-i18n="dash.login">Login</a>
-        <a class="btn secondary" href="/signup.html" data-i18n="dash.create">Create Account</a>
-        <a class="btn secondary" href="/logout" data-i18n="dash.logout">Logout</a>
-      </div>
+    <!-- Document preview -->
+    <section aria-labelledby="docTitle" class="wrap__docs">
+      <article class="card card--emph">
+        <h2 id="docTitle" class="card__title" data-i18n="doc.title">Embedded Legal Document Preview</h2>
+        <p><strong>LexOmega — <span data-i18n="doc.sample">Document Sample</span></strong></p>
+        <div class="card" style="background:#0c121b;border:1px dashed var(--line);text-align:center;color:#8aa0b2;">
+          <div id="docBox" style="padding:30px 10px" data-i18n="doc.placeholder">Document preview placeholder</div>
+        </div>
+        <p id="docFail" class="muted" style="margin-top:10px" data-i18n="doc.unable">Unable to fetch documents.</p>
+      </article>
+    </section>
 
-      <div class="stat">
-        <strong data-i18n="dash.statusPrefix">Status:</strong>
-        <span id="status" data-i18n="dash.statusGuest">Signed in as Guest</span>
-      </div>
-      <div class="muted" style="margin-top:10px;" id="stat-fallback" data-i18n="dash.unable">Unable to load stats.</div>
-    </div>
-  </section>
+    <!-- Case search -->
+    <section aria-labelledby="caseTitle">
+      <article class="card card--emph">
+        <h2 id="caseTitle" class="card__title" data-i18n="case.title">Case Search</h2>
+        <p class="muted" data-i18n="case.hint">Try: “Fourth Amendment traffic stop”</p>
+        <div class="case" style="margin-top:8px">
+          <input id="caseQ" type="search" placeholder="Search cases..." aria-label="Search cases" />
+          <button id="caseGo" aria-label="Search">Search</button>
+        </div>
+      </article>
+    </section>
+  </main>
 
-  <!-- Embedded legal document preview -->
-  <section class="section">
-    <div class="card headered">
-      <div class="title" data-i18n="doc.title">Embedded Legal Document Preview</div>
-      <p><strong>LexOmega — <span data-i18n="doc.sample">Document Sample</span></strong></p>
-      <div class="card" style="background:#0c121b; border:1px dashed var(--line); text-align:center; color:#8aa0b2;">
-        <div style="padding:30px 10px;" data-i18n="doc.placeholder">Document preview placeholder</div>
-      </div>
-      <div class="muted" style="margin-top:10px;" id="doc-fallback" data-i18n="doc.unable">Unable to fetch documents.</div>
-    </div>
-  </section>
-
-  <!-- Case search -->
-  <section class="section">
-    <div class="card headered">
-      <div class="title" data-i18n="case.title">Case Search</div>
-      <p class="muted" data-i18n="case.hint">Try: “Fourth Amendment traffic stop”</p>
-      <div class="case-search" style="margin-top:8px;">
-        <input id="case-q" placeholder="Search cases..." />
-        <button id="case-go" aria-label="Search">Search</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer verse (as per your preference) -->
-  <footer>
+  <footer class="footer">
     “Jesus said to him, 'I am the way, the truth, and the life. No one comes to the Father except through Me.' — John 14:6
   </footer>
 
-  <!-- Floating Chat Button -->
-  <button id="chat-fab" title="Chat">?</button>
+  <!-- Floating chat -->
+  <button class="fab" id="chatOpen" aria-label="Open Ask Lex">💬</button>
 
-  <!-- Ask Lex Panel (same engine as before) -->
-  <aside id="chat-panel" aria-live="polite" aria-label="Ask Lex">
-    <div id="chat-head">
+  <!-- Ask Lex panel -->
+  <section class="sheet" id="chat" aria-label="Ask Lex" role="dialog" aria-modal="false" aria-hidden="true">
+    <header class="sheet__head">
       <strong data-i18n="chat.title">Ask Lex</strong>
-      <button id="close-chat" class="btn secondary" style="padding:6px 10px;">Close</button>
-    </div>
-    <div id="chat-body">
-      <div class="msg bot">
-        <div class="muted" data-i18n="chat.welcome">Hi! Ask anything like “Go to Tools”, “Search: Miranda rights”, or “Draft an affidavit”.</div>
-        <p><a href="#" class="muted" id="voice-demo" data-i18n="chat.voice">I can voice search as well</a></p>
+      <button id="chatClose" class="btn btn--ghost" style="padding:6px 10px">Close</button>
+    </header>
+    <div class="sheet__body" id="chatBody">
+      <div class="msg msg--bot">
+        <div class="muted" data-i18n="chat.welcome">
+          Ask anything like “Go to Tools”, “Search: Miranda rights”, or “Draft an affidavit”.
+        </div>
+        <p><a href="#" id="voiceHint" class="muted" data-i18n="chat.voice">I can voice search as well</a></p>
       </div>
     </div>
-    <div id="chat-foot">
-      <input id="ask-input" type="text" placeholder="Type your question..." aria-label="Your question" />
-      <button id="send-btn" data-i18n="chat.send">Send</button>
-    </div>
-    <div class="muted" style="padding:0 10px 10px 10px;" id="limit-note"></div>
-  </aside>
+    <footer class="sheet__foot">
+      <input id="ask" type="text" placeholder="Type your question…" aria-label="Your question" />
+      <button id="send" class="send" data-i18n="chat.send">Send</button>
+    </footer>
+    <p id="limit" class="muted" style="padding:0 10px 10px 10px"></p>
+  </section>
 
-  <!-- Toast like “Continuing as guest” -->
   <div class="toast" id="toast">Continuing as guest</div>
 
-  <!-- Logic: drawer, toast, minimal demo for search, i18n init, chat (delegated to chatbot.js) -->
   <script>
-    // Drawer controls
-    const drawer = document.getElementById('drawer');
-    const btnDrawer = document.getElementById('btn-drawer');
-    const drawerClose = document.getElementById('drawer-close');
-    btnDrawer.addEventListener('click', () => drawer.classList.add('open'));
-    drawerClose.addEventListener('click', () => drawer.classList.remove('open'));
-    drawer.addEventListener('click', (e)=>{ if(e.target.id==='drawer') drawer.classList.remove('open'); });
+    /* ---------- Helpers ---------- */
+    const $ = (s,r=document)=>r.querySelector(s);
+    const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+    const on = (el,ev,cb)=>el&&el.addEventListener(ev,cb);
 
-    // Simple guest toast (mimics your screenshot)
-    const toast = document.getElementById('toast');
-    function showToast(msg){ toast.textContent = msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 2400); }
-    showToast('Continuing as guest');
+    /* ---------- Drawer ---------- */
+    const drawer=$("#drawer"), menuBtn=$("#menuBtn"), drawerClose=$("#drawerClose");
+    let drawerLastFocus=null;
+    function openDrawer(){drawerLastFocus=document.activeElement;drawer.classList.add("drawer--open");drawer.setAttribute("aria-hidden","false");menuBtn.setAttribute("aria-expanded","true");($("#drawer .drawer__panel a, #drawer select")||drawerClose).focus();}
+    function closeDrawer(){drawer.classList.remove("drawer--open");drawer.setAttribute("aria-hidden","true");menuBtn.setAttribute("aria-expanded","false");drawerLastFocus&&drawerLastFocus.focus();}
+    on(menuBtn,"click",openDrawer);on(drawerClose,"click",closeDrawer);on(drawer,"click",e=>{if(e.target===drawer)closeDrawer();});
 
-    // Fake “failed to fetch” preview if API not wired yet (for parity with screenshot)
-    const demoFail = () => {
-      const bot = document.createElement('div');
-      bot.className = 'msg bot';
-      bot.innerHTML = '<span class="muted">Error: Failed to fetch</span>';
-      document.getElementById('chat-body').appendChild(bot);
-    };
+    /* ---------- Toast ---------- */
+    const toast=$("#toast");
+    function showToast(msg,ms=2400){toast.textContent=msg;toast.classList.add("toast--show");setTimeout(()=>toast.classList.remove("toast--show"),ms);}
+    showToast("Continuing as guest");
 
-    // Minimal i18n resources to seed page keys (more in chatbot.js if you wish)
-    const RES = {
-      en:{ ui:{home:"Home",dashboard:"Dashboard",tools:"Tools",documents:"Documents",notary:"Notary",language:"Language"},
-           promo:{text:"LexOmega Launch Offer: 30-day free trial. No credit card required."},
-           hero:{title:"Welcome to LexOmega",subtitle:"The Future of Legal Intelligence"},
-           dash:{title:"Live Dashboard Preview",copy:"Analytics, case tracking, document generation and real-time alerts.",login:"Login",create:"Create Account",logout:"Logout",statusPrefix:"Status:",statusGuest:"Signed in as Guest",unable:"Unable to load stats."},
-           doc:{title:"Embedded Legal Document Preview",sample:"Document Sample",placeholder:"Document preview placeholder",unable:"Unable to fetch documents."},
-           case:{title:"Case Search",hint:"Try: “Fourth Amendment traffic stop”"},
-           chat:{title:"Ask Lex",welcome:"Hi! Ask anything like “Go to Tools”, “Search: Miranda rights”, or “Draft an affidavit”.",send:"Send",voice:"I can voice search as well",limit:"LexOmega has reached today’s API capacity. Please retry later."}
+    /* ---------- i18n (flat dot-keys) ---------- */
+    const LANG_KEY="lexomega.lang"; const RTL=new Set(["ar","ur"]);
+    const I18N={
+      en:{
+        "promo.text":"LexOmega Launch Offer: 30-day free trial. No credit card required.",
+        "ui.home":"Home","ui.dashboard":"Dashboard","ui.tools":"Tools","ui.documents":"Documents","ui.notary":"Notary","ui.language":"Language",
+        "hero.title":"Welcome to LexOmega","hero.subtitle":"The Future of Legal Intelligence",
+        "dash.title":"Live Dashboard Preview","dash.copy":"Analytics, case tracking, document generation and real-time alerts.","dash.login":"Login","dash.create":"Create Account","dash.logout":"Logout","dash.statusPrefix":"Status:","dash.statusGuest":"Signed in as Guest","dash.unable":"Unable to load stats.",
+        "doc.title":"Embedded Legal Document Preview","doc.sample":"Document Sample","doc.placeholder":"Document preview placeholder","doc.unable":"Unable to fetch documents.",
+        "case.title":"Case Search","case.hint":"Try: “Fourth Amendment traffic stop”",
+        "chat.title":"Ask Lex","chat.welcome":"Ask anything like “Go to Tools”, “Search: Miranda rights”, or “Draft an affidavit”.","chat.voice":"I can voice search as well","chat.send":"Send","chat.limit":"LexOmega has reached today’s API capacity. Please retry later."
       },
-      es:{ ui:{home:"Inicio",dashboard:"Panel",tools:"Herramientas",documents:"Documentos",notary:"Notaría",language:"Idioma"},
-           promo:{text:"Oferta de lanzamiento: prueba gratis de 30 días. No se requiere tarjeta."},
-           hero:{title:"Bienvenido a LexOmega",subtitle:"El Futuro de la Inteligencia Legal"},
-           dash:{title:"Vista previa del panel en vivo",copy:"Analítica, seguimiento de casos, generación de documentos y alertas en tiempo real.",login:"Acceder",create:"Crear cuenta",logout:"Salir",statusPrefix:"Estado:",statusGuest:"Conectado como invitado",unable:"No se pueden cargar estadísticas."},
-           doc:{title:"Vista previa de documento legal incrustado",sample:"Documento de ejemplo",placeholder:"Marcador de vista previa de documento",unable:"No se pueden obtener documentos."},
-           case:{title:"Búsqueda de casos",hint:"Prueba: “Detención de tráfico Cuarta Enmienda”"},
-           chat:{title:"Preguntar a Lex",welcome:"¡Hola! Pregunta algo como “Ir a Herramientas”, “Buscar: derechos Miranda” o “Redactar una declaración jurada”.",send:"Enviar",voice:"También puedo buscar por voz",limit:"Se alcanzó la capacidad de la API. Inténtalo luego."}
+      es:{
+        "promo.text":"Oferta de lanzamiento: prueba gratis de 30 días. No se requiere tarjeta.",
+        "ui.home":"Inicio","ui.dashboard":"Panel","ui.tools":"Herramientas","ui.documents":"Documentos","ui.notary":"Notaría","ui.language":"Idioma",
+        "hero.title":"Bienvenido a LexOmega","hero.subtitle":"El Futuro de la Inteligencia Legal",
+        "dash.title":"Vista previa del panel en vivo","dash.copy":"Analítica, seguimiento de casos, generación de documentos y alertas en tiempo real.","dash.login":"Acceder","dash.create":"Crear cuenta","dash.logout":"Salir","dash.statusPrefix":"Estado:","dash.statusGuest":"Conectado como invitado","dash.unable":"No se pueden cargar estadísticas.",
+        "doc.title":"Vista previa de documento legal incrustado","doc.sample":"Documento de ejemplo","doc.placeholder":"Marcador de vista previa de documento","doc.unable":"No se pueden obtener documentos.",
+        "case.title":"Búsqueda de casos","case.hint":"Prueba: “Detención de tráfico Cuarta Enmienda”",
+        "chat.title":"Preguntar a Lex","chat.welcome":"¡Hola! Pregunta algo como “Ir a Herramientas”, “Buscar: derechos Miranda” o “Redactar una declaración jurada”.","chat.voice":"También puedo buscar por voz","chat.send":"Enviar","chat.limit":"Se alcanzó la capacidad de la API. Inténtalo luego."
       },
-      ar:{ ui:{home:"الرئيسية",dashboard:"لوحة التحكم",tools:"الأدوات",documents:"المستندات",notary:"التوثيق",language:"اللغة"},
-           promo:{text:"عرض الإطلاق: تجربة مجانية لمدة 30 يوماً. لا حاجة لبطاقة."},
-           hero:{title:"مرحباً بك في ليكس أوميغا",subtitle:"مستقبل الذكاء القانوني"},
-           dash:{title:"معاينة لوحة المعلومات الحية",copy:"تحليلات، تتبع القضايا، إنشاء المستندات، وتنبيهات فورية.",login:"تسجيل الدخول",create:"إنشاء حساب",logout:"تسجيل الخروج",statusPrefix:"الحالة:",statusGuest:"متصل كضيف",unable:"يتعذر تحميل الإحصاءات."},
-           doc:{title:"معاينة مستند قانوني مضمن",sample:"نموذج مستند",placeholder:"عنصر نائب لمعاينة المستند",unable:"تعذر جلب المستندات."},
-           case:{title:"بحث القضايا",hint:"جرّب: «توقيف مروري والتعديل الرابع»"},
-           chat:{title:"اسأل ليكس",welcome:"اسأل أي شيء مثل «اذهب إلى الأدوات»، «ابحث: حقوق ميراندا»، أو «صِغ إفادة»",send:"إرسال",voice:"يمكنني البحث صوتياً أيضاً",limit:"تم بلوغ سعة واجهة البرمجة لليوم. حاول لاحقاً."}
+      ar:{
+        "promo.text":"عرض الإطلاق: تجربة مجانية لمدة 30 يوماً. لا حاجة لبطاقة.",
+        "ui.home":"الرئيسية","ui.dashboard":"لوحة التحكم","ui.tools":"الأدوات","ui.documents":"المستندات","ui.notary":"التوثيق","ui.language":"اللغة",
+        "hero.title":"مرحباً بك في ليكس أوميغا","hero.subtitle":"مستقبل الذكاء القانوني",
+        "dash.title":"معاينة لوحة المعلومات الحية","dash.copy":"تحليلات، تتبع القضايا، إنشاء المستندات، وتنبيهات فورية.","dash.login":"تسجيل الدخول","dash.create":"إنشاء حساب","dash.logout":"تسجيل الخروج","dash.statusPrefix":"الحالة:","dash.statusGuest":"متصل كضيف","dash.unable":"يتعذر تحميل الإحصاءات.",
+        "doc.title":"معاينة مستند قانوني مُضمَّن","doc.sample":"نموذج مستند","doc.placeholder":"عنصر نائب لمعاينة المستند","doc.unable":"تعذر جلب المستندات.",
+        "case.title":"بحث القضايا","case.hint":"جرّب: «توقيف مروري والتعديل الرابع»",
+        "chat.title":"اسأل ليكس","chat.welcome":"اسأل أي شيء مثل «اذهب إلى الأدوات»، «ابحث: حقوق ميراندا»، أو «صِغ إفادة».","chat.voice":"يمكنني البحث صوتياً أيضاً","chat.send":"إرسال","chat.limit":"تم بلوغ سعة واجهة البرمجة لليوم. حاول لاحقاً."
       }
     };
-    const RTL = new Set(["ar","ur"]);
-    const LANG_KEY = "lexomega.lang";
-    i18next.init({ resources: RES, lng: localStorage.getItem(LANG_KEY)||"en", fallbackLng:"en", interpolation:{escapeValue:false}}, ()=>{
-      // simple binder
-      document.querySelectorAll("[data-i18n]").forEach(el=>{ el.innerHTML = i18next.t(el.getAttribute("data-i18n")); });
-      const lng = i18next.language; document.documentElement.setAttribute("lang", lng); document.documentElement.setAttribute("dir", RTL.has(lng)?"rtl":"ltr");
-      const sel = document.getElementById("lang-select"); if (sel) sel.value = lng;
+    function setLang(l){
+      const d=I18N[l]||I18N.en;
+      $$("[data-i18n]").forEach(el=>{ const k=el.dataset.i18n; el.innerHTML = d[k] ?? k; });
+      document.documentElement.lang=l;
+      document.documentElement.dir = RTL.has(l) ? "rtl" : "ltr";
+      localStorage.setItem(LANG_KEY,l);
+      const sel=$("#lang"); if(sel) sel.value=l;
+    }
+    setLang(localStorage.getItem(LANG_KEY)||"en");
+    on($("#lang"),"change",e=>setLang(e.target.value));
+
+    /* ---------- Status & doc previews (graceful fallback) ---------- */
+    (async()=>{
+      try{const r=await fetch("/api/status"); if(!r.ok) throw 0; const j=await r.json(); if(j?.user) $("#status").textContent=j.user; $("#statFail").style.display="none";}catch{}
+      try{const r=await fetch("/api/documents/sample"); if(!r.ok) throw 0; const html=await r.text(); $("#docBox").innerHTML=html; $("#docFail").style.display="none";}catch{}
+    })();
+
+    /* ---------- Case Search (placeholder demo) ---------- */
+    on($("#caseGo"),"click",()=>{
+      const m=document.createElement("div");
+      m.className="msg msg--bot";
+      m.innerHTML='<span class="muted">Error: Failed to fetch</span>';
+      $("#chatBody").appendChild(m);
+      showToast("Searching cases… (demo)");
     });
 
-    document.getElementById("lang-select")?.addEventListener("change", async (e)=>{
-      const lng = e.target.value; localStorage.setItem(LANG_KEY, lng); await i18next.changeLanguage(lng);
-      document.querySelectorAll("[data-i18n]").forEach(el=>{ el.innerHTML = i18next.t(el.getAttribute("data-i18n")); });
-      document.documentElement.setAttribute("dir", RTL.has(lng)?"rtl":"ltr"); document.documentElement.setAttribute("lang", lng);
-    });
+    /* ---------- Ask Lex (cache + throttle + 429) ---------- */
+    const chat=$("#chat"), chatOpen=$("#chatOpen"), chatClose=$("#chatClose"), chatBody=$("#chatBody"), ask=$("#ask"), send=$("#send"), limit=$("#limit");
+    function openChat(){chat.style.display="flex";ask.focus();chat.setAttribute("aria-hidden","false");}
+    function closeChat(){chat.style.display="none";chat.setAttribute("aria-hidden","true");chatOpen.focus();}
+    on(chatOpen,"click",openChat); on(chatClose,"click",closeChat);
 
-    // Case search demo (wire to your backend when ready)
-    document.getElementById("case-go").addEventListener("click", ()=> demoFail());
+    function bubble(html,me=false){const d=document.createElement("div"); d.className=`msg ${me?"msg--me":"msg--bot"}`; d.innerHTML=html; chatBody.appendChild(d); chatBody.scrollTop=chatBody.scrollHeight;}
 
+    const CACHE_KEY="lexomega.cache.v1"; let CACHE={order:[],map:{}}; try{const c=JSON.parse(localStorage.getItem(CACHE_KEY)||""); if(c?.order && c?.map) CACHE=c;}catch{}
+    const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+    function cacheGet(k){return CACHE.map[k];}
+    function cachePut(k,v){const MAX=100; if(CACHE.map[k]!==undefined){CACHE.order=CACHE.order.filter(x=>x!==k);} CACHE.map[k]=v; CACHE.order.unshift(k); while(CACHE.order.length>MAX){const old=CACHE.order.pop(); delete CACHE.map[old];} localStorage.setItem(CACHE_KEY,JSON.stringify(CACHE));}
+
+    let sending=false;
+    async function fetchWithRetry(url,opts,retries=2){
+      let a=0; while(true){
+        try{const res=await fetch(url,opts);
+          if(res.status===429){limit.textContent=I18N[document.documentElement.lang]["chat.limit"]; return {ok:false,code:429};}
+          if(!res.ok) throw new Error(String(res.status));
+          return {ok:true,json:await res.json()};
+        }catch(e){if(a>=retries) return {ok:false,code:e.message||"ERR"}; await sleep(300*Math.pow(2,a++));}
+      }
+    }
+
+    async function askLex(){
+      const q=(ask.value||"").trim(); if(!q||sending) return;
+      sending=true; send.disabled=true; limit.textContent=""; bubble(q,true); ask.value="";
+      const lng=document.documentElement.lang||"en"; const key=`${lng}|${q}`; const c=cacheGet(key);
+      if(c){bubble(c); sending=false; send.disabled=false; return;}
+      await sleep(600);
+      const res=await fetchWithRetry("/api/chat",{method:"POST",headers:{"Content-Type":"application/json","x-lex-locale":lng,"Accept-Language":lng},body:JSON.stringify({query:q,locale:lng})});
+      if(!res.ok){ if(res.code===429){sending=false; send.disabled=false; return;} bubble(`<span class="muted">(Error ${res.code}) Something went wrong. Please try again.</span>`); sending=false; send.disabled=false; return;}
+      const answer=res.json?.answer ?? res.json?.text ?? "—"; bubble(answer); cachePut(key,answer); sending=false; send.disabled=false;
+    }
+    on(send,"click",askLex); on(ask,"keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();askLex();}});
+
+    on(document,"keydown",e=>{if(e.key==="Escape"){ if($("#chat").style.display==="flex") closeChat(); if($("#drawer").classList.contains("drawer--open")) closeDrawer(); }});
   </script>
-
-  <!-- Centralized chat + locale logic -->
-  <script src="chatbot.js"></script>
 </body>
 </html>
